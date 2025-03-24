@@ -1,0 +1,313 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    height: 100vh;
+    background-color: #000;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*----------header----------*/
+header {
+    width: 100%;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #000;
+    position: fixed;
+    top: 0;
+    left: 5px;
+    z-index: 1000;
+}
+
+h1 img {
+    width: 35px;
+    height: auto;
+    vertical-align: middle;
+}
+
+.btn-MP {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 30px;
+}
+
+.btn-MP img {
+    width: 30px;
+    height: 30px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #222;
+    border-radius: 50px;
+    padding: 12px 24px;
+    width: 600px;
+    height: 50px;
+    color: white;
+}
+
+.search-bar i {
+    font-size: 22px;
+    color: #aaa;
+    margin: 0 10px;
+}
+
+.search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 18px;
+}
+
+.search-bar .divider {
+    width: 1px;
+    height: 20px;
+    background-color: gray;
+    margin: 0 12px;
+}
+
+.btn-TB {
+    position: absolute;
+    right: 90px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.btn-TB img {
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}
+
+.btn-ND {
+    position: absolute;
+    right: 30px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.btn-ND img {
+    width: 40px;
+    height: 40px;
+    border-radius: 30px;
+    vertical-align: middle;
+}
+
+/*----------container----------*/
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/*----------sidebar----------*/
+.sidebar {
+    position: fixed;
+    width: 60px;
+    height: 77vh;
+    background-color: #121212;
+    color: white;
+    padding: 20px;
+    left: 10px;
+    top: 80px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn-YL,
+.btn-NN {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.btn-YL img,
+.btn-NN img {
+    width: 30px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+/*----------song section----------*/
+.song_side {
+    position: absolute;
+    right: 10px;
+    top: 80px;
+    width: calc(100% - 90px);
+    height: 77vh;
+    border-radius: 8px;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+}
+
+.song_side::-webkit-scrollbar {
+    width: 6px;
+}
+
+.song_side::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.song_side h1,
+.song_side h2 {
+    font-size: 50px;
+    font-weight: bold;
+    color: white;
+}
+
+.song-list {
+    display: flex;
+    gap: 15px;
+    overflow-x: auto;
+    padding: 10px;
+}
+
+.song-item {
+    color: white;
+
+}
+
+.song-item img {
+    width: 250px;
+    height: 250px;
+}
+
+.song-item .title {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.song-item .artist {
+    font-size: 14px;
+    color: #ccc;
+}
+
+/*----------footer----------*/
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background-color: black;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Phân bố đều không gian */
+    padding: 10px 20px;
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: auto; /* Đẩy sát bên trái */
+}
+
+.playing-song img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.title-playing-song {
+    font-size: 14px;
+    color: white;
+}
+
+.song-title {
+    font-weight: bold;
+}
+
+.song-artist {
+    font-size: 12px;
+    color: gray;
+}
+
+.music-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-grow: 1; /* Chiếm không gian để căn giữa */
+    margin-left: -230px; /* Dịch sang trái 50px từ vị trí giữa */
+}
+
+.music-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.music-controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.music-controls img {
+    width: 15px;
+    height: 15px;
+}
+
+.progress-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 300px;
+    margin-top: 5px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 5px;
+    background: gray;
+    border-radius: 5px;
+}
+
+.current-progress {
+    width: 40%;
+    height: 100%;
+    background: white;
+    border-radius: 5px;
+}
+
+.current-time,
+.total-time {
+    color: white;
+    font-size: 12px;
+}
+
+.btn-DC {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: auto; /* Đẩy sát bên phải */
+}
+
+.btn-DC img {
+    width: 30px;
+    height: 30px;
+}
