@@ -1,7 +1,10 @@
 // app.js
+
 require('dotenv').config();
+const cors = require('cors');
 const express = require('express');
 const { getPool } = require('./config/database');
+
 
 // Import các hàm controller cho Users
 const {
@@ -10,7 +13,8 @@ const {
   getUserById,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  loginController
 } = require('./controllers/userController');
 
 // Import controller cho Tracks
@@ -68,6 +72,7 @@ const {
 } = require('./controllers/roleController');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Khởi động ứng dụng
@@ -144,4 +149,8 @@ app.put('/api/roles/:id', updateRole);
 app.delete('/api/roles/:id', deleteRole);
 
 // Gọi hàm khởi chạy
+app.post('/api/auth/login', loginController);
+
 startApp();
+
+// lsof -i :3001

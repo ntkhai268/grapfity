@@ -1,4 +1,5 @@
 // controllers/userController.js
+
 const { sql, getPool } = require('../config/database');
 
 // ✅ Hàm dùng để in ra bảng Users khi khởi chạy app
@@ -136,6 +137,27 @@ async function deleteUser(req, res) {
   }
 }
 
+const loginController = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+      const pool = await getPool();
+      const result = await pool.request()
+          .input('Username', sql.VarChar, username)
+          .input('Password', sql.VarChar, password)
+          .query('SELECT * FROM Users WHERE Username = @Username AND Password = @Password');
+
+      if (result.recordset.length === 0) {
+          return res.status(401).json({ error: 'Tài khoản hoặc mật khẩu không đúng' });
+      }
+
+      res.json({ message: 'Đăng nhập thành công', user: result.recordset[0] });
+  } catch (err) {
+      console.error('Lỗi login:', err);
+      res.status(500).json({ error: 'Lỗi server' });
+  }
+};
+
 module.exports = {
   getAllUsersRaw,  // dùng để in bảng ra console khi app khởi chạy
   getAllUsers,
@@ -143,4 +165,6 @@ module.exports = {
   createUser,
   updateUser,
   deleteUser,
+  loginController, 
 };
+
