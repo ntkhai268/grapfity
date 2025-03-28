@@ -19,7 +19,7 @@ body {
 
 /*----------header----------*/
 header {
-    width: 100%;
+    width: 120%;
     height: 80px;
     display: flex;
     align-items: center;
@@ -117,6 +117,7 @@ h1 img {
     height: 100vh;
     display: flex;
     flex-direction: column;
+
 }
 
 /*----------sidebar----------*/
@@ -161,6 +162,7 @@ h1 img {
     overflow: auto;
     scrollbar-width: thin;
     scrollbar-color: #888 transparent;
+    background-color: #000;
 }
 
 .song_side::-webkit-scrollbar {
