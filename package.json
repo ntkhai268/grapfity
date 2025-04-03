@@ -1,0 +1,27 @@
+{
+  "name": "grapfity",
+  "version": "1.0.0",
+  "description": "backend",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntkhai268/grapfity.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react"
+  ],
+  "author": "khaint",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ntkhai268/grapfity/issues"
+  },
+  "homepage": "https://github.com/ntkhai268/grapfity#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
