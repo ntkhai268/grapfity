@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './LoginForm.css';
+import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/LoginForm.css';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
