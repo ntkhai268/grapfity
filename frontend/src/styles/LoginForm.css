@@ -1,44 +1,43 @@
-*{
+
+.login-background {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(90deg, #e2e2e2, #54e3b1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+}
+
+ .login-background *{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
   text-decoration: none;
   list-style: none;
-}
-
-body{
+} .login-background body{
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(90deg, #e2e2e2, #54e3b1);
-}
-
-.container{
+} .login-background .container{
   position: relative;
   width: 850px;
   height: 550px;
   background: #fff;
-  margin: 20px;
+  margin: 0 auto;
   border-radius: 30px;
   box-shadow: 0 0 30px rgba(0, 0, 0, .2);
   overflow: hidden;
-}
-
-  .container h1{
+} .login-background .container h1{
       font-size: 36px;
       margin: -10px 0;
-  }
-
-  .container p{
+  } .login-background .container p{
       font-size: 14.5px;
       margin: 15px 0;
-  }
-
-form{ width: 100%; }
-
-.form-box{
+  } .login-background form{ width: 100%; } .login-background .form-box{
   position: absolute;
   right: 0;
   width: 50%;
@@ -51,19 +50,10 @@ form{ width: 100%; }
   padding: 40px;
   z-index: 1;
   transition: .6s ease-in-out 1.2s, visibility 0s 1s;
-}
-
-  .container.active .form-box{ right: 50%; }
-
-  .form-box.register{ visibility: hidden; }
-      .container.active .form-box.register{ visibility: visible; }
-
-.input-box{
+} .login-background .container.active .form-box{ right: 50%; } .login-background .form-box.register{ visibility: hidden; } .login-background .container.active .form-box.register{ visibility: visible; } .login-background .input-box{
   position: relative;
   margin: 30px 0;
-}
-
-  .input-box input{
+} .login-background .input-box input{
       width: 100%;
       padding: 13px 50px 13px 20px;
       background: #eee;
@@ -73,28 +63,19 @@ form{ width: 100%; }
       font-size: 16px;
       color: #333;
       font-weight: 500;
-  }
-
-      .input-box input::placeholder{
+  } .login-background .input-box input::placeholder{
           color: #888;
           font-weight: 400;
-      }
-  
-  .input-box i{
+      } .login-background .input-box i{
       position: absolute;
       right: 20px;
       top: 50%;
       transform: translateY(-50%);
       font-size: 20px;
-  }
-
-.forgot-link{ margin: -15px 0 15px; }
-  .forgot-link a{
+  } .login-background .forgot-link{ margin: -15px 0 15px; } .login-background .forgot-link a{
       font-size: 14.5px;
       color: #333;
-  }
-
-.btn{
+  } .login-background .btn{
   width: 100%;
   height: 48px;
   background: #088b3e;
@@ -105,14 +86,10 @@ form{ width: 100%; }
   font-size: 16px;
   color: #fff;
   font-weight: 600;
-}
-
-.social-icons{
+} .login-background .social-icons{
   display: flex;
   justify-content: center;
-}
-
-  .social-icons a{
+} .login-background .social-icons a{
       display: inline-flex;
       padding: 10px;
       border: 2px solid #ccc;
@@ -120,15 +97,11 @@ form{ width: 100%; }
       font-size: 24px;
       color: #333;
       margin: 0 8px;
-  }
-
-.toggle-box{
+  } .login-background .toggle-box{
   position: absolute;
   width: 100%;
   height: 100%;
-}
-
-  .toggle-box::before{
+} .login-background .toggle-box::before{
       content: '';
       position: absolute;
       left: -250%;
@@ -139,11 +112,7 @@ form{ width: 100%; }
       border-radius: 150px;
       z-index: 2;
       transition: 1.8s ease-in-out;
-  }
-
-      .container.active .toggle-box::before{ left: 50%; }
-
-.toggle-panel{
+  } .login-background .container.active .toggle-box::before{ left: 50%; } .login-background .toggle-panel{
   position: absolute;
   width: 50%;
   height: 100%;
@@ -155,29 +124,19 @@ form{ width: 100%; }
   align-items: center;
   z-index: 2;
   transition: .6s ease-in-out;
-}
-
-  .toggle-panel.toggle-left{ 
+} .login-background .toggle-panel.toggle-left{ 
       left: 0;
       transition-delay: 1.2s; 
-  }
-      .container.active .toggle-panel.toggle-left{
+  } .login-background .container.active .toggle-panel.toggle-left{
           left: -50%;
           transition-delay: .6s;
-      }
-
-  .toggle-panel.toggle-right{ 
+      } .login-background .toggle-panel.toggle-right{ 
       right: -50%;
       transition-delay: .6s;
-  }
-      .container.active .toggle-panel.toggle-right{
+  } .login-background .container.active .toggle-panel.toggle-right{
           right: 0;
           transition-delay: 1.2s;
-      }
-
-  .toggle-panel p{ margin-bottom: 20px; }
-
-  .toggle-panel .btn{
+      } .login-background .toggle-panel p{ margin-bottom: 20px; } .login-background .toggle-panel .btn{
       width: 160px;
       height: 46px;
       background: transparent;
@@ -186,52 +145,34 @@ form{ width: 100%; }
   }
 
 @media screen and (max-width: 650px){
-  .container{ height: calc(100vh - 40px); }
-
-  .form-box{
+  .container{ height: calc(100vh - 40px); } .login-background .form-box{
       bottom: 0;
       width: 100%;
       height: 70%;
-  }
-
-      .container.active .form-box{
+  } .login-background .container.active .form-box{
           right: 0;
           bottom: 30%;
-      }
-
-  .toggle-box::before{
+      } .login-background .toggle-box::before{
       left: 0;
       top: -270%;
       width: 100%;
       height: 300%;
       border-radius: 20vw;
-  }
-
-      .container.active .toggle-box::before{
+  } .login-background .container.active .toggle-box::before{
           left: 0;
           top: 70%;
-      }
-
-      .container.active .toggle-panel.toggle-left{
+      } .login-background .container.active .toggle-panel.toggle-left{
           left: 0;
           top: -30%;
-      }
-
-  .toggle-panel{ 
+      } .login-background .toggle-panel{ 
       width: 100%;
       height: 30%;
-  }
-      .toggle-panel.toggle-left{ top: 0; }
-      .toggle-panel.toggle-right{
+  } .login-background .toggle-panel.toggle-left{ top: 0; } .login-background .toggle-panel.toggle-right{
           right: 0;
           bottom: -30%;
-      }
-
-          .container.active .toggle-panel.toggle-right{ bottom: 0; }
+      } .login-background .container.active .toggle-panel.toggle-right{ bottom: 0; }
 }
 
 @media screen and (max-width: 400px){
-  .form-box { padding: 20px; }
-
-  .toggle-panel h1{font-size: 30px; }
+  .form-box { padding: 20px; } .login-background .toggle-panel h1{font-size: 30px; }
 }
