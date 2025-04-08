@@ -1,4 +1,5 @@
-import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/Footer.css'; // ✅ thêm dòng này
+
+import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/Footer.css';
 
 import sampleImage from '../assets/anhmau.png';
 import plusIcon from '../assets/plus.png';
@@ -13,7 +14,10 @@ const Footer = () => (
     <div className="footer-left">
       <div className="playing-song"><img src={sampleImage} alt="Song" /></div>
       <div className="title-playing-song">
-        <p className="song-title">Nỗi Đau Đính Kèm</p>
+        <div className="song-title-line">
+          <p className="song-title">Nỗi Đau Đính Kèm</p>
+          <button className="btn-DC"><img src={plusIcon} alt="Add" /></button>
+        </div>
         <p className="song-artist">Anh Tú Atus, RHYDER</p>
       </div>
     </div>
@@ -32,9 +36,6 @@ const Footer = () => (
         </div>
         <span className="total-time">4:39</span>
       </div>
-    </div>
-    <div className="footer-right">
-      <button className="btn-DC"><img src={plusIcon} alt="Add" /></button>
     </div>
   </footer>
 );

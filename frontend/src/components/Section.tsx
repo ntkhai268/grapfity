@@ -15,6 +15,15 @@ const Section = () => (
       ))}
     </div>
     <h2>con nửa</h2>
+    <div className="song-list">
+      {[1, 2, 3, 4].map((_, i) => (
+        <div key={i} className="song-item">
+          <img src={sampleImage} alt="Track" />
+          <p className="title">Song Title</p>
+          <p className="artist">Artist</p>
+        </div>
+      ))}
+    </div>
   </section>
 );
 
