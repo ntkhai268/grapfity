@@ -1,46 +1,24 @@
 const connection = require('../config/database') //import connection từ file database.js
-const { Request } = require('tedious') //import Request từ thư viện tedious để thực hiện truy vấn SQL
+const sql = require('mssql') //import thư viện sql để sử dụng các hàm của nó
 require('dotenv').config() //đọc file .env và lưu vào biến process.env 
-const Connection = require('tedious').Connection;  //import thư viện tedious để kết nối với SQL Server
-//test connection db
 
 const getHomepage = (req, res) => {
-    connection.connect();
-
-    connection.on("connect", function (err) {
-        if (err) {
-            console.log("Lỗi mẹ rồi");
-            console.log('Error: ', err)
-        } else {
-            console.log("Successful");
-            executeStatement();
-        }
-    });
-
-    const executeStatement = () => {
-        const request = new Request("SELECT * FROM Users", (err) => {
-            if (err) {
-                console.log(err);
-            }
-        });
-        let result = "";
-        request.on('row', (columns) => {
-            columns.forEach((column) => {
-                if (column.value === null) {
-                    console.log('NULL');
-                } else {
-                    result += column.value + " ";
-                }
-            });
-            console.log(result);
-            res.send(result + ' rows returned');
-        });
-        connection.execSql(request);
-    };
+    res.render('homepage.ejs') //render file homepage.ejs
 }
 
 const getABC = (req, res) => {
-    res.render('sample.ejs')
+    connection
+        .then((pool) => {
+            return pool.request().query('SELECT * FROM Users')
+        })
+        .then(result => {
+            const users = result.recordset;
+            console.log(users);
+            res.render('sample.ejs', {users});
+        })
+        .catch((err) => {
+            console.error('Database connection failed:', err)
+        })
 }
 
 module.exports = {

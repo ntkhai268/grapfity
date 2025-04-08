@@ -1,14 +1,40 @@
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/style.css">
-    <title>Document</title>
+    <title>Danh sách người dùng</title>
 </head>
+
 <body>
-    hello world with ejs
-    <div>
-        <img class="hinh-anh" src="/images/cuteshit.jpg">
-    </div>
+    <h1>📋 Danh sách Users</h1>
+
+    <% if (users.length===0) { %>
+        <p>Không có người dùng nào.</p>
+        <% } else { %>
+            <table border="1" cellpadding="8" cellspacing="0">
+                <thead>
+                    <tr>
+                        <% for (let key in users[0]) { %>
+                            <th>
+                                <%= key %>
+                            </th>
+                            <% } %>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% users.forEach(user=> { %>
+                        <tr>
+                            <% for (let key in user) { %>
+                                <td>
+                                    <%= user[key] %>
+                                </td>
+                                <% } %>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+            <% } %>
 </body>
+
 </html>

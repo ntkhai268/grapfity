@@ -1,23 +1,24 @@
 require('dotenv').config() //đọc file .env và lưu vào biến process.env 
-const Connection = require('tedious').Connection;  //import thư viện tedious để kết nối với SQL Server
+const sql = require('mssql')
 //test connection db
-const config = {
+
+const sqlConfig = {
+    user: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
     server: process.env.DB_SERVER,
-    authentication: {
-        type: 'default',
-        options: {
-            userName: process.env.DB_USERNAME,
-            password: process.env.DB_PASSWORD
-        }
+    port: parseInt(process.env.DB_PORT || '1433'),
+    pool: {
+        max: 10,
+        min: 0,
+        idleTimeoutMillis: 30000
     },
     options: {
-        encrypt: process.env.DB_ENCRYPT === 'false',
-        trustServerCertificate: true,
-        database: process.env.DB_NAME,
-        port: parseInt(process.env.DB_PORT || '1433')
+        encrypt: false,
+        trustServerCertificate: true // change to true for local dev / self-signed certs
     }
-};
+}
 
-const connection = new Connection(config); //tạo kết nối với SQL Server
+const connection = sql.connect(sqlConfig)
 
 module.exports = connection;
