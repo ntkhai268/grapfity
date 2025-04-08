@@ -5,6 +5,7 @@ const cors = require('cors');
 const express = require('express');
 const { getPool } = require('./config/database');
 
+const { handleGoogleLogin } = require('./controllers/authController');
 
 // Import các hàm controller cho Users
 const {
@@ -150,6 +151,7 @@ app.delete('/api/roles/:id', deleteRole);
 
 // Gọi hàm khởi chạy
 app.post('/api/auth/login', loginController);
+app.post('/api/auth/google', handleGoogleLogin);
 
 startApp();
 

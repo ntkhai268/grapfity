@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/LoginForm.css';
+import { GoogleLogin } from '@react-oauth/google';
 
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
 
   useEffect(() => {
     const container = document.querySelector('.container');
@@ -41,6 +41,27 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+    try {
+      const res = await fetch('http://localhost:3001/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert('Đăng nhập Google thành công!');
+        window.location.href = 'http://localhost:5173/mainpage';
+      } else {
+        alert(data.error || 'Đăng nhập Google thất bại!');
+      }
+    } catch (err) {
+      console.error('Lỗi khi gửi credential:', err);
+      alert('Không thể kết nối máy chủ khi đăng nhập bằng Google.');
+    }
+  };
+
   return (
     <div className="container">
       <div className="form-box login">
@@ -58,10 +79,10 @@ const LoginForm: React.FC = () => {
           <button type="submit" className="btn">Login</button>
           <p>or login with social platforms</p>
           <div className="social-icons">
-            <a href="#"><i className='bx bxl-google'></i></a>
-            <a href="#"><i className='bx bxl-facebook'></i></a>
-            <a href="#"><i className='bx bxl-github'></i></a>
-            <a href="#"><i className='bx bxl-linkedin'></i></a>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={() => alert('Đăng nhập Google thất bại!')}
+            />
           </div>
         </form>
       </div>
@@ -84,10 +105,10 @@ const LoginForm: React.FC = () => {
           <button type="submit" className="btn">Register</button>
           <p>or register with social platforms</p>
           <div className="social-icons">
-            <a href="#"><i className='bx bxl-google'></i></a>
-            <a href="#"><i className='bx bxl-facebook'></i></a>
-            <a href="#"><i className='bx bxl-github'></i></a>
-            <a href="#"><i className='bx bxl-linkedin'></i></a>
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={() => alert('Đăng ký Google thất bại!')}
+            />
           </div>
         </form>
       </div>

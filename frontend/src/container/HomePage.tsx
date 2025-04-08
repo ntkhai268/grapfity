@@ -1,5 +1,5 @@
 const Homepage = () => {
-    return <div style={{ color: 'white' }}>Trang chủ Graptify</div>;
+    return <div style={{ color: 'white' }}></div>;
   };
   
   export default Homepage;
