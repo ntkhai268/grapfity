@@ -1,3 +1,6 @@
+body{
+  margin: 0;
+}
 .main-background {
   background-color: black;
   min-height: 100vh;
