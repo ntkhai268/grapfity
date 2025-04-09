@@ -1,124 +1,134 @@
-
 .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 80px;
-    background-color: black;
-    display: flex;
+    display: grid;
+    grid-template-columns: 300px 1fr 300px;  /* ✅ 3 cột cố định trái, giữa, phải */
     align-items: center;
-    justify-content: space-between;
     padding: 10px 20px;
-    z-index: 9999; /* Ä‘áº£m báº£o khĂ´ng bá»‹ che */
-}
-
-.footer-left {
+    background: black;
+    color: white;
+    width: 100vw;
+    box-sizing: border-box;
+  }
+  
+  .left-info {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-right: auto;
-}
-
-.playing-song img {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  
+  .footer-img {
     width: 50px;
     height: 50px;
-    border-radius: 5px;
-    margin: 20px 0px 10px 0px;
-}
-
-.title-playing-song {
-    font-size: 14px;
-    color: white;
-    display: flex;
-    flex-direction: column;
-}
-
-.song-title-line {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.song-title {
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  
+  .footer-title {
     font-weight: bold;
     margin: 0;
-    line-height: 1.2;
-}
-
-.song-artist {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+  
+  .footer-artist {
     font-size: 12px;
-    color: gray;
-    margin: -10px 0 0 0;
-}
-
-.btn-DC {
+    color: #ccc;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 180px;
+  }
+  
+  .icon-small {
+    width: 16px;
+    height: 16px;
+    margin-left: 10px;
+    flex-shrink: 0;
+  }
+  
+  .icon-button {
     background: none;
     border: none;
+    padding: 0;
+    margin-left: 8px;
     cursor: pointer;
-    z-index: 10;
-    pointer-events: auto;
-}
-
-.song-title-line .btn-DC {
-    margin-left: 0;
-    transform: none;
-    padding-top: 2px;
-}
-
-.btn-DC img {
-    width: 30px;
-    height: 30px;
-}
-
-.music-player {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .center-controls {
     display: flex;
     flex-direction: column;
     align-items: center;
-    flex-grow: 1;
-    margin-left: -230px;
-}
-
-.music-controls {
+    gap: 8px;
+    width: 100%;  /* ✅ giúp seek-bar kéo dài */
+  }
+  
+  .control-icons {
     display: flex;
     align-items: center;
-    gap: 15px;
-}
-
-.music-controls button {
-    background: none;
-    border: none;
+    gap: 20px;
+  }
+  
+  .control-icons img {
+    width: 20px;
+    height: 20px;
     cursor: pointer;
-}
-
-.music-controls img {
-    width: 15px;
-    height: 15px;
-}
-
-.progress-container {
+    opacity: 0.85;
+  }
+  
+  .play-button {
+    background: black;
+    border: 2px solid white;
+    border-radius: 50%;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  
+  .play-button img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+  
+  .seek-row {
     display: flex;
     align-items: center;
     gap: 10px;
-    width: 300px;
-    margin-top: 5px;
-}
-
-.progress-bar {
-    width: 100%;
-    height: 5px;
-    background: gray;
-    border-radius: 5px;
-}
-
-.current-progress {
-    width: 40%;
-    height: 100%;
-    background: white;
-    border-radius: 5px;
-}
-
-.current-time, .total-time {
-    color: white;
+    width: 50%;            /* ✅ chiếm hết phần giữa */
+    padding: 0 30px;
+    box-sizing: border-box;
+  }
+  
+  .seek-bar {
+    flex: 1;
+    height: 4px;
+    accent-color: white;
+    background: #444;
+    border-radius: 10px;
+  }
+  
+  .time {
     font-size: 12px;
-}
+    color: #ccc;
+    min-width: 30px;
+    text-align: center;
+  }
+  
+  .right-info {
+    width: 100%; /* không cần fix cứng nếu dùng grid column cố định */
+    height: 1px;
+  }
+  

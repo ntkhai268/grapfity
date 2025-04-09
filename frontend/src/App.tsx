@@ -1,38 +1,38 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+// src/App.tsx
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login from '/Users/dangkhoii/Documents/Graptify/frontend/src/container/Login.tsx';
-import Homepage from '/Users/dangkhoii/Documents/Graptify/frontend/src/container/HomePage.tsx';
+import Login from "./container/Login";
+import Homepage from "./container/HomePage";
 
-import LoginLayout from '/Users/dangkhoii/Documents/Graptify/frontend/src/layouts/LoginLayouts.tsx';
-import MainLayout from '/Users/dangkhoii/Documents/Graptify/frontend/src/layouts/MainLayouts.tsx';
+import LoginLayout from "./layouts/LoginLayouts";
+import MainLayout from "./layouts/MainLayouts";
+
+import { PlayerProvider } from "./context/PlayerContext";
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      {/* Login page with LoginLayout */}
-      <Route
-        path="/"
-        element={
-          <LoginLayout>
-            <Login />
-          </LoginLayout>
-        }
-      />
-
-      {/* Homepage with MainLayout */}
-      <Route
-        path="/mainpage"
-        element={
-          <MainLayout>
-            <Homepage />
-          </MainLayout>
-        }
-      />
-
-      {/* Redirect unknown routes */}
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <PlayerProvider>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <LoginLayout>
+              <Login />
+            </LoginLayout>
+          }
+        />
+        <Route
+          path="/mainpage"
+          element={
+            <MainLayout>
+              <Homepage />
+            </MainLayout>
+          }
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </PlayerProvider>
   );
 };
 
