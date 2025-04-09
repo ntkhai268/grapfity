@@ -57,25 +57,34 @@ const Playlist = () => {
               <div className="waveform">
                 <div className="audio-playlist"></div>
               </div>
+              
               <div className="track-list">
-                {playlist.tracks.map((track, i) => (
-                  <div className="track-item" data-src={track.src} key={i}>
-                    <div className="track-number">{i + 1}</div>
-                    <div className="track-content">
-                      <div className="track-text">
-                        <span>{track.title}</span>
-                      </div>
-                      <div className="track-plays">
-                        <i className="fas fa-play"></i>
-                        <span>{track.plays}</span>
-                      </div>
+              {playlist.tracks.map((track, i) => (
+                <div
+                  className="track-item"
+                  data-src={track.src}
+                  data-title={track.title}
+                  data-artist={playlist.artist}
+                  data-cover="assets/anhmau.png" // hoặc dùng track.cover nếu bạn có thông tin ảnh riêng cho từng bài
+                  key={i}
+                >
+                  <div className="track-number">{i + 1}</div>
+                  <div className="track-content">
+                    <div className="track-text">
+                      <span>{track.title}</span>
+                    </div>
+                    <div className="track-plays">
+                      <i className="fas fa-play"></i>
+                      <span>{track.plays}</span>
                     </div>
                   </div>
-                ))}
-                <div className="view-more">
-                  <span>View 22 tracks</span>
                 </div>
+              ))}
+              <div className="view-more">
+                <span>View 22 tracks</span>
               </div>
+            </div>
+
             </div>
           </div>
           <div className="action-buttons">

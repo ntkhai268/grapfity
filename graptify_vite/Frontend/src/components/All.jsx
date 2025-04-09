@@ -1,5 +1,5 @@
-import React from "react";
-
+import React,{useEffect} from "react";
+import { initWaveSurfer } from "../js/waveform";
 const songs = [
   {
     src: "assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3",
@@ -19,10 +19,24 @@ const songs = [
 ];
 
 const SongList = () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      initWaveSurfer(); // Khởi tạo WaveSurfer chỉ khi tab này được render
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
   return (
     <div className="content all active">
       {songs.map((song, index) => (
-        <div key={index} className="song" data-src={song.src}>
+        <div 
+          key={index}
+          className="song"
+          data-src={song.src}
+          data-title={song.title}
+          data-artist={song.artist}
+          data-cover="assets/anhmau.png"
+        >
           <div className="song_left">
             <img src="assets/anhmau.png" alt="Album Cover" className="album_cover" />
             <button className="play_button">

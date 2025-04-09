@@ -1,37 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
+import  useSongManager  from "../../js/Manager_song_play_pause";
 
 const Controls = () => {
-  const [songUrl, setSongUrl] = useState(localStorage.getItem("currentSong") || "");
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const newSong = localStorage.getItem("currentSong") || "";
-      setSongUrl(newSong);
-      if (audioRef.current && newSong) {
-        audioRef.current.load();
-        
-        setIsPlaying(false);
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
-
-  const togglePlay = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  const { audioRef, songUrl, isPlaying, togglePlay } = useSongManager();
 
   return (
     <div className="controls">

@@ -1,4 +1,5 @@
 import WaveSurfer from "wavesurfer.js";
+import GlobalAudioManager from "./GlobalAudioManager";
 
 export function initializeWaveSurfer() {
     console.log("WaveSurfer initialized!");
@@ -9,6 +10,22 @@ export function initializeWaveSurfer() {
     let currentTrackElement = null;
     let isTrackFinished = false;
 
+    function setPlaylist(tracks, startIndex = 0) {
+        GlobalAudioManager.setPlaylist({
+            list: tracks,
+            startIndex,
+            play: (index) => playSongAt(index),
+        });
+    }
+
+    function playSongAt(index) {
+        const playlist = GlobalAudioManager.getPlaylistContainer();
+        if (!playlist) return;
+        const tracks = Array.from(playlist.querySelectorAll(".track-item[data-src]"));
+        const track = tracks[index];
+        if (track) track.click();
+    }
+
     playlists.forEach((playlist, index) => {
         const waveContainer = playlist.querySelector(".audio-playlist");
         if (!waveContainer) {
@@ -16,7 +33,6 @@ export function initializeWaveSurfer() {
             return;
         }
 
-        // 🔥 Kiểm tra nếu WaveSurfer đã tồn tại
         if (waveContainer.dataset.wavesurferInit === "true") {
             console.warn(`WaveSurfer đã tồn tại trong playlist ${index + 1}, bỏ qua.`);
             return;
@@ -40,10 +56,15 @@ export function initializeWaveSurfer() {
 
             const parentPlaylist = trackElement.closest(".player-container");
             const ws = waveSurfers.get(parentPlaylist);
-
             if (!ws) return;
 
-            // Dừng track cũ nếu đổi playlist
+            const song = {
+                title: trackElement.getAttribute("data-title") || "Không rõ",
+                artist: trackElement.getAttribute("data-artist") || "Không rõ",
+                cover: trackElement.getAttribute("data-cover") || "assets/anhmau.png",
+                src: trackUrl,
+            };
+
             if (currentPlaying && currentPlaying !== parentPlaylist) {
                 const oldWs = waveSurfers.get(currentPlaying);
                 if (oldWs) {
@@ -56,15 +77,34 @@ export function initializeWaveSurfer() {
 
             currentPlaying = parentPlaylist;
 
-            // Nếu bấm lại track đang phát, toggle play/pause
             if (currentTrackElement === trackElement) {
-                ws.isPlaying() ? ws.pause() : ws.play();
+                if (ws.isPlaying()) {
+                    ws.pause();
+                    GlobalAudioManager.setIsPlaying(false);
+                } else {
+                    GlobalAudioManager.setActive(
+                        "playlist",
+                        () => ws.stop(),
+                        { play: () => ws.play(), pause: () => ws.pause(), stop: () => ws.stop() },
+                        song
+                    );
+                    ws.play();
+                }
             } else {
                 ws.stop();
                 ws.load(trackUrl);
 
+                ws.un("ready");
                 ws.on("ready", () => {
-                    if (autoPlay) ws.play();
+                    if (autoPlay) {
+                        GlobalAudioManager.setActive(
+                            "playlist",
+                            () => ws.stop(),
+                            { play: () => ws.play(), pause: () => ws.pause(), stop: () => ws.stop() },
+                            song
+                        );
+                        setTimeout(() => ws.play(), 0);
+                    }
                 });
 
                 parentPlaylist.querySelectorAll(".track-item").forEach((item) =>
@@ -72,10 +112,14 @@ export function initializeWaveSurfer() {
                 );
                 trackElement.classList.add("active");
                 currentTrackElement = trackElement;
+
+                // Cập nhật index hiện tại cho GlobalAudioManager
+                const tracks = Array.from(parentPlaylist.querySelectorAll(".track-item[data-src]"));
+                const currentIndex = tracks.indexOf(trackElement);
+                setPlaylist(tracks, currentIndex);
             }
 
-            // Đăng ký sự kiện hoàn thành track
-            ws.un("finish"); // Xóa sự kiện cũ
+            ws.un("finish");
             ws.on("finish", () => {
                 if (!isTrackFinished) {
                     isTrackFinished = true;
@@ -88,7 +132,6 @@ export function initializeWaveSurfer() {
         function playNextTrackOrPlaylist() {
             if (!currentTrackElement) return;
             const nextTrack = currentTrackElement.nextElementSibling;
-
             if (nextTrack && nextTrack.classList.contains("track-item")) {
                 loadTrack(nextTrack, true);
             } else {
@@ -111,18 +154,30 @@ export function initializeWaveSurfer() {
             }
         }
 
-        // Gán sự kiện click cho từng track
+        // Click từng bài
         playlist.querySelectorAll(".track-item[data-src]").forEach((track) => {
             track.addEventListener("click", function () {
                 loadTrack(this);
             });
         });
 
-        // Tự động load bài đầu tiên nhưng không phát
+        // Click nút “Play Playlist”
+        const playBtn = playlist.querySelector(".play-playlist");
+        if (playBtn) {
+            playBtn.addEventListener("click", () => {
+                const tracks = Array.from(playlist.querySelectorAll(".track-item[data-src]"));
+                if (tracks.length) {
+                    setPlaylist(tracks, 0);
+                    playSongAt(0);
+                }
+            });
+        }
+
+        // Load track đầu tiên không tự play
         const firstTrack = playlist.querySelector(".track-item[data-src]");
         if (firstTrack) {
             loadTrack(firstTrack, false);
-            firstTrack.classList.remove("active"); 
+            firstTrack.classList.remove("active");
         }
     });
 }

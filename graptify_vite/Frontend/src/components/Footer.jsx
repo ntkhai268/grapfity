@@ -1,10 +1,11 @@
 import React from "react";
+import useFooterAudioPlayer from "../js/FooterAudioPlayer";
 
 const FooterLeft = ({ song }) => {
   return (
     <div className="footer-left">
       <div className="playing-song">
-        <img src={song.cover} alt={song.title} />
+        <img src={song.cover || "assets/anhmau.png"} alt={song.title} />
       </div>
       <div className="title-playing-song">
         <p className="song-title">{song.title}</p>
@@ -14,19 +15,19 @@ const FooterLeft = ({ song }) => {
   );
 };
 
-const MusicControls = ({ isPlaying, togglePlay }) => {
+const MusicControls = ({ isPlaying, togglePlay, nextSong, prevSong }) => {
   return (
     <div className="music-controls">
       <button className="shuffle">
         <img src="assets/shuffle.png" alt="Shuffle" />
       </button>
-      <button className="prev">
+      <button className="prev" onClick={prevSong}>
         <img src="assets/prev.png" alt="Previous" />
       </button>
       <button className="play-pause" onClick={togglePlay}>
         <img src={isPlaying ? "assets/stop.png" : "assets/play.png"} alt="Play/Pause" />
       </button>
-      <button className="next">
+      <button className="next" onClick={nextSong}>
         <img src="assets/next.png" alt="Next" />
       </button>
       <button className="repeat">
@@ -59,25 +60,52 @@ const FooterRight = () => {
 };
 
 const Footer = () => {
-  const song = {
-    title: "Nỗi Đau Đính Kèm",
-    artist: "Anh Tú Atus, RHYDER",
-    cover: "assets/anhmau.png",
-  };
+  const {
+    song,
+    isPlaying,
+    togglePlay,
+    nextSong,
+    prevSong
+  } = useFooterAudioPlayer();
 
-  const [isPlaying, setIsPlaying] = React.useState(false);
-
-  const togglePlay = () => {
-    setIsPlaying(!isPlaying);
-  };
+  if (!song) {
+    return (
+      <footer className="footer">
+        <div className="footer-left">
+          <div className="playing-song">
+            <img src="assets/anhmau.png" alt="default" />
+          </div>
+          <div className="title-playing-song">
+            <p className="song-title">Chưa chọn bài hát</p>
+            <p className="song-artist">—</p>
+          </div>
+        </div>
+        <FooterRight />
+        <div className="music-player">
+          <MusicControls
+            isPlaying={false}
+            togglePlay={() => {}}
+            nextSong={() => {}}
+            prevSong={() => {}}
+          />
+          <ProgressBar currentTime="0:00" totalTime="0:00" />
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className="footer">
       <FooterLeft song={song} />
       <FooterRight />
       <div className="music-player">
-        <MusicControls isPlaying={isPlaying} togglePlay={togglePlay} />
-        <ProgressBar currentTime="2:14" totalTime="4:39" />
+        <MusicControls
+          isPlaying={isPlaying}
+          togglePlay={togglePlay}
+          nextSong={nextSong}
+          prevSong={prevSong}
+        />
+        <ProgressBar currentTime="0:00" totalTime="4:39" />
       </div>
     </footer>
   );

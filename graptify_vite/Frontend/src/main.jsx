@@ -8,6 +8,9 @@ import "./js/waveform";
 import "./js/playlist.js";
 
 import "./js/trans_tab";
+import "./js/Manager_song_play_pause.js";
+import "./js/GlobalAudioManager.js"; 
+import "./js/FooterAudioPlayer.js";
 
 
 
