@@ -6,6 +6,43 @@
     <title>Danh sách người dùng</title>
 </head>
 
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        font-family: Arial, sans-serif;
+    }
+
+    th,
+    td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    tr:hover {
+        background-color: #e6f7ff;
+        /* 💡 Màu nền khi hover */
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    button {
+        margin-right: 6px;
+        padding: 5px 10px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #007BFF;
+        color: white;
+        transition: 0.2s;
+    }
+</style>
+
 <body>
     <h1>📋 Danh sách Users</h1>
 
@@ -20,6 +57,7 @@
                                 <%= key %>
                             </th>
                             <% } %>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,6 +68,12 @@
                                     <%= user[key] %>
                                 </td>
                                 <% } %>
+                                <td>
+                                    <a href="/update/<%= user.UserID %>">
+                                    <button>Edit</button> 
+                                    <a href="/update/<%= user.UserID %>"></a>
+                                    <button>Delete</button>
+                                </td>
                         </tr>
                         <% }) %>
                 </tbody>
