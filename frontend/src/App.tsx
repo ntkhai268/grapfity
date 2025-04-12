@@ -2,46 +2,41 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
-import Login from "./container/Login";
 import Homepage from "./container/HomePage";
+import Profile from "./container/ProfilePage";
 
-import LoginLayout from "./layouts/LoginLayouts";
 import HomeLayout from "./layouts/HomeLayouts";
+import ProfileLayout from "./layouts/ProfileLayouts";
 
 import { PlayerProvider } from "./context/PlayerContext";
 
 const App: React.FC = () => {
-  // return (
-  //   <PlayerProvider>
-  //     <Routes>
-  //       <Route
-  //         path="/"
-  //         element={
-  //           <LoginLayout>
-  //             <Login />
-  //           </LoginLayout>
-  //         }
-  //       />
-  //       <Route
-  //         path="/mainpage"
-  //         element={
-  //           <MainLayout>
-  //             <Homepage />
-  //           </MainLayout>
-  //         }
-  //       />
-  //       <Route path="*" element={<Navigate to="/" replace />} />
-  //     </Routes>
-  //   </PlayerProvider>
-  // );
   return (
     <PlayerProvider>
-      <HomeLayout>
-        <Homepage />
-      </HomeLayout>
+      <Routes>
+        {/* ✅ Tự chuyển hướng từ / sang /mainpage */}
+        <Route path="/" element={<Navigate to="/mainpage" replace />} />
+
+        <Route
+          path="/mainpage"
+          element={
+            <HomeLayout>
+              <Homepage />
+            </HomeLayout>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProfileLayout>
+              <Profile />
+            </ProfileLayout>
+          }
+        />
+      </Routes>
     </PlayerProvider>
   );
-  
 };
 
 export default App;

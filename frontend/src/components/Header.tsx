@@ -1,5 +1,7 @@
+// src/components/Header.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/Header.css';
+import { useNavigate } from "react-router-dom";
+import '../styles/Header.css';
 
 import spotifyLogo from '../assets/spotify.png';
 import homeIcon from '../assets/home.png';
@@ -11,10 +13,10 @@ import { faSearch, faTrash } from '@fortawesome/free-solid-svg-icons';
 const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   const toggleUserMenu = () => setShowMenu((prev) => !prev);
 
-  // 🧠 Khi click ngoài menu, tự động đóng
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -32,7 +34,10 @@ const Header: React.FC = () => {
   return (
     <header>
       <h1><img src={spotifyLogo} alt="Spotify" /></h1>
-      <button className="btn-MP"><img src={homeIcon} alt="Trang chủ" /></button>
+
+      <button className="btn-MP" onClick={() => navigate("/mainpage")}>
+        <img src={homeIcon} alt="Trang chủ" />
+      </button>
 
       <div className="search-bar">
         <FontAwesomeIcon icon={faSearch} />
@@ -43,7 +48,6 @@ const Header: React.FC = () => {
 
       <button className="btn-TB"><img src={bellIcon} alt="Thông báo" /></button>
 
-      {/* Dropdown người dùng */}
       <div className="user-dropdown" ref={dropdownRef}>
         <button className="btn-ND" onClick={toggleUserMenu}>
           <img src={userIcon} alt="Người dùng" />
@@ -51,7 +55,9 @@ const Header: React.FC = () => {
 
         {showMenu && (
           <div className="dropdown-menu">
-            <div className="menu-item">Profile</div>
+            <div className="menu-item" onClick={() => navigate("/profile")}>
+              Profile
+            </div>
             <div className="menu-item">Logout</div>
           </div>
         )}

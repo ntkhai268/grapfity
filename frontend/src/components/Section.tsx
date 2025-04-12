@@ -34,6 +34,12 @@ const Section = () => {
           </button>
         ))}
       </div>
+      <h1>Recommended for today</h1>
+      <h1>Recommended for today</h1>
+      <h1>Recommended for today</h1>
+      <h1>Recommended for today</h1>
+      <h1>Recommended for today</h1>
+      <h1>Recommended for today</h1>
     </section>
   );
 };

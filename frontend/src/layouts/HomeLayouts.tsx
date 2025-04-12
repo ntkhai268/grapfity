@@ -3,13 +3,13 @@ import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 import Section from '../components/Section';
-import '../styles/MainLayout.css';
+import '../styles/HomeLayout.css';
 
-interface MainLayoutProps {
+interface HomeLayoutProps {
   children: React.ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const HomeLayout: React.FC<HomeLayoutProps> = ({ children }) => {
   return (
     <div className="main-background"> 
       <div className="main-layout">
@@ -27,4 +27,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   );
 };
 
-export default MainLayout;
+export default HomeLayout;
