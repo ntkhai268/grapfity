@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/LoginForm.css';
+import '../styles/LoginForm.css';
 import { GoogleLogin } from '@react-oauth/google';
 
 const LoginForm: React.FC = () => {

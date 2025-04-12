@@ -1,8 +1,8 @@
 // src/components/Section.tsx
 import { usePlayer } from "../context/PlayerContext";
-import bacphan from "/Users/dangkhoii/Documents/Graptify/frontend/src/assets/BacPhanRapVersion-TuiHat-6184759.mp3";
-import banhmikhong from "/Users/dangkhoii/Documents/Graptify/frontend/src/assets/Bánh Mì Không.mp3";
-import codangdeyeuthuong from "/Users/dangkhoii/Documents/Graptify/frontend/src/assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
+import bacphan from "../assets/BacPhanRapVersion-TuiHat-6184759.mp3";
+import banhmikhong from "../assets/Bánh Mì Không.mp3";
+import codangdeyeuthuong from "../assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
 import img1 from "../assets/bacphan.jpg";
 import img2 from "../assets/banhmikhong.jpg";
 import img3 from "../assets/anhmau.png";

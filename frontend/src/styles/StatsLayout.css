@@ -1,0 +1,60 @@
+.stats-layout {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    min-height: 100vh;
+  }
+  
+  .stats-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .stats-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .stats-logo {
+    font-size: 22px;
+  }
+  
+  .stats-title {
+    font-weight: bold;
+    font-size: 20px;
+  }
+  
+  .stats-nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .stats-nav-links a {
+    text-decoration: none;
+    color: black;
+    font-weight: 500;
+  }
+  
+  .stats-nav-links a:hover {
+    color: #387e5f;
+    text-decoration: underline;
+  }
+  
+  .stats-account {
+    font-size: 14px;
+    color: #333;
+  }
+  .stats-icon {
+    width: 48px;      /* 👈 nhỏ hơn nữa nếu cần: 40px hoặc 32px */
+    height: 48px;
+    margin-bottom: 16px;
+    object-fit: contain; /* giữ nguyên tỉ lệ ảnh */
+  }
+  

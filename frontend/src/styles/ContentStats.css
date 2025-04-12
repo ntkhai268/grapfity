@@ -1,0 +1,83 @@
+.content-stats {
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: sans-serif;
+  }
+  
+  .stats-header {
+    background-color: #e2e8f0;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 60px;
+  }
+  
+  .stats-header h1 {
+    margin-bottom: 10px;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .stats-header p {
+    color: #4a5568;
+    margin-bottom: 20px;
+  }
+  
+  .stats-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .stats-buttons button {
+    background-color: #2f855a;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    width: 200px;
+    align-self: center;
+  }
+  
+  .stats-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+  }
+  
+  .info-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 400px;
+  }
+  
+  .info-block img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+  }
+  
+  .info-block h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .info-block p {
+    margin-top: 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+  }
+  

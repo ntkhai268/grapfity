@@ -24,7 +24,7 @@ body{
 .sidebar {
   flex-shrink: 0;
 }
-
+        
 .song_side {
   flex: 1;
   overflow-y: auto;

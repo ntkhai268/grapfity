@@ -58,7 +58,12 @@ const Header: React.FC = () => {
             <div className="menu-item" onClick={() => navigate("/profile")}>
               Profile
             </div>
-            <div className="menu-item">Logout</div>
+            <div className="menu-item" onClick={() => navigate("/stats")}>
+              Stats
+            </div>
+            <div className="menu-item" onClick={() => console.log("Logging out...")}>
+              Logout
+            </div>
           </div>
         )}
       </div>
