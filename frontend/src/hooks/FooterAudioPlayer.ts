@@ -22,7 +22,7 @@ const useFooterAudioPlayer = () => {
     return () => unsubscribe();
   }, []);
   useEffect(() => {
-    console.log("🕒 currentTime changed:", currentTime);
+    
   }, [currentTime]);
 
   // Cập nhật duration & currentTime khi audio thay đổi
