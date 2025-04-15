@@ -138,7 +138,9 @@ const GlobalAudioManager = (() => {
 
     setActive("FooterPlayer", () => audio.pause(), audio, song);
     notify();
+    notifySongChanged(); 
   }
+  
 
   function playNext(): void {
     if (!playlist.length) return;
@@ -230,3 +232,6 @@ if (typeof window !== "undefined") {
 
 export default GlobalAudioManager;
 export type { Song };
+export const notifySongChanged = () => {
+  window.dispatchEvent(new Event("songchanged"));
+};

@@ -122,3 +122,21 @@ export const initFirstWaveforms = () => {
       renderWaveform(tempAudio, waveformContainer);
     });
   };
+
+  const handleSongChanged = () => {
+  const container = GlobalAudioManager.getPlaylistContainer();
+  if (!container) return;
+
+  const waveformContainer = container.querySelector(".waveform .audio-playlist") as HTMLDivElement | null;
+  const audio = GlobalAudioManager.getCurrentAudio();
+  const song = GlobalAudioManager.getCurrentSong();
+
+  if (!waveformContainer || !audio || !song) return;
+
+  const existing = waveformMap.get(waveformContainer);
+  if (existing?.src === song.src) return;
+
+  renderWaveform(audio, waveformContainer);
+};
+
+window.addEventListener("songchanged", handleSongChanged);
