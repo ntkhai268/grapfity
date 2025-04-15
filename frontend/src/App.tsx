@@ -8,34 +8,30 @@ import Profile from "./container/ProfilePage";
 import HomeLayout from "./layouts/HomeLayouts";
 import ProfileLayout from "./layouts/ProfileLayouts";
 
-import { PlayerProvider } from "./context/PlayerContext";
-
 const App: React.FC = () => {
   return (
-    <PlayerProvider>
-      <Routes>
-        {/* ✅ Tự chuyển hướng từ / sang /mainpage */}
-        <Route path="/" element={<Navigate to="/mainpage" replace />} />
+    <Routes>
+      {/* ✅ Tự chuyển hướng từ / sang /mainpage */}
+      <Route path="/" element={<Navigate to="/mainpage" replace />} />
 
-        <Route
-          path="/mainpage"
-          element={
-            <HomeLayout>
-              <Homepage />
-            </HomeLayout>
-          }
-        />
+      <Route
+        path="/mainpage"
+        element={
+          <HomeLayout>
+            <Homepage />
+          </HomeLayout>
+        }
+      />
 
-        <Route
-          path="/profile"
-          element={
-            <ProfileLayout>
-              <Profile />
-            </ProfileLayout>
-          }
-        />
-      </Routes>
-    </PlayerProvider>
+      <Route
+        path="/profile"
+        element={
+          <ProfileLayout>
+            <Profile />
+          </ProfileLayout>
+        }
+      />
+    </Routes>
   );
 };
 

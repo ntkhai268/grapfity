@@ -1,4 +1,5 @@
-import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/Sidebar.css'; // ✅ thêm dòng này
+import "../styles/Sidebar.css";
+
 
 import stackIcon from '../assets/stack.png';
 import musicNoteIcon from '../assets/notnhac.png';
