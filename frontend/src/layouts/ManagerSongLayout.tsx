@@ -3,16 +3,22 @@ import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-import ProfileSection from "../components/ProfileSection";
-import "../styles/ProfileLayout.css";
+import ManagerSongSection from "../components/ManagerSongSection";
+import "../styles/ManagerSongLayout.css";
 
-const ProfileLayout: React.FC = () => {
+const ManagerSongLayout: React.FC = () => {
   useEffect(() => {
     import("../hooks/Trans_Tab").then((module) => {
       if (typeof module.initTabs === "function") {
         module.initTabs(); // Gọi lại tab init mỗi khi vào profile
       }
     });
+  }, []);
+  useEffect(() => {
+    document.body.classList.add("managersong-page");
+    return () => {
+      document.body.classList.remove("managersong-page");
+    };
   }, []);
   return (
     <div className="main-background">
@@ -21,7 +27,7 @@ const ProfileLayout: React.FC = () => {
         <div className="main-content">
           <Sidebar />
           <div className="page-content">
-            <ProfileSection /> {/* Thay Section bằng ProfileSection */}
+            <ManagerSongSection /> {/* Thay Section bằng ProfileSection */}
           </div>
         </div>
         <Footer />
@@ -30,4 +36,4 @@ const ProfileLayout: React.FC = () => {
   );
 };
 
-export default ProfileLayout;
+export default ManagerSongLayout;

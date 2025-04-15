@@ -46,11 +46,11 @@ const PopularSongs: React.FC = () => {
     <div className="popular-songs">
       <h2>Các bản nhạc thịnh hành của</h2>
       <h2>ICM</h2>
-      <div className="song-list">
+      <div className="song-list-manager">
         {/* TypeScript sẽ tự suy luận kiểu cho 'song' (là ISong) và 'index' (là number) 
             từ kiểu của mảng 'songs' */}
         {songs.map((song, index) => (
-          <div className="song-item" key={index}> 
+          <div className="song-item-manager" key={index}> 
             <div className="song-number">{song.number}</div>
             <img src={song.cover} alt={song.title} className="rec-song-image" />
             <div className="rec-song-info">

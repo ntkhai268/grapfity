@@ -1,16 +1,16 @@
 // import React from "react";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import Tab from "../components/UI_Profile/Tab";
-import Footer from "../components/Footer";
-import SongRight from "../components/UI_Profile/Song_right";
-import Song from "../components/UI_Profile/All";
-import PopularTracks from "../components/UI_Profile/Popular_Tracks";
-import Tracks from "../components/UI_Profile/Tracks";
-import Playlists from "../components/UI_Profile/Playlist";
+// import Header from "./Header";
+// import Sidebar from "./Sidebar";
+import Tab from "./UI_Profile/Tab";
+// import Footer from "./Footer";
+import SongRight from "./UI_Profile/Song_right";
+import Song from "./UI_Profile/All";
+import PopularTracks from "./UI_Profile/Popular_Tracks";
+import Tracks from "./UI_Profile/Tracks";
+import Playlists from "./UI_Profile/Playlist";
 
-import ProfileSlide from "../components/UI_Profile/Profile_Slide";
-import ProfileStat from "../components/UI_Profile/Profile_Stats";
+import ProfileSlide from "./UI_Profile/Profile_Slide";
+import ProfileStat from "./UI_Profile/Profile_Stats";
 
 // import css
 
@@ -26,8 +26,8 @@ const ProfileSection = () => {
   return (
     <div>
       <div className="container">
-        <Header />
-        <Sidebar />
+        {/* <Header />
+        <Sidebar /> */}
         <div className="song_side_profile">
             {/* -------------------------UI profile------------------------------------------- */}
             <div className="profile_slide">
@@ -63,7 +63,7 @@ const ProfileSection = () => {
             </div>  */}
             {/* -------------------------------------------------------------------- */}
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );

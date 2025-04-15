@@ -3,10 +3,11 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Homepage from "./container/HomePage";
-import Profile from "./container/ProfilePage";
+// import Profile from "./container/ProfilePage";
 
 import HomeLayout from "./layouts/HomeLayouts";
 import ProfileLayout from "./layouts/ProfileLayouts";
+import ManagerSongLayout from "./layouts/ManagerSongLayout";
 
 const App: React.FC = () => {
   return (
@@ -23,13 +24,21 @@ const App: React.FC = () => {
         }
       />
 
-      <Route
+      {/* <Route
         path="/profile"
         element={
           <ProfileLayout>
             <Profile />
           </ProfileLayout>
         }
+      /> */}
+      <Route
+        path="/profile"
+        element={<ProfileLayout />}
+      />
+      <Route
+        path="/ManagerSong"
+        element={<ManagerSongLayout />}
       />
     </Routes>
   );

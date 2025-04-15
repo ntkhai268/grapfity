@@ -64,9 +64,9 @@ const Recommendations: React.FC = () => {
   return (
     <div className="recommendations">
       <h2>Đề xuất</h2>
-      <div className="song-list">
+      <div className="song-list-manager">
       {recommendations.map((song) => (
-        <div key={song.id} className="song-item">
+        <div key={song.id} className="song-item-manager">
             <div className="song-number">{song.id}</div>
             <img src={song.cover} alt={song.title} className="rec-song-image" />
             <div className="rec-song-info">
