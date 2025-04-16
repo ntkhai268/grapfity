@@ -16,14 +16,14 @@ const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
   return (
     <div className="footer-left">
       <div className="playing-song">
-        <img src={song.cover || "assets/anhmau.png"} alt={song.title} />
+        <img src={song.cover || "/assets/anhmau.png"} alt={song.title} />
       </div>
       <div className="title-playing-song">
         <p className="song-title">{song.title}</p>
         <p className="song-artist">{song.artist}</p>
       </div>
       <button className="btn-DC">
-        <img src="assets/plus.png" alt="Add" />
+        <img src="/assets/plus.png" alt="Add" />
       </button>
     </div>
   );
@@ -45,19 +45,19 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   return (
     <div className="music-controls">
       <button className="shuffle">
-        <img src="assets/shuffle.png" alt="Shuffle" />
+        <img src="/assets/shuffle.png" alt="Shuffle" />
       </button>
       <button className="prev" onClick={prevSong}>
-        <img src="assets/prev.png" alt="Previous" />
+        <img src="/assets/prev.png" alt="Previous" />
       </button>
       <button className="play-pause" onClick={togglePlay}>
-        <img src={isPlaying ? "assets/stop.png" : "assets/play.png"} alt="Play/Pause" />
+        <img src={isPlaying ? "/assets/stop.png" : "/assets/play.png"} alt="Play/Pause" />
       </button>
       <button className="next" onClick={nextSong}>
-        <img src="assets/next.png" alt="Next" />
+        <img src="/assets/next.png" alt="Next" />
       </button>
       <button className="repeat">
-        <img src="assets/loop.png" alt="Repeat" />
+        <img src="/assets/loop.png" alt="Repeat" />
       </button>
     </div>
   );
@@ -124,14 +124,14 @@ const Footer: React.FC = () => {
       <footer className="footer">
         <div className="footer-left">
           <div className="playing-song">
-            <img src="assets/anhmau.png" alt="default" />
+            <img src="/assets/anhmau.png" alt="default" />
           </div>
           <div className="title-playing-song">
             <p className="song-title">Chưa chọn bài hát</p>
             <p className="song-artist">—</p>
           </div>
           <button className="btn-DC">
-            <img src="assets/plus.png" alt="Add" />
+            <img src="/assets/plus.png" alt="Add" />
           </button>
         </div>
 

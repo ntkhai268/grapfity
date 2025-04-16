@@ -8,6 +8,7 @@ import Homepage from "./container/HomePage";
 import HomeLayout from "./layouts/HomeLayouts";
 import ProfileLayout from "./layouts/ProfileLayouts";
 import ManagerSongLayout from "./layouts/ManagerSongLayout";
+import ManagerPlaylistLayout from "./layouts/ManagerPlaylistLayout";
 
 const App: React.FC = () => {
   return (
@@ -39,6 +40,10 @@ const App: React.FC = () => {
       <Route
         path="/ManagerSong"
         element={<ManagerSongLayout />}
+      />
+      <Route
+        path="/ManagerPlaylistLayout/:playlistId"
+        element={<ManagerPlaylistLayout />}
       />
     </Routes>
   );

@@ -1,37 +1,28 @@
 import React from "react";
-// import { initWaveSurfer } from "../js/waveform";
 
 interface PopularTrack {
-  src: string;
   title: string;
   artist: string;
+  src: string;
+  cover: string;
 }
 
 const popularTracks: PopularTrack[] = [
   {
-    src: "assets/Bánh Mì Không.mp3",
     title: "Bánh Mì Không",
     artist: "Đạt G, Du Uyên",
+    src: "assets/Bánh Mì Không.mp3",
+    cover: "assets/anhmau.png",
   },
-
   {
-    src: "assets/BacPhanRapVersion-TuiHat-6184759.mp3",
     title: "Bạc Phận",
     artist: "K-ICM, Jack",
+    src: "assets/BacPhanRapVersion-TuiHat-6184759.mp3",
+    cover: "assets/anhmau.png",
   },
 ];
 
-interface PopularTracksProps {}
-
-const PopularTracks: React.FC<PopularTracksProps> = () => {
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     initWaveSurfer(); // Khởi tạo WaveSurfer chỉ khi tab này được render
-  //   }, 300);
-
-  //   return () => clearTimeout(timer);
-  // }, []);
-
+const PopularTracks: React.FC = () => {
   return (
     <div className="content popular">
       {popularTracks.map((track, index) => (
@@ -41,10 +32,10 @@ const PopularTracks: React.FC<PopularTracksProps> = () => {
           data-src={track.src}
           data-title={track.title}
           data-artist={track.artist}
-          data-cover="assets/anhmau.png"
+          data-cover={track.cover}
         >
           <div className="song_left">
-            <img src="assets/anhmau.png" alt="Album Cover" className="album_cover" />
+            <img src={track.cover} alt="Album Cover" className="album_cover" />
             <button className="play_button">
               <img src="assets/play.png" alt="Play" />
             </button>

@@ -157,6 +157,7 @@
   /* Lyrics Section */
   .lyrics {
     padding: 0 32px 24px;
+    background-color: var(--spotify-black);
   }
   
   .lyrics h3 {
@@ -206,7 +207,11 @@
   
   .song-item-manager:hover {
     background-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.85;
+    transform: scale(1.02);
+    transition: all 0.2s ease-in-out;
   }
+  
   
   .song-number {
     width: 16px;
@@ -247,6 +252,7 @@
   /* Popular Songs Section */
   .popular-songs {
     padding: 24px 32px;
+    background-color: var(--spotify-black);
   }
   
   .popular-songs h2 {

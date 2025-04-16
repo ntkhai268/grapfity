@@ -1,26 +1,51 @@
 import { useState, useEffect, useRef } from "react";
 import GlobalAudioManager, { Song } from "./GlobalAudioManager";
 
-const useSongManager = () => {
-  const [currentSong, setCurrentSong] = useState<Song | null>(GlobalAudioManager.getCurrentSong());
-  const [isPlaying, setIsPlaying] = useState<boolean>(GlobalAudioManager.getIsPlaying());
+/**
+ * Custom hook để quản lý phát nhạc.
+ * Có thể truyền vào danh sách bài hát (songs) và index khởi đầu.
+ */
+const useSongManager = (songs?: Song[], initialIndex: number = 0) => {
+  const [currentSong, setCurrentSong] = useState<Song | null>(
+    songs ? songs[initialIndex] : GlobalAudioManager.getCurrentSong()
+  );
+
+  const [isPlaying, setIsPlaying] = useState<boolean>(
+    GlobalAudioManager.getIsPlaying()
+  );
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const pausedByUserRef = useRef(false); // Để không bị auto play lại sau khi pause
+  const pausedByUserRef = useRef(false);
 
-  // Đăng ký listener từ GlobalAudioManager
   useEffect(() => {
-    const unsubscribe = GlobalAudioManager.subscribe(() => {
-      setCurrentSong(GlobalAudioManager.getCurrentSong());
-
-      if (!pausedByUserRef.current) {
-        setIsPlaying(GlobalAudioManager.getIsPlaying());
+    if (!songs) {
+      const unsubscribe = GlobalAudioManager.subscribe(() => {
+        const globalSong = GlobalAudioManager.getCurrentSong();
+        setCurrentSong(globalSong);
+  
+        if (!pausedByUserRef.current) {
+          setIsPlaying(GlobalAudioManager.getIsPlaying());
+        }
+      });
+  
+      return () => unsubscribe();
+    } else {
+      const globalSong = GlobalAudioManager.getCurrentSong();
+  
+      // Nếu bài hiện tại trong useManager khác với bài trong global => pause
+      if (globalSong?.src !== songs[initialIndex]?.src) {
+        console.log("🛑 [useSongManager] Không trùng bài hát với Global:", {
+          global: globalSong?.title,
+          local: songs[initialIndex]?.title,
+        });
+        setIsPlaying(false);
+      } else {
+        console.log("✅ [useSongManager] Trùng bài với Global:", globalSong?.title);
       }
-    });
+    }
+  }, [songs, initialIndex]);
+  
 
-    return () => {
-      unsubscribe();
-    };
-  }, []);
 
   const togglePlay = () => {
     const audio = audioRef.current;
@@ -33,7 +58,7 @@ const useSongManager = () => {
       console.log("⏸ [useSongManager] Pause");
       audio.pause();
       setIsPlaying(false);
-      pausedByUserRef.current = true; // Đánh dấu là do người dùng pause
+      pausedByUserRef.current = true;
     } else {
       console.log("▶️ [useSongManager] Play", song);
       pausedByUserRef.current = false;

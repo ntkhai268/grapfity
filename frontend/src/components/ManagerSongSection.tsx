@@ -1,7 +1,7 @@
 // import React from "react";
-import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import Footer from "../components/Footer";
+// import Header from "../components/Header";
+// import Sidebar from "../components/Sidebar";
+// import Footer from "../components/Footer";
 import Controls
 from "./Manager_Songs/Controls";
 import Lyrics from "./Manager_Songs/Lyrics";
@@ -10,7 +10,7 @@ import Recommendations from "./Manager_Songs/Recommendations";
 import SongHeader from "./Manager_Songs/Song-Header";
 
 
-import "../styles/ManagerSongLayout.css";
+// import "../styles/ManagerSongLayout.css";
 
 
 
@@ -20,8 +20,8 @@ const ManagerSongSection = () => {
   return (
     <div>
       <div className="container">
-        <Header />
-        <Sidebar />
+        {/* <Header />
+        <Sidebar /> */}
         <div className="song_side_profile">
                 
             {/* -------------------------UI quản lí bài hát---------------------------------------- */}
@@ -34,7 +34,7 @@ const ManagerSongSection = () => {
             </div> 
             {/* -------------------------------------------------------------------- */}
         </div>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );

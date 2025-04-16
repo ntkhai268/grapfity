@@ -12,8 +12,8 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
 
   const waveSurfer = WaveSurfer.create({
     container,
-    waveColor: "#fff",
-    progressColor: "#383351",
+    waveColor: "#a9a9a9",
+    progressColor: "#fff",
     cursorColor: "white",
     barWidth: 2,
     height: 50,

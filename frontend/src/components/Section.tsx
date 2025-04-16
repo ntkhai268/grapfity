@@ -1,5 +1,4 @@
-// import React from "react";
-import { useNavigate } from "react-router-dom"; // ✅ thêm dòng này
+import { useNavigate } from "react-router-dom";
 import GlobalAudioManager from "../hooks/GlobalAudioManager";
 import bacphan from "../assets/BacPhanRapVersion-TuiHat-6184759.mp3";
 import banhmikhong from "../assets/Bánh Mì Không.mp3";
@@ -16,12 +15,23 @@ const songs = [
 ];
 
 const Section = () => {
-  const navigate = useNavigate(); // ✅
+  const navigate = useNavigate();
 
   const handleClick = (index: number) => {
+    const song = songs[index];
+
+    // ✅ Cập nhật GlobalAudioManager
     GlobalAudioManager.setPlaylist(songs, index);
     GlobalAudioManager.playSongAt(index);
-    navigate("/ManagerSong"); // ✅ chuyển hướng khi click
+
+    // ✅ Điều hướng sang ManagerSong, truyền toàn bộ thông tin
+    navigate("/ManagerSong", {
+      state: {
+        songs,
+        currentIndex: index,
+        currentSong: song,
+      },
+    });
   };
 
   return (

@@ -1,29 +1,39 @@
 import React, { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-// Định nghĩa component với kiểu React.FC
+interface Song {
+  title: string;
+  artist: string;
+  cover: string;
+  src: string;
+}
+
 const SongHeader: React.FC = () => {
-  // Định kiểu rõ ràng cho biến songUrl là string
-  const songUrl: string = "assets/SuNghiepChuong.mp3"; // Thay bằng URL bài hát thật
+  const location = useLocation();
+  const { currentSong }: { currentSong?: Song } = location.state || {};
 
-  // useEffect không cần thay đổi về kiểu trong trường hợp này
   useEffect(() => {
-    // localStorage và window là các đối tượng global, TypeScript nhận biết được
-    localStorage.setItem("currentSong", songUrl);
-    window.dispatchEvent(new Event("storage")); // Gửi sự kiện để thông báo cho Controls
-  }, []); // Mảng dependency rỗng đảm bảo effect chỉ chạy một lần khi mount
+    if (currentSong?.src) {
+      localStorage.setItem("currentSong", currentSong.src);
+      window.dispatchEvent(new Event("storage")); // Thông báo cho Controls
+    }
+  }, [currentSong]);
+
+  if (!currentSong) {
+    return <div>Không tìm thấy thông tin bài hát.</div>;
+  }
 
   return (
-    // JSX không thay đổi
     <div className="song-header">
-      <img src="assets/anhmau.png" alt="Hoa Vô Sắc" className="song-image" />
+      <img src={currentSong.cover} alt={currentSong.title} className="song-image" />
       <div className="song-details">
         <div className="song-type">Bài hát</div>
-        <h1 className="song-title-track">Hoa Vô Sắc</h1>
+        <h1 className="song-title-track">{currentSong.title}</h1>
         <div className="song-meta">
-          <img src="assets/anhmau.png" alt="ICM" className="artist-image" />
-          <span>ICM</span>
+          <img src={currentSong.cover} alt={currentSong.artist} className="artist-image" />
+          <span>{currentSong.artist}</span>
           <span className="dot-separator">•</span>
-          <span>Hoa Vô Sắc</span>
+          <span>{currentSong.title}</span>
           <span className="dot-separator">•</span>
           <span>2023</span>
           <span className="dot-separator">•</span>

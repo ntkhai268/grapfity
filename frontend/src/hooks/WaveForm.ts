@@ -32,8 +32,8 @@ function initWaveSurfer(): void {
 
     const waveTrack = WaveSurfer.create({
       container: audioContainer,
-      waveColor: '#fff',
-      progressColor: '#383351',
+      waveColor: '#808080',
+      progressColor: '#fff',
       barWidth: 2,
       height: 50,
       mediaControls: false,

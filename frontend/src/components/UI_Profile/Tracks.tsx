@@ -1,31 +1,22 @@
-import React, { useEffect } from "react";
-// import { initWaveSurfer } from "../js/waveform";
+import React from "react";
 
 interface Track {
-  src: string;
   title: string;
   artist: string;
+  src: string;
+  cover: string;
 }
 
 const tracks: Track[] = [
   {
-    src: "assets/LacTroi.mp3",
     title: "Lạc Trôi",
     artist: "Sơn Tùng M-TP",
+    src: "assets/LacTroi.mp3",
+    cover: "assets/anhmau.png",
   },
 ];
 
-interface TracksProps {}
-
-const Tracks: React.FC<TracksProps> = () => {
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     initWaveSurfer(); // Khởi tạo WaveSurfer chỉ khi tab này được render
-  //   }, 500);
-
-  //   return () => clearTimeout(timer);
-  // }, []);
-
+const Tracks: React.FC = () => {
   return (
     <div className="content track">
       {tracks.map((track, index) => (
@@ -35,10 +26,10 @@ const Tracks: React.FC<TracksProps> = () => {
           data-src={track.src}
           data-title={track.title}
           data-artist={track.artist}
-          data-cover="assets/anhmau.png"
+          data-cover={track.cover}
         >
           <div className="song_left">
-            <img src="assets/anhmau.png" alt="Album Cover" className="album_cover" />
+            <img src={track.cover} alt="Album Cover" className="album_cover" />
             <button className="play_button">
               <img src="assets/play.png" alt="Play" />
             </button>
