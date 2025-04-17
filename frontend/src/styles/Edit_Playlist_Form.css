@@ -233,4 +233,37 @@
   .popup-close-btn:hover {
     color: #fff;
   }
+  .image-preview-wrapper {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 150px;
+  }
   
+  .preview-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .remove-img-btn {
+    position: absolute;
+    top: 6px;         /* Cách đỉnh ảnh một chút */
+    right: 6px;       /* Cách mép phải một chút */
+    background-color: rgba(255, 77, 79, 1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+  }

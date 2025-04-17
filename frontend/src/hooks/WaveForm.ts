@@ -3,17 +3,19 @@ import GlobalAudioManager, { Song } from './GlobalAudioManager';
 
 let currentPlaying: HTMLAudioElement | null = null;
 let currentButton: HTMLImageElement | null = null;
-const waveTracks: { [key: string]: WaveSurfer } = {}; // Lưu tất cả các waveTrack theo src để reset
+const waveTracks: { [key: string]: WaveSurfer } = {}; // Lưu các waveform theo src
 
 function initWaveSurfer(): void {
   const songElements = Array.from(document.querySelectorAll(".content.active .song"));
 
-  const playlist: Song[] = songElements.map((songElement) => ({
-    title: songElement.getAttribute("data-title") || "Không rõ tiêu đề",
-    artist: songElement.getAttribute("data-artist") || "Không rõ ca sĩ",
-    cover: songElement.getAttribute("data-cover") || "assets/anhmau.png",
-    src: songElement.getAttribute("data-src")!,
-  })) as Song[];
+  const playlist: Song[] = songElements.map((el) => ({
+    title: el.getAttribute("data-title") || "Không rõ tiêu đề",
+    artist: el.getAttribute("data-artist") || "Không rõ ca sĩ",
+    cover: el.getAttribute("data-cover") || "assets/anhmau.png",
+    src: el.getAttribute("data-src")!,
+  }));
+
+  const srcList: string[] = playlist.map(song => song.src);
 
   songElements.forEach((songElement, index) => {
     const audioContainer = songElement.querySelector<HTMLElement>(".audio");
@@ -25,10 +27,6 @@ function initWaveSurfer(): void {
 
     const audio = new Audio(songSrc);
     audio.crossOrigin = "anonymous";
-
-    audio.addEventListener("loadedmetadata", () => {
-      console.log("🧠 Duration:", audio.duration);
-    });
 
     const waveTrack = WaveSurfer.create({
       container: audioContainer,
@@ -51,72 +49,69 @@ function initWaveSurfer(): void {
       const isThisTabActive = songElement.closest(".content")?.classList.contains("active");
       if (!isThisTabActive) return;
 
-      if (GlobalAudioManager.getCurrentAudio() === audio && !audio.paused) {
+      const currentAudio = GlobalAudioManager.getCurrentAudio();
+
+      if (currentAudio === audio && !audio.paused) {
         audio.pause();
         playButton.src = "assets/play.png";
         GlobalAudioManager.setIsPlaying(false);
-      } else {
-        Object.entries(waveTracks).forEach(([src, track]) => {
-          if (src !== songSrc) track.seekTo(0);
-        });
-
-        if (currentPlaying && currentPlaying !== audio) {
-          currentPlaying.pause();
-          if (currentButton) currentButton.src = "assets/play.png";
-        }
-
-        if (!GlobalAudioManager.isSamePlaylist(playlist)) {
-          GlobalAudioManager.setPlaylist(playlist, index, (i) => {
-            const nextSongSrc = playlist[i].src;
-            const nextSongElement = document.querySelector(`.content.active .song[data-src="${nextSongSrc}"]`);
-            nextSongElement?.querySelector(".play_button")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-          });
-        } else {
-          GlobalAudioManager.setCurrentIndex(index);
-          const playCallback = GlobalAudioManager.getPlaylist()?.[index];
-          if (playCallback) {
-            audio.src = playCallback.src;
-            audio.load();
-          }
-        }
-
-        GlobalAudioManager.setActive(
-          "waveform",
-          () => {
-            audio.pause();
-            playButton.src = "assets/play.png";
-          },
-          audio,
-          song
-        );
-
-        audio.play();
-        playButton.src = "assets/stop.png";
-        currentPlaying = audio;
-        currentButton = playButton;
-
-        GlobalAudioManager.subscribe(() => {
-          const currentAudio = GlobalAudioManager.getCurrentAudio();
-          if (currentAudio === audio) {
-            playButton.src = GlobalAudioManager.getIsPlaying() ? "assets/stop.png" : "assets/play.png";
-          }
-        });
+        return;
       }
+
+      Object.entries(waveTracks).forEach(([src, track]) => {
+        if (src !== songSrc) track.seekTo(0);
+      });
+
+      if (currentPlaying && currentPlaying !== audio) {
+        currentPlaying.pause();
+        if (currentButton) currentButton.src = "assets/play.png";
+      }
+
+      // Nếu playlist khác hoặc chưa set
+      if (!GlobalAudioManager.isSamePlaylist(playlist)) {
+        GlobalAudioManager.setPlaylist(playlist, index, (nextIndex) => {
+          const nextSrc = srcList[nextIndex];
+          const nextSongElement = document.querySelector(`.content.active .song[data-src="${nextSrc}"]`);
+          nextSongElement?.querySelector(".play_button")?.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        });
+      } else {
+        GlobalAudioManager.setCurrentIndex(index);
+        const current = GlobalAudioManager.getPlaylist()?.[index];
+        if (current) {
+          audio.src = current.src;
+          audio.load();
+        }
+      }
+
+      GlobalAudioManager.setActive(
+        "waveform",
+        () => {
+          audio.pause();
+          playButton.src = "assets/play.png";
+        },
+        audio,
+        song
+      );
+
+      audio.play();
+      playButton.src = "assets/stop.png";
+      currentPlaying = audio;
+      currentButton = playButton;
+
+      GlobalAudioManager.subscribe(() => {
+        const isThisAudio = GlobalAudioManager.getCurrentAudio() === audio;
+        if (isThisAudio) {
+          playButton.src = GlobalAudioManager.getIsPlaying() ? "assets/stop.png" : "assets/play.png";
+        }
+      });
     });
 
     audio.addEventListener("ended", () => {
       playButton.src = "assets/play.png";
-      const nextIndex = GlobalAudioManager.getCurrentIndex() + 1;
-      const newPlaylist = GlobalAudioManager.getPlaylist();
-      if (nextIndex < newPlaylist.length) {
-        const nextSongSrc = newPlaylist[nextIndex].src;
-        const nextSongElement = document.querySelector(`.content.active .song[data-src="${nextSongSrc}"]`);
-        const nextPlayBtn = nextSongElement?.querySelector(".play_button") as HTMLElement;
-        nextPlayBtn?.click();
-      }
+      // Không cần xử lý auto-next ở đây nữa vì đã truyền callback vào setPlaylist
     });
 
-    console.log(`WaveSurfer đã khởi tạo cho bài hát: ${songSrc}`);
+    console.log(`✅ WaveSurfer đã khởi tạo cho: ${song.title}`);
   });
 }
 

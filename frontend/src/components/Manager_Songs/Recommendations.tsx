@@ -37,7 +37,7 @@ const Recommendations: React.FC = () => {
     },
     {
       id: 3,
-      src: "/assets/ MyEverything.mp3",
+      src: "/assets/MyEverything.mp3",
       cover: "assets/anhmau.png",
       title: " My Everything",
       artist: "Tiên Tiên",

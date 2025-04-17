@@ -19,7 +19,11 @@ const useFooterAudioPlayer = () => {
     };
   
     const unsubscribe = GlobalAudioManager.subscribe(handleChange);
-    return () => unsubscribe();
+  
+    // ✅ Bọc lại để return đúng kiểu `() => void`
+    return () => {
+      unsubscribe(); // gọi nhưng không return boolean
+    };
   }, []);
   useEffect(() => {
     
@@ -59,12 +63,6 @@ const useFooterAudioPlayer = () => {
     GlobalAudioManager.setIsPlaying(!isPlaying);
   };
 
-  const simulateClickCurrentSong = () => {
-    const currentSrc = GlobalAudioManager.getCurrentSong()?.src;
-    const songEl = document.querySelector(`.content.active .song[data-src="${currentSrc}"]`);
-    const playBtn = songEl?.querySelector(".play_button") as HTMLElement;
-    playBtn?.click();
-  };
   const seekTo = (time: number) => {
     if (audio) {
       audio.currentTime = time;
@@ -75,36 +73,34 @@ const useFooterAudioPlayer = () => {
   const nextSong = () => {
     const playlist = GlobalAudioManager.getPlaylist();
     const currentIndex = GlobalAudioManager.getCurrentIndex();
-
     const oldAudio = GlobalAudioManager.getCurrentAudio();
     oldAudio?.pause();
     if (oldAudio) oldAudio.currentTime = 0;
-
+  
     if (currentIndex < playlist.length - 1) {
-      GlobalAudioManager.playNext();
+      GlobalAudioManager.playNext(); // chuyển bài như bình thường
     } else {
-      simulateClickCurrentSong(); // phát lại bài hiện tại
-      return;
+      // Đang ở bài cuối → phát lại bài cuối
+      const lastSong = playlist[currentIndex];
+      if (lastSong) {
+        GlobalAudioManager.playSongAt(currentIndex); // phát lại bài cuối
+      }
     }
-
-    simulateClickCurrentSong();
   };
 
   const prevSong = () => {
+    // const playlist = GlobalAudioManager.getPlaylist();
     const currentIndex = GlobalAudioManager.getCurrentIndex();
-
     const oldAudio = GlobalAudioManager.getCurrentAudio();
     oldAudio?.pause();
     if (oldAudio) oldAudio.currentTime = 0;
-
+  
     if (currentIndex > 0) {
       GlobalAudioManager.playPrevious();
     } else {
-      simulateClickCurrentSong(); // phát lại bài hiện tại
-      return;
+      // Nếu đang ở bài đầu, thì phát lại bài đầu
+      GlobalAudioManager.playSongAt(0);
     }
-
-    simulateClickCurrentSong();
   };
 
   return {

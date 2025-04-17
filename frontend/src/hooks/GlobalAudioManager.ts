@@ -10,23 +10,24 @@ const GlobalAudioManager = (() => {
   let currentStopFunction: (() => void) | null = null;
   let currentAudio: HTMLAudioElement | null = null;
   let currentSong: Song | null = null;
-  let isPlaying: boolean = false;
+  let isPlaying = false;
   let playlist: Song[] = [];
-  let currentIndex: number = -1;
+  let currentIndex = -1;
   let playCallback: ((index: number) => void) | null = null;
   let playlistContainer: HTMLElement | null = null;
+  let onPlaylistEnded: (() => void) | null = null;
 
-  let currentTime: number = 0;
-  let duration: number = 0;
-  let progress: number = 0;
+  let currentTime = 0;
+  let duration = 0;
+  let progress = 0;
 
-  const listeners: Set<() => void> = new Set();
+  const listeners = new Set<() => void>();
 
-  function notify(): void {
-    listeners.forEach((listener) => listener());
+  function notify() {
+    listeners.forEach(listener => listener());
   }
 
-  function subscribe(listener: () => void): () => void {
+  function subscribe(listener: () => void) {
     listeners.add(listener);
     return () => listeners.delete(listener);
   }
@@ -36,98 +37,92 @@ const GlobalAudioManager = (() => {
     stopFunction: () => void,
     audio: HTMLAudioElement,
     song: Song
-  ): void {
+  ) {
     if (currentSystem && currentSystem !== systemName && currentStopFunction) {
       currentStopFunction();
     }
-  
+
     currentSystem = systemName;
     currentStopFunction = stopFunction;
     currentAudio = audio;
     currentSong = song;
     isPlaying = true;
-  
-    // Sync trạng thái play/pause
+
+    // Sync playback events
     audio.onplay = () => {
       isPlaying = true;
       notify();
     };
-  
+
     audio.onpause = () => {
       isPlaying = false;
       notify();
     };
-  
-    // Progress/time update
+
     audio.ontimeupdate = () => {
       currentTime = audio.currentTime;
       duration = audio.duration || 0;
       progress = duration ? (currentTime / duration) * 100 : 0;
       notify();
     };
-  
+
     audio.onended = () => {
       isPlaying = false;
       notify();
+      const nextIndex = currentIndex + 1;
+
+      if (nextIndex < playlist.length) {
+        playSongAt(nextIndex);
+      } else {
+        onPlaylistEnded?.(); // Gọi nếu hết playlist
+      }
     };
-  
+
     if (audio.readyState >= 1) {
       notify();
     } else {
-      audio.addEventListener(
-        "loadedmetadata",
-        () => {
-          duration = audio.duration || 0;
-          notify();
-        },
-        { once: true }
-      );
+      audio.addEventListener("loadedmetadata", () => {
+        duration = audio.duration || 0;
+        notify();
+      }, { once: true });
     }
   }
-  
-  
 
   function setPlaylist(
-    newPlaylist: Song[] = [],
-    startIndex: number = 0,
+    newPlaylist: Song[],
+    startIndex = 0,
     playFn: ((index: number) => void) | null = null,
-    container: HTMLElement | null = null
-  ): void {
-    if (Array.isArray(newPlaylist) && newPlaylist.length > 0) {
-      playlist = newPlaylist;
-      currentIndex = startIndex;
-      playCallback = typeof playFn === "function" ? playFn : null;
-      playlistContainer = container;
+    container: HTMLElement | null = null,
+    onEnded?: () => void
+  ) {
+    if (!Array.isArray(newPlaylist) || !newPlaylist.length) return;
 
-      console.log("✅ Playlist set:", {
-        currentIndex,
-        playlist: playlist.map((el) => el?.title || el?.src),
-        hasPlayCallback: typeof playCallback === "function",
-      });
-    }
+    playlist = newPlaylist;
+    currentIndex = startIndex;
+    playCallback = playFn;
+    playlistContainer = container;
+    onPlaylistEnded = onEnded || null;
+
+    console.log("✅ Playlist set:", {
+      currentIndex,
+      playlist: playlist.map(el => el.title || el.src),
+      hasPlayCallback: !!playCallback,
+    });
   }
 
-  function playSongAt(index: number): void {
+  function playSongAt(index: number) {
     if (index < 0 || index >= playlist.length) return;
+
     currentIndex = index;
-
-    if (typeof playCallback === "function") {
-      playCallback(index);
-    }
-
     const song = playlist[index];
     if (!song) return;
 
-    if (currentAudio && typeof currentAudio.pause === "function") {
-      currentAudio.pause();
-    }
+    currentAudio?.pause();
 
     const audio = new Audio(song.src);
     audio.crossOrigin = "anonymous";
     audio.preload = "auto";
-    audio.play();
 
-    currentIndex = index;
     currentAudio = audio;
     currentSong = song;
     isPlaying = true;
@@ -138,35 +133,60 @@ const GlobalAudioManager = (() => {
 
     setActive("FooterPlayer", () => audio.pause(), audio, song);
     notify();
-    notifySongChanged(); 
-  }
-  
+    notifySongChanged();
 
-  function playNext(): void {
+    audio.play().catch(err => {
+      console.error("🔴 audio.play() failed:", err);
+      isPlaying = false;
+      notify();
+    });
+
+    playCallback?.(index);
+  }
+
+  function playNext() {
     if (!playlist.length) return;
 
     const nextIndex = currentIndex + 1;
-    if (nextIndex >= playlist.length) return;
-
-    playSongAt(nextIndex);
+    if (nextIndex < playlist.length) {
+      playSongAt(nextIndex);
+    } else {
+      onPlaylistEnded?.(); // Đã hết playlist → gọi tiếp
+    }
   }
 
-  function playPrevious(): void {
+  function playPrevious() {
     if (!playlist.length) return;
-
     const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
     playSongAt(prevIndex);
   }
 
-  function isSamePlaylist(newPlaylist: Song[]): boolean {
-    if (!playlist || playlist.length !== newPlaylist.length) return false;
-    return playlist.every((song, index) => song.src === newPlaylist[index].src);
+  function isSamePlaylist(newPlaylist: Song[]) {
+    return (
+      playlist.length === newPlaylist.length &&
+      playlist.every((s, i) => s.src === newPlaylist[i].src)
+    );
   }
 
-  function seekTo(percent: number): void {
+  function seekTo(percent: number) {
     if (currentAudio && duration && percent >= 0 && percent <= 100) {
       currentAudio.currentTime = (percent / 100) * duration;
     }
+  }
+
+  function clearActive(systemName: string) {
+    if (currentSystem !== systemName) return;
+
+    currentSystem = null;
+    currentAudio?.pause();
+    currentAudio = null;
+    currentStopFunction = null;
+    currentSong = null;
+    isPlaying = false;
+    currentTime = 0;
+    duration = 0;
+    progress = 0;
+    notify();
   }
 
   return {
@@ -176,47 +196,32 @@ const GlobalAudioManager = (() => {
     playNext,
     playPrevious,
     subscribe,
-    getPlaylist: (): Song[] => playlist,
-    getCurrentIndex: (): number => currentIndex,
+    getPlaylist: () => playlist,
+    getCurrentIndex: () => currentIndex,
     isSamePlaylist,
-    getCurrentSystem: (): string | null => currentSystem,
-    getCurrentAudio: (): HTMLAudioElement | null => currentAudio,
-    getCurrentSong: (): Song | null => currentSong,
-    getIsPlaying: (): boolean => isPlaying,
-    getCurrentTime: (): number => currentTime,
-    getDuration: (): number => duration,
-    getProgress: (): number => progress,
+    getCurrentSystem: () => currentSystem,
+    getCurrentAudio: () => currentAudio,
+    getCurrentSong: () => currentSong,
+    getIsPlaying: () => isPlaying,
+    getCurrentTime: () => currentTime,
+    getDuration: () => duration,
+    getProgress: () => progress,
     seekTo,
-    setIsPlaying: (state: boolean): void => {
+    setIsPlaying: (state: boolean) => {
       isPlaying = state;
       if (currentAudio) {
         state ? currentAudio.play() : currentAudio.pause();
       }
       notify();
     },
-    setCurrentIndex: (index: number): void => {
+    setCurrentIndex: (index: number) => {
       if (index >= 0 && index < playlist.length) {
         currentIndex = index;
       }
     },
-    getPlaylistContainer: (): HTMLElement | null => playlistContainer,
-    clearActive: (systemName: string): void => {
-      if (currentSystem === systemName) {
-        currentSystem = null;
-        if (currentAudio) {
-          currentAudio.pause();
-        }
-        currentAudio = null;
-        currentStopFunction = null;
-        currentSong = null;
-        isPlaying = false;
-        currentTime = 0;
-        duration = 0;
-        progress = 0;
-        notify();
-      }
-    },
-    getAudioElement: (): HTMLAudioElement | null => currentAudio,
+    getPlaylistContainer: () => playlistContainer,
+    clearActive,
+    getAudioElement: () => currentAudio,
   };
 })();
 

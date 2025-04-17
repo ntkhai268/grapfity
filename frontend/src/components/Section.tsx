@@ -9,9 +9,35 @@ import img3 from "../assets/anhmau.png";
 import "../styles/Section.css";
 
 const songs = [
-  { title: "Bạc phận", artist: "Jack", cover: img1, src: bacphan },
-  { title: "Bánh mì không", artist: "Đạt G", cover: img2, src: banhmikhong },
-  { title: "Có đáng để yêu thương", artist: "Du Uyên", cover: img3, src: codangdeyeuthuong },
+  {
+    id: 1,
+    title: "Bạc phận",
+    artist: "Jack",
+    cover: img1,
+    src: bacphan,
+  },
+  {
+    id: 2,
+    title: "Bánh mì không",
+    artist: "Đạt G",
+    cover: img2,
+    src: banhmikhong,
+  },
+  {
+    id: 3,
+    title: "Có đáng để yêu thương",
+    artist: "Du Uyên",
+    cover: img3,
+    src: codangdeyeuthuong,
+  },
+  {
+    id: 3,
+    title: "Quá Lâu",
+    artist: "Vinh Khuất",
+    cover: "/assets/qualau.png",
+    src: "/assets/QuaLau.mp3",
+  },
+  
 ];
 
 const Section = () => {
@@ -38,13 +64,13 @@ const Section = () => {
     <section className="song_side">
       <h1>Recommended for today</h1>
       <div className="song-list">
-        {songs.map((song, index) => (
-          <button key={index} className="song-item" onClick={() => handleClick(index)}>
-            <img src={song.cover} alt={song.title} />
-            <p className="title">{song.title}</p>
-            <p className="artist">{song.artist}</p>
-          </button>
-        ))}
+      {songs.map((song, index) => (
+        <button key={song.id} className="song-item" onClick={() => handleClick(index)}>
+          <img src={song.cover} alt={song.title} />
+          <p className="title">{song.title}</p>
+          <p className="artist">{song.artist}</p>
+        </button>
+      ))}
       </div>
     </section>
   );

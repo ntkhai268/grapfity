@@ -2,8 +2,10 @@ import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager";
 import React from "react";
 import WaveSurfer from "wavesurfer.js";
 
+// Map để lưu instance WaveSurfer tương ứng với mỗi waveform container
 const waveformMap = new Map<HTMLDivElement, { waveSurfer: WaveSurfer; src: string }>();
 
+// Hàm render waveform cho một bài hát
 const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
   const existing = waveformMap.get(container);
   if (existing) {
@@ -29,11 +31,38 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
     }
   });
 
+  // Tự động chuyển bài khi kết thúc
   audio.onended = () => {
     GlobalAudioManager.playNext();
   };
 };
 
+// Hàm tự động chuyển sang playlist tiếp theo
+const playNextPlaylist = (currentContainer: HTMLDivElement) => {
+  const allContainers = Array.from(document.querySelectorAll(".player-container")) as HTMLDivElement[];
+  const currentIndex = allContainers.findIndex((el) => el === currentContainer);
+  const nextContainer = allContainers[currentIndex + 1];
+  if (!nextContainer) return console.log("⛔ Không có playlist tiếp theo");
+
+  const nextData = nextContainer.getAttribute("data-playlist");
+  if (!nextData) return;
+
+  const playlistData = JSON.parse(nextData);
+  const firstTrack = playlistData.tracks?.[0];
+  if (!firstTrack) return;
+
+  const songs: Song[] = playlistData.tracks.map((track: any) => ({
+    src: track.src,
+    title: track.title,
+    artist: playlistData.artist,
+    cover: track.cover || "assets/anhmau.png",
+  }));
+
+  GlobalAudioManager.setPlaylist(songs, 0, null, nextContainer, () => playNextPlaylist(nextContainer));
+  GlobalAudioManager.playSongAt(0);
+};
+
+// Hàm xử lý khi click play 1 track
 const handlePlayTrack = (event: React.MouseEvent<HTMLDivElement>) => {
   const trackItem = event.currentTarget.closest(".track-item") as HTMLDivElement | null;
   if (!trackItem) return;
@@ -43,19 +72,14 @@ const handlePlayTrack = (event: React.MouseEvent<HTMLDivElement>) => {
   if (!src) return;
 
   const playlistContainer = trackItem.closest(".player-container") as HTMLDivElement | null;
-  const playlistData = playlistContainer?.dataset.playlist
-    ? (JSON.parse(playlistContainer.dataset.playlist) as {
-        title: string;
-        artist: string;
-        timeAgo: string;
-        tracks: { title: string; src: string; plays: string }[];
-      })
-    : null;
+  const playlistDataAttr = playlistContainer?.getAttribute("data-playlist");
+  if (!playlistDataAttr) return;
 
-  const currentTrackIndex = playlistData?.tracks.findIndex((track) => track.src === src);
-  if (!playlistData || currentTrackIndex === undefined) return;
+  const playlistData = JSON.parse(playlistDataAttr);
+  const currentTrackIndex = playlistData.tracks.findIndex((track: any) => track.src === src);
+  if (currentTrackIndex === -1) return;
 
-  const songs: Song[] = playlistData.tracks.map((track) => ({
+  const songs: Song[] = playlistData.tracks.map((track: any) => ({
     src: track.src,
     title: track.title,
     artist: playlistData.artist,
@@ -70,12 +94,19 @@ const handlePlayTrack = (event: React.MouseEvent<HTMLDivElement>) => {
     return;
   }
 
-  GlobalAudioManager.setPlaylist(songs, currentTrackIndex, null, playlistContainer);
+  GlobalAudioManager.setPlaylist(
+    songs,
+    currentTrackIndex,
+    null,
+    playlistContainer,
+    () => playNextPlaylist(playlistContainer!)
+  );
   GlobalAudioManager.playSongAt(currentTrackIndex);
 };
 
 export default handlePlayTrack;
 
+// Hàm render waveform đầu tiên của mỗi playlist
 export const initFirstWaveforms = () => {
   const containers = document.querySelectorAll(".player-container");
 
@@ -99,6 +130,7 @@ export const initFirstWaveforms = () => {
   });
 };
 
+// Khi bài hát thay đổi => update waveform
 const handleSongChanged = () => {
   console.log("🎧 songchanged event fired!");
 
@@ -118,10 +150,14 @@ const handleSongChanged = () => {
     console.log("🔄 Rendering new waveform for:", song.title || song.src);
     renderWaveform(audio, waveformContainer);
   } else {
-    audio.addEventListener("loadedmetadata", () => {
-      console.log("🔄 Rendering new waveform after metadata load:", song.title || song.src);
-      renderWaveform(audio, waveformContainer);
-    }, { once: true });
+    audio.addEventListener(
+      "loadedmetadata",
+      () => {
+        console.log("🔄 Rendering new waveform after metadata load:", song.title || song.src);
+        renderWaveform(audio, waveformContainer);
+      },
+      { once: true }
+    );
   }
 };
 

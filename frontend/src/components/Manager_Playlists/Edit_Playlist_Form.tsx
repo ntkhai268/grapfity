@@ -1,8 +1,29 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "../../styles/Edit_Playlist_Form.css";
 
-const SongUploadForm: React.FC = () => {
+interface SongUploadFormProps {
+  onCancel: () => void;
+}
+
+const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
   const [isPublic, setIsPublic] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   return (
     <div className="upload-form-overlay">
@@ -13,25 +34,51 @@ const SongUploadForm: React.FC = () => {
           {/* Image Upload */}
           <div className="form-image-upload">
             <div className="image-placeholder">
-              <button className="upload-btn">Upload Image</button>
+              {previewImage ? (
+                <div className="image-preview-wrapper">
+                  <img
+                    src={previewImage}
+                    alt="Preview"
+                    className="preview-img"
+                    onClick={handleUploadClick}
+                  />
+                  <button
+                    className="remove-img-btn"
+                    onClick={() => setPreviewImage(null)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ) : (
+                <button className="upload-btn" onClick={handleUploadClick}>
+                  Upload Image
+                </button>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+              />
             </div>
           </div>
 
           {/* Form Fields */}
           <div className="form-fields">
-          <label>
-            <div className="label-row">
+            <label>
+              <div className="label-row">
                 Titles <span className="required">*</span>
-            </div>
-            <input type="text" placeholder="Enter title" />
+              </div>
+              <input type="text" placeholder="Enter title" />
             </label>
 
             <label>
-            <div className="label-row">
+              <div className="label-row">
                 Permalink <span className="required">*</span>
-            </div>
-            <input type="text" placeholder="e.g. /my-song" />
-        </label>
+              </div>
+              <input type="text" placeholder="e.g. /my-song" />
+            </label>
 
             <label>
               Genre
@@ -52,47 +99,52 @@ const SongUploadForm: React.FC = () => {
         </label>
 
         <label>
-            <div className="label-row">
-                Caption <span className="caption-info">?</span>
-            </div>
-            <textarea placeholder="Enter caption" />
+          <div className="label-row">
+            Caption <span className="caption-info">?</span>
+          </div>
+          <textarea placeholder="Enter caption" />
         </label>
 
         {/* Privacy */}
         <div className="privacy-section">
-            <span className="privacy-title">Privacy:</span>
+          <span className="privacy-title">Privacy:</span>
 
-            <label className="privacy-option">
-                <div className="privacy-label-wrapper">
-                    <div className="privacy-header">
-                    <span className="privacy-label">Public</span>
-                    <input
-                        type="radio"
-                        checked={isPublic}
-                        onChange={() => setIsPublic(true)}
-                    />
-                    </div>
-                    <div className="privacy-desc">Anyone will be able to listen to this track.</div>
-                </div>
-                </label>
-                <label className="privacy-option">
-                <div className="privacy-label-wrapper">
-                    <div className="privacy-header">
-                    <span className="privacy-label">Private</span>
-                    <input
-                        type="radio"
-                        checked={!isPublic}
-                        onChange={() => setIsPublic(false)}
-                    />
-                    </div>
-                </div>
-                </label>
+          <label className="privacy-option">
+            <div className="privacy-label-wrapper">
+              <div className="privacy-header">
+                <span className="privacy-label">Public</span>
+                <input
+                  type="radio"
+                  checked={isPublic}
+                  onChange={() => setIsPublic(true)}
+                />
+              </div>
+              <div className="privacy-desc">
+                Anyone will be able to listen to this track.
+              </div>
             </div>
+          </label>
+
+          <label className="privacy-option">
+            <div className="privacy-label-wrapper">
+              <div className="privacy-header">
+                <span className="privacy-label">Private</span>
+                <input
+                  type="radio"
+                  checked={!isPublic}
+                  onChange={() => setIsPublic(false)}
+                />
+              </div>
+            </div>
+          </label>
+        </div>
 
         {/* Buttons */}
         <div className="form-buttons">
           <button className="save-btn">SAVE CHANGES</button>
-          <button className="cancel-btn">CANCEL</button>
+          <button className="cancel-btn" onClick={onCancel}>
+            CANCEL
+          </button>
         </div>
       </div>
     </div>

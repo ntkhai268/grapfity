@@ -48,13 +48,14 @@ const ControlPlaylist: React.FC = () => {
       {isEditing && (
         <div className="popup-backdrop">
           <div className="popup-content">
-            <SongUploadForm />
+            <SongUploadForm onCancel={() => setIsEditing(false)} />
             <button className="popup-close-btn" onClick={() => setIsEditing(false)}>
               &times;
             </button>
           </div>
         </div>
       )}
+
     </>
   );
 };
