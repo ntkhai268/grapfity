@@ -1,0 +1,220 @@
+/* src/components/TopUpload.css */
+
+/* Thiết lập chung cho container */
+.top-upload-container {
+    display: flex;
+    justify-content: space-evenly; /* Các phần tử sẽ được căn đều nhau */
+    padding: 20px;
+    position: absolute; /* Đặt vị trí của container */
+    bottom: 0; /* Đảm bảo container nằm ở dưới cùng của trang */
+    width: 97%; /* Chiếm toàn bộ chiều rộng của trang */
+    background-color: #fff; /* Màu nền */
+    gap: 20px;
+    top: 280px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
+  }
+  
+  /* Phần Top Tracks */
+  .top-tracks-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Xếp theo cột */
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .section-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
+  
+  .see-more {
+    color: #777;
+    cursor: pointer;
+  }
+  
+  .time-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .time-tabs button {
+    background: none;
+    border: none;
+    padding: 10px 0;
+    margin-right: 20px;
+    color: #777;
+    cursor: pointer;
+    position: relative;
+    font-size: 14px;
+  }
+  
+  .time-tabs button.active {
+    color: #000;
+    font-weight: 500;
+  }
+  
+  .time-tabs button.active::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #000;
+  }
+  
+  .date-range {
+    color: #777;
+    font-size: 14px;
+    margin-bottom: 20px;
+    flex-grow: 1; /* Đảm bảo date-range có thể chiếm hết không gian */
+  }
+  
+  .track-time {
+    color: #777;
+    font-size: 14px;
+    margin-left: 20px; /* Đẩy thời gian stream ra bên phải */
+    text-align: right;
+    flex-shrink: 0;
+  }
+  
+  .track-streams {
+    color: #777;
+    font-size: 14px;
+    text-align: right;
+    margin-left: 20px; /* Đẩy streams ra bên phải */
+    flex-shrink: 0; /* Đảm bảo không bị thu nhỏ */
+  }
+  
+  .tracks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .track-item {
+    display: flex;
+    align-items: center;
+  }
+  
+  .track-icon {
+    width: 50px;
+    height: 50px;
+    background-color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+  }
+  
+  .track-info {
+    flex: 1;
+  }
+  
+  .track-title {
+    font-size: 14px;
+  }
+  
+  /* Phần Top Listeners */
+  .top-listeners-section {
+    width: 500px;
+  }
+  
+  .top-listeners-section h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+  }
+  
+  .listener-tabs {
+    margin-bottom: 15px;
+  }
+  
+  .listener-tabs button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #777;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .listener-tabs button.active {
+    color: #000;
+    font-weight: 500;
+  }
+  
+  .streams-label {
+    color: #777;
+    font-size: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .listener-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .listener-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #eee;
+    margin-right: 15px;
+  }
+  
+  .listener-info {
+    flex: 1;
+  }
+  
+  .listener-name {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .listener-stats {
+    display: flex;
+    gap: 10px;
+    color: #777;
+    font-size: 14px;
+  }
+  
+  .play-count,
+  .followers-count {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .pro-message {
+    color: #777;
+    font-size: 14px;
+    margin-top: 30px;
+  }
+  
+  /* Responsive styling for small screens */
+  @media (max-width: 768px) {
+    .top-upload-container {
+      flex-direction: column; /* Xếp các phần tử theo cột khi màn hình nhỏ */
+      align-items: center; /* Căn giữa các phần tử khi xếp theo cột */
+    }
+  
+    .top-tracks-section,
+    .top-listeners-section {
+      width: 100%; /* Mở rộng chiều rộng khi màn hình nhỏ */
+    }
+  
+    .tracks-list {
+      gap: 10px; /* Giảm khoảng cách giữa các item */
+    }
+  }
+  

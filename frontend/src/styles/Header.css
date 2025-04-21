@@ -1,0 +1,93 @@
+header {
+    width: 100%;
+    height: 80px;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+}
+
+header h1 img {
+    width: 35px;
+    height: auto;
+    vertical-align: middle;
+}
+
+.btn-MP, .btn-TB, .btn-ND {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 30px;
+}
+
+.btn-MP img, .btn-TB img, .btn-ND img {
+    width: 30px;
+    height: 30px;
+}
+
+/* ----------------------------- SEARCH BAR ----------------------------- */
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #222;
+    border-radius: 50px;
+    padding: 12px 24px;
+    width: 600px;
+    color: white;
+    margin-left: 30px;
+}
+
+.search-bar i {
+    font-size: 22px;
+    color: #aaa;
+    margin: 0 10px;
+}
+
+.search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 18px;
+}
+
+.search-bar .divider {
+    width: 1px;
+    height: 20px;
+    background-color: gray;
+    margin: 0 12px;
+}
+
+/* ----------------------------- DROPDOWN MENU ----------------------------- */
+.user-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #181818;
+    border-radius: 6px;
+    width: 180px;
+    padding: 8px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.menu-item {
+    color: white;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #333;
+}
