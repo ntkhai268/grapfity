@@ -1,7 +1,7 @@
 import '../styles/Sidebar.css';
 
-import stackIcon from '../assets/stack.png';
-import musicNoteIcon from '../assets/notnhac.png';
+import stackIcon from '../assets/images/stack.png';
+import musicNoteIcon from '../assets/images/notnhac.png';
 
 const Sidebar = () => (
   <aside className="sidebar">

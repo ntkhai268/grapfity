@@ -1,4 +1,3 @@
-// src/context/PlayerContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 type Song = {
@@ -21,7 +20,6 @@ const PlayerContext = createContext<PlayerContextType | undefined>(undefined);
 export const PlayerProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [playlist, setPlaylist] = useState<Song[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-
   const currentSong = playlist[currentIndex] || null;
 
   return (

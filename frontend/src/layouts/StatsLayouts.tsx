@@ -1,14 +1,16 @@
 import React from "react";
-import "../styles/StatsLayout.css";
-import NavStats from "../components/NavStats";
+import { Routes, Route } from "react-router-dom";
+import StatsPage from "../container/StatsPage";
 
-const StatsLayouts: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const StatsLayouts = () => {
   return (
-    <div className="stats-layout">
-      <NavStats />
-      <main className="stats-content">{children}</main>
+    <div className="stats-layouts">
+      <Routes>
+        <Route path="/" element={<StatsPage />} /> {/* Route con cho /listening */}
+      </Routes>
     </div>
   );
 };
 
 export default StatsLayouts;
+

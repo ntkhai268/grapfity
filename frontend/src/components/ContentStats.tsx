@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom"; // 👈 Thêm Link từ react-router-dom
 import "../styles/ContentStats.css";
 
 const ContentStats = () => {
@@ -8,8 +9,12 @@ const ContentStats = () => {
         <h1>Stats for Graptify</h1>
         <p>Choose what you want to see:</p>
         <div className="stats-buttons">
-          <button>Listening</button>
-          <button>Upload</button>
+          <Link to="/listening">
+            <button>Listening</button> {/* Thêm điều hướng cho Listening */}
+          </Link>
+          <Link to="/upload">
+            <button>Upload</button> {/* Thêm điều hướng cho Upload */}
+          </Link>
         </div>
       </div>
 

@@ -4,13 +4,13 @@ import { usePlayer } from "../context/PlayerContext";
 import "../styles/Footer.css";
 
 // Icons
-import shuffleIcon from "../assets/shuffle.png";
-import prevIcon from "../assets/prev.png";
-import playIcon from "../assets/play.png";
-import pauseIcon from "../assets/stop.png";
-import nextIcon from "../assets/next.png";
-import repeatIcon from "../assets/loop.png";
-import plusIcon from "../assets/plus.png";
+import shuffleIcon from "../assets/images/shuffle.png";
+import prevIcon from "../assets/images/prev.png";
+import playIcon from "../assets/images/play.png";
+import pauseIcon from "../assets/images/stop.png";
+import nextIcon from "../assets/images/next.png";
+import repeatIcon from "../assets/images/loop.png";
+import plusIcon from "../assets/images/plus.png";
 
 const Footer = () => {
   const { playlist, currentIndex, currentSong, setCurrentIndex } = usePlayer();

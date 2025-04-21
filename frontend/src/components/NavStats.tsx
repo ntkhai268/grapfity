@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom"; // 👈 Thêm dòng này
+import { useNavigate, Link } from "react-router-dom"; // 👈 Thêm Link từ react-router-dom
 import "../styles/NavStats.css";
 
 const NavStats = () => {
@@ -30,7 +30,7 @@ const NavStats = () => {
   return (
     <nav className="nav-stats">
       <div className="nav-group-left">
-        <div className="nav-left">
+      <Link to="/stats" className="nav-left"> {/* Thay đổi đây */}
           <img
             src="https://img.icons8.com/color/48/combo-chart--v1.png"
             alt="Logo"
@@ -38,11 +38,11 @@ const NavStats = () => {
             height="24"
           />
           Stats for Graptify
-        </div>
+        </Link>
 
         <div className="nav-center">
-          <a href="#">Listening</a>
-          <a href="#">Upload</a>
+          <Link to="/listening">Listening</Link> {/* Thay đổi đây */}
+          <Link to="/upload">Upload</Link> {/* Thay đổi đây */}
         </div>
       </div>
 

@@ -1,12 +1,16 @@
 import React from "react";
-import StatsLayouts from "../layouts/StatsLayouts";
+import NavStats from "../components/NavStats";
 import ContentStats from "../components/ContentStats";
+import "../styles/StatsLayout.css";
 
-const StatsPage: React.FC = () => {
+const StatsPage = () => {
   return (
-    <StatsLayouts>
-      <ContentStats />
-    </StatsLayouts>
+    <div className="stats-layout">
+      <NavStats />
+      <div className="stats-content">
+        < ContentStats/>
+      </div>
+    </div>
   );
 };
 

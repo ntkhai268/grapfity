@@ -1,13 +1,13 @@
 import React from "react";
 import { usePlayer } from "../context/PlayerContext";
 
-import bacphan from "../assets/BacPhanRapVersion-TuiHat-6184759.mp3";
-import banhmikhong from "../assets/Bánh Mì Không.mp3";
-import codangdeyeuthuong from "../assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
+import bacphan from "../assets/audio/BacPhanRapVersion-TuiHat-6184759.mp3";
+import banhmikhong from "../assets/audio/Bánh Mì Không.mp3";
+import codangdeyeuthuong from "../assets/audio/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
 
-import img1 from "../assets/bacphan.jpg";
-import img2 from "../assets/banhmikhong.jpg";
-import img3 from "../assets/anhmau.png";
+import img1 from "../assets/images/bacphan.jpg";
+import img2 from "../assets/images/banhmikhong.jpg";
+import img3 from "../assets/images/anhmau.png";
 
 import "../styles/ProfileSection.css";
 

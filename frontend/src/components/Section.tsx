@@ -1,21 +1,27 @@
 // src/components/Section.tsx
+import React, { useEffect, useState } from "react";
 import { usePlayer } from "../context/PlayerContext";
-import bacphan from "../assets/BacPhanRapVersion-TuiHat-6184759.mp3";
-import banhmikhong from "../assets/Bánh Mì Không.mp3";
-import codangdeyeuthuong from "../assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
-import img1 from "../assets/bacphan.jpg";
-import img2 from "../assets/banhmikhong.jpg";
-import img3 from "../assets/anhmau.png";
+import { fetchSongs } from "../services/songAPI";
 import "../styles/Section.css";
 
-const songs = [
-  { title: "Bạc phận", artist: "Jack", image: img1, audio: bacphan },
-  { title: "Bánh mì không", artist: "Đạt G", image: img2, audio: banhmikhong },
-  { title: "Có đáng để yêu thương", artist: "Du Uyên", image: img3, audio: codangdeyeuthuong },
-];
+type Song = {
+  title: string;
+  artist: string;
+  image: string;
+  audio: string;
+};
 
 const Section = () => {
+  const [songs, setSongs] = useState<Song[]>([]);
   const { setPlaylist, setCurrentIndex } = usePlayer();
+
+  useEffect(() => {
+    const loadSongs = async () => {
+      const data = await fetchSongs();
+      setSongs(data as Song[]);
+    };
+    loadSongs();
+  }, []);
 
   const handleClick = (index: number) => {
     setPlaylist(songs);
@@ -34,12 +40,6 @@ const Section = () => {
           </button>
         ))}
       </div>
-      <h1>Recommended for today</h1>
-      <h1>Recommended for today</h1>
-      <h1>Recommended for today</h1>
-      <h1>Recommended for today</h1>
-      <h1>Recommended for today</h1>
-      <h1>Recommended for today</h1>
     </section>
   );
 };
