@@ -1,0 +1,152 @@
+/*----------header----------*/
+header {
+    width: 100%;
+    height: 70px; /* Chiều cao cố định */
+    display: flex;
+    /* justify-content: space-between; Căn cách đều */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    padding: 10px 20px; /* Khoảng cách bên trong */
+    background-color: #000; /* Màu nền */
+    position: fixed; /* Giữ header ở trên cùng */
+    top: 0;
+    left: 0px   ;
+    z-index: 1000; /* Đảm bảo nằm trên cùng */
+
+}
+
+
+
+h1 img {
+    width: 35px; /* Đặt chiều rộng */
+    height: auto; /* Giữ tỉ lệ ảnh */
+    vertical-align: middle ; /* Căn giữa theo chiều dọc */
+    margin-bottom: 10px;
+}
+.btn-MP {
+    background: none; /* Xóa nền mặc định */
+    border: none; /* Xóa viền */
+    cursor: pointer;
+    margin-left: 20px;
+}
+.btn-MP img {
+    width: 30px;
+    height: 30px;
+   
+}
+
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #222; /* Màu nền */
+    border-radius: 50px; /* Bo tròn viền */
+    padding: 12px 24px; /* Tăng padding để làm to hơn */
+    width: 600px; /* Tăng độ rộng */
+    height: 50px; /* Thêm đơn vị px và tăng chiều cao */
+    color: white;
+    position: relative;
+    top: center;
+    margin-left: 20px;
+}
+
+.search-bar i {
+    font-size: 22px; /* Tăng kích thước icon */
+    color: #aaa; /* Màu icon */
+    margin: 10 0px;
+}
+
+.search-bar input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: white;
+    font-size: 18px; /* Tăng kích thước chữ */
+    margin-left: 10px;
+}
+
+.search-bar .divider {
+    width: 1px;
+    height: 20px; /* Tăng chiều cao vạch ngăn */
+    background-color: gray;
+    margin: 0 12px;
+}
+
+.btn {
+    padding: 10px 20px;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    color: white;
+}
+
+
+.btn-TB {
+    position: absolute;
+    right: 90px; /* Cách lề phải (50px của user + 20px khoảng cách) */
+    border: none; /* Xoá viền */
+    outline: none; /* Xoá viền khi focus */
+    background: none; /* Xoá màu nền */ 
+    border: none; /* Xóa viền */
+    cursor: pointer;
+    margin-top: 8px;
+}
+.btn-TB img {
+    width: 30px; 
+    height: 30px;
+
+    vertical-align: middle; 
+}
+.btn-ND {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    }
+    
+.btn-ND img {
+    width: 40px; /* Điều chỉnh kích thước ảnh */
+    height: 40px;
+    border-radius: 30px;
+    vertical-align: middle;/*Căn giữa theo chiều dọc */
+}
+
+
+
+
+
+/* ----------------------------- DROPDOWN MENU ----------------------------- */
+.user-dropdown {
+    /* position: relative; */
+    display: inline-block;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 80px;
+    right: 30px;
+    background-color: #181818;
+    border-radius: 6px;
+    width: 180px;
+    padding: 8px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+.menu-item {
+    color: white;
+    padding: 10px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.menu-item:hover {
+    background-color: #333;
+}

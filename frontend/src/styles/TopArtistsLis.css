@@ -1,0 +1,141 @@
+/* Main container */
+.listening-container_artists {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 2000px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  color: #000;
+}
+
+/* Main title */
+.listening-title_artists {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Top section with back button, title and filter */
+.top-section_artists {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.back-button_artists {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  margin-right: 10px;
+}
+
+.section-title_artists {
+  font-size: 24px;
+  font-weight: bold;
+  flex-grow: 1;
+  margin: 0;
+}
+
+.filter-dropdown_artists {
+  background-color: #f0f0f0;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-arrow_artists {
+  margin-left: 5px;
+}
+
+/* Stats bar */
+.stats-bar_artists {
+  display: flex;
+  margin-bottom: 30px;
+}
+
+.stat-item_artists {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  font-size: 14px;
+  color: #666;
+}
+
+.play-stat_artists {
+  background-color: #000;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 20px;
+}
+
+.play-icon_artists,
+.heart-icon_artists,
+.comment-icon_artists,
+.repost-icon_artists,
+.download-icon_artists {
+  margin-right: 5px;
+}
+
+/* Artists list */
+.artists-list_artists {
+  display: flex;
+  flex-direction: column;
+}
+
+.artist-item_artists {
+  display: flex;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.artist-rank_artists {
+  font-size: 18px;
+  color: #666;
+  width: 30px;
+  text-align: center;
+}
+
+.artist-image_artists {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 15px;
+}
+
+.artist-image_artists img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.artist-info_artists {
+  flex-grow: 1;
+}
+
+.artist-name_artists {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.scrobbles-count_artists {
+  background-color: #ffd1d6;
+  color: #000;
+  display: inline-block;
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.arrow-icon_artists {
+  font-weight: bold;
+  margin-left: 5px;
+}

@@ -1,0 +1,269 @@
+.upload-form-overlay {
+    background-color: black;
+    color: white;
+    width: 100%;
+    height: 100%;
+    padding: 30px;
+    max-width: 700px;
+
+    margin: 50px auto;
+    border: 2px solid #0cf;
+    border-radius: 10px;
+    font-family: sans-serif;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+  }
+  
+  .form-grid {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .form-image-upload {
+    flex: 1;
+  }
+  
+  .image-placeholder {
+    width: 150px;
+    height: 150px;
+    background-color: #ccc;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    flex-direction: column; /* Đảm bảo hướng dọc */
+  }
+  
+  .upload-btn {
+    background-color: transparent;
+    border: 1px solid #666;
+    padding: 8px 12px;
+    color: white;
+    margin-top: auto;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+  
+  .form-fields {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 6px;
+  }
+  
+  .form-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px; /* Khoảng cách giữa "Titles" và "*" */
+    font-weight: bold;
+    color: white;
+  }
+  
+  label span.required {
+    color: red;
+    font-size: 1rem;
+    margin-left: 4px;
+    line-height: 1;
+  }
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  
+  input[type="text"],
+  input[type="date"],
+  textarea {
+    background-color: #222;
+    border: 1px solid #444;
+    padding: 8px;
+    border-radius: 4px;
+    color: white;
+    margin-top: 2px;
+  }
+  
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  
+  .caption-info {
+    color: #aaa;
+    background-color: #333;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .privacy-title{
+    font-weight: bold;
+  }
+  .privacy-option {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+    padding-left: 12px;
+  }
+  
+  .privacy-label-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .privacy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .privacy-label {
+    font-weight: bold;
+    color: white;
+  }
+  
+  .privacy-desc {
+    font-size: 0.85rem;
+    color: #aaa;
+  }
+  
+  .privacy-option input[type="radio"] {
+    cursor: pointer;
+  }
+  
+  
+  .form-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+    gap: 10px;
+  }
+  
+  .save-btn,
+  .cancel-btn {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .save-btn {
+    background-color: #1db954;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .cancel-btn {
+    background-color: #333;
+    color: white;
+  }
+  .popup-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .popup-content {
+    width: 640px;                  /* giống SoundCloud */
+    max-height: 90vh;
+    overflow-y: auto;
+  
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    padding: 24px 28px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    position: relative;
+  
+    color: white;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .popup-overlay {
+    position: absolute;  /* <-- thay vì fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  
+    background-color: rgba(255, 0, 0, 0.4); /* thử màu đỏ semi-transparent để dễ test */
+    z-index: 10;
+  }
+  .popup-close-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #bbb;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  
+  .popup-close-btn:hover {
+    color: #fff;
+  }
+  .image-preview-wrapper {
+    position: relative;
+    display: inline-block;
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 150px;
+  }
+  
+  .preview-img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .remove-img-btn {
+    position: absolute;
+    top: 6px;         /* Cách đỉnh ảnh một chút */
+    right: 6px;       /* Cách mép phải một chút */
+    background-color: rgba(255, 77, 79, 1);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+  }
