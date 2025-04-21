@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { playlists } from "../../components/Manager_Playlists/ManagerDataPlaylist";
+import { getPlaylists } from "../../components/Manager_Playlists/ManagerDataPlaylist"; // Import hàm getPlaylists
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 
 const DataPlaylist: React.FC = () => {
@@ -8,6 +8,10 @@ const DataPlaylist: React.FC = () => {
   const navigate = useNavigate();
   const numericId = Number(playlistId);
 
+  // Lấy danh sách playlists từ getPlaylists
+  const playlists = getPlaylists();
+  
+  // Tìm playlist theo ID
   const playlist = playlists.find((pl) => pl.id === numericId);
 
   if (!playlist) {

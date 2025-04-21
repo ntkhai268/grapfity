@@ -1,12 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react"; 
 import { useNavigate } from "react-router-dom";
 import handlePlayTrack, { initFirstWaveforms } from "../../hooks/Manager_Playlist";
-import { playlists } from "../../components/Manager_Playlists/ManagerDataPlaylist";
+import { getPlaylists } from "../../components/Manager_Playlists/ManagerDataPlaylist"; // Import getPlaylists
+
+// Định nghĩa kiểu TrackItem
+interface TrackItem {
+  title: string;
+  src: string;
+  artist: string;
+  cover: string;
+}
+
+// Định nghĩa kiểu PlaylistData
+interface PlaylistData {
+  id: number;
+  title: string;
+  artist: string;
+  timeAgo: string;
+  cover: string;
+  tracks: TrackItem[];
+}
 
 const Playlist: React.FC = () => {
+  const [playlists, setPlaylists] = useState<PlaylistData[]>([]); // State để lưu playlists
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Lấy playlists từ getPlaylists khi component mount
+    const fetchedPlaylists = getPlaylists();
+    setPlaylists(fetchedPlaylists);
+
     setTimeout(() => {
       initFirstWaveforms();
     }, 300);
@@ -14,7 +37,7 @@ const Playlist: React.FC = () => {
 
   return (
     <div className="content playlist">
-      {playlists.map((playlist, index) => (
+      {playlists.map((playlist: PlaylistData, index: number) => (
         <div
           className="player-container"
           key={index}
@@ -49,7 +72,7 @@ const Playlist: React.FC = () => {
               </div>
 
               <div className="track-list">
-                {playlist.tracks.map((track, i) => (
+                {playlist.tracks.map((track: TrackItem, i: number) => (
                   <div
                     className="track-item"
                     data-src={track.src}

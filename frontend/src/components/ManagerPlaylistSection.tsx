@@ -2,7 +2,7 @@ import React from "react";
 import ControlPlaylist from "./Manager_Playlists/ControlPlaylist";
 import PlaylistHeader from "./Manager_Playlists/HeaderPlaylist";
 import DataPlaylist from "./Manager_Playlists/DataPlaylist";
-import { playlists } from "../components/Manager_Playlists/ManagerDataPlaylist";
+import { getPlaylists } from "../components/Manager_Playlists/ManagerDataPlaylist"; // Sửa từ playlists thành getPlaylists
 
 import "../styles/ManagerSongLayout.css";
 
@@ -11,8 +11,29 @@ interface ManagerPlaylistSectionProps {
   playlistId: number;
 }
 
+// Định nghĩa kiểu PlaylistData nếu chưa có
+interface TrackItem {
+  title: string;
+  src: string;
+  artist: string;
+  cover: string;
+}
+
+interface PlaylistData {
+  id: number;
+  title: string;
+  artist: string;
+  timeAgo: string;
+  cover: string;
+  tracks: TrackItem[];
+}
+
 const ManagerPlaylistSection: React.FC<ManagerPlaylistSectionProps> = ({ playlistId }) => {
-  const playlist = playlists.find((pl) => pl.id === playlistId);
+  // Lấy danh sách playlists từ getPlaylists
+  const playlists = getPlaylists();
+  
+  // Tìm playlist theo id
+  const playlist = playlists.find((pl: PlaylistData) => pl.id === playlistId);
 
   if (!playlist) {
     return <div>Không tìm thấy playlist với id {playlistId}</div>;

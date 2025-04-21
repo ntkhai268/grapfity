@@ -1,11 +1,33 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { playlists } from "../../components/Manager_Playlists/ManagerDataPlaylist";
+import { getPlaylists } from "../../components/Manager_Playlists/ManagerDataPlaylist";
+
+// Định nghĩa kiểu PlaylistData (nếu chưa có)
+interface TrackItem {
+  title: string;
+  src: string;
+  artist: string;
+  cover: string;
+}
+
+interface PlaylistData {
+  id: number;
+  title: string;
+  artist: string;
+  timeAgo: string;
+  cover: string;
+  tracks: TrackItem[];
+}
 
 const PlaylistHeader: React.FC = () => {
   const { playlistId } = useParams<{ playlistId: string }>();
   const numericId = Number(playlistId);
-  const playlist = playlists.find((pl) => pl.id === numericId);
+
+  // Lấy danh sách playlists từ getPlaylists
+  const playlists = getPlaylists();
+  
+  // Tìm playlist theo id
+  const playlist = playlists.find((pl: PlaylistData) => pl.id === numericId);
 
   if (!playlist) {
     return <div>Không tìm thấy thông tin playlist.</div>;

@@ -1,3 +1,4 @@
+// types
 export interface TrackItem {
   title: string;
   src: string;
@@ -10,17 +11,18 @@ export interface PlaylistData {
   title: string;
   artist: string;
   timeAgo: string;
-  cover: string; // ✅ Thêm cover cho playlist
+  cover: string;
   tracks: TrackItem[];
 }
 
-export const playlists: PlaylistData[] = [
+// ✅ Danh sách playlist hiện có
+let playlists: PlaylistData[] = [
   {
     id: 1,
     title: "MUSICAS PARA CHURRASCO 🔥",
     artist: "Funk Trapstar",
     timeAgo: "11 months ago",
-    cover: "/assets/anhmau.png", // ✅ Playlist cover
+    cover: "/assets/anhmau.png",
     tracks: [
       {
         title: "Em Gì Ơi (Jack)",
@@ -68,10 +70,10 @@ export const playlists: PlaylistData[] = [
   },
   {
     id: 2,
-    title: "MUSICAS PARA CHURRASCO 🔥",
-    artist: "Funk Trapstar",
-    timeAgo: "11 months ago",
-    cover: "/assets/anhmau.png", // ✅ Playlist cover
+    title: "Chill Vibes",
+    artist: "Lo-fi Beats",
+    timeAgo: "2 months ago",
+    cover: "/assets/anhmau.png",
     tracks: [
       {
         title: "Sự Nghiệp Chướng (Pháo)",
@@ -83,10 +85,10 @@ export const playlists: PlaylistData[] = [
   },
   {
     id: 3,
-    title: "MUSICAS PARA CHURRASCO 🔥",
-    artist: "Funk Trapstar",
-    timeAgo: "11 months ago",
-    cover: "/assets/anhmau.png", // ✅ Playlist cover
+    title: "Rap Việt Collection",
+    artist: "Various Artists",
+    timeAgo: "5 months ago",
+    cover: "/assets/anhmau.png",
     tracks: [
       {
         title: "Mạnh Bà (Linh Hương Luz)",
@@ -103,3 +105,25 @@ export const playlists: PlaylistData[] = [
     ],
   },
 ];
+
+// ✅ Hàm truy cập danh sách playlist
+export const getPlaylists = (): PlaylistData[] => playlists;
+
+// ✅ Hàm tìm playlist theo ID
+export const getPlaylistById = (id: number): PlaylistData | undefined =>
+  playlists.find((p) => p.id === id);
+
+// ✅ Hàm tạo playlist mới
+export const addPlaylist = (): PlaylistData => {
+  const newPlaylist: PlaylistData = {
+    id: Math.max(...playlists.map((p) => p.id), 0) + 1,
+    title: "Playlist mới",
+    artist: "Chưa có nghệ sĩ",
+    timeAgo: "Vừa tạo",
+    cover: "/assets/anhmau.png",
+    tracks: [],
+  };
+
+  playlists.push(newPlaylist);
+  return newPlaylist;
+};
