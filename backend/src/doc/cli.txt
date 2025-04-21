@@ -1,0 +1,37 @@
+Các CLI được dùng:
+- Tạo Track:
+    npx sequelize-cli model:generate --name Track --attributes trackUrl:string,imageUrl:string,uploaderId:integer
+    Ghi chú: uploaderID chính là tài khoản dùng để đăng bài.
+- Tạo User:
+    npx sequelize-cli model:generate --name User --attributes userName:string,email:string,password:string,roleId:integer
+- Tạo Role:
+    npx sequelize-cli model:generate --name Role --attributes roleName:string
+- Tạo Playlist:
+    npx sequelize-cli model:generate --name Playlist --attributes userId:integer,title:string,createDate:date,imageUrl:string
+- Tạo Like:
+    npx sequelize-cli model:generate --name Like --attributes userId:integer,trackId:integer
+- Tạo Listening History:
+    npx sequelize-cli model:generate --name listeningHistory --attributes userId:integer,trackId:integer, timestamp:time
+- Tạo Search History
+    npx sequelize-cli model:generate --name searchHistory --attributes userId:integer,searchQuery:string, timestamp:time
+- Tạo migration:
+    npx sequelize-cli db:migrate
+- Tạo seed:
+    npx sequelize-cli db:seed:all
+- Tạo metadata:
+    npx sequelize-cli model:generate --name Metadata --attributes \
+    trackname:string,track_id:integer,\
+    explicit:boolean,danceability:float,energy:float,key:integer,loudness:float,\
+    mode:integer,speechiness:float,acousticness:float,instrumentalness:float,\
+    liveness:float,valence:float,tempo:float,duration_ms:integer,\
+    time_signature:integer,year:integer,release_date:date
+
+- User(UserID, Username, Email, Password).
+- Role(RoleID, UserID, Rolename)
+- Track(TrackID, Title, Genre, UserID, Duration, Release Date).
+- Playlist(PlaylistID, UserID, Title, Creation Date).
+- Like(LikeID, UserID, TrackID).
+- Listening History(HistoryID, UserID, TrackID, Timestamp).
+- Search History(SearchID, UserID, SearchQuery, Timestamp).
+
+
