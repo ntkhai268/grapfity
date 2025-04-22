@@ -1,18 +1,46 @@
 {
-  "name": "backend",
+  "name": "grapfity",
   "version": "1.0.0",
-  "main": "index.js",
+  "type": "module",
+  "description": "backend",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./src/server.js"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntkhai268/grapfity.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react"
+  ],
+  "author": "khaint",
   "license": "ISC",
-  "description": "",
+  "bugs": {
+    "url": "https://github.com/ntkhai268/grapfity/issues"
+  },
+  "homepage": "https://github.com/ntkhai268/grapfity#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^9.0.0",
+    "@sequelize/mssql": "^7.0.0-alpha.46",
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "google-auth-library": "^9.15.1",
-    "mssql": "^11.0.1"
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "jsonwebtoken": "^9.0.2",
+    "mssql": "^11.0.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.2",
+    "tedious": "^18.6.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
