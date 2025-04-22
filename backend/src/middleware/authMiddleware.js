@@ -1,7 +1,6 @@
 import { verityJWT } from './JWTActions.js'
 
 const authenticateUser = (req, res, next) =>{
-    console.log('ahihi')
     const token = req.cookies.jwt;
     if (!token){
         return res.status(401).json({ error: 'Chưa đăng nhập hoặc token không tồn tại' });

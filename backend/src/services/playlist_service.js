@@ -7,8 +7,18 @@ const getAllPlaylistsByUserId = async (userId) => {
             include: [
                 {
                     model: db.Track,
-                    through: { attributes: [] }, // Không lấy thuộc tính của bảng trung gian
+                    attributes: ['id', 'trackUrl', 'imageUrl'],
+                    include: [
+                        {
+                            model: db.User,
+                            attributes: ['userName']
+                        }
+                    ],
                 },
+                {
+                    model: db.User,
+                    attributes: ['userName']
+                }
             ],
         });
         return playlists;
