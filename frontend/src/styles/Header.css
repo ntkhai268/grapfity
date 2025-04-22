@@ -150,3 +150,25 @@ h1 img {
 .menu-item:hover {
     background-color: #333;
 }
+
+.btn-upload {
+    margin-left: auto; /* đẩy nút upload sang bên phải, sát icon TB */
+    margin-right: 120px; /* cách 1 chút so với icon thông báo */
+    background-color: #1db954;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+  
+  .btn-upload:hover {
+    background-color: #1ed760;
+  }
+
+  

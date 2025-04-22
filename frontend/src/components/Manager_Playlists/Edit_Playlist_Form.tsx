@@ -1,11 +1,11 @@
 import React, { useRef, useState } from "react";
 import "../../styles/Edit_Playlist_Form.css";
 
-interface SongUploadFormProps {
+interface EditPlaylistFormProps {
   onCancel: () => void;
 }
 
-const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
+const EditPlaylistForm: React.FC<EditPlaylistFormProps> = ({ onCancel }) => {
   const [isPublic, setIsPublic] = useState(true);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -28,7 +28,7 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
   return (
     <div className="upload-form-overlay">
       <div className="upload-form">
-        <h2 className="form-title">Basic info</h2>
+        <h2 className="form-title">Edit Playlist</h2>
 
         <div className="form-grid">
           {/* Image Upload */}
@@ -51,7 +51,7 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
                 </div>
               ) : (
                 <button className="upload-btn" onClick={handleUploadClick}>
-                  Upload Image
+                  Upload Playlist Cover
                 </button>
               )}
               <input
@@ -68,16 +68,16 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
           <div className="form-fields">
             <label>
               <div className="label-row">
-                Titles <span className="required">*</span>
+                Playlist Title <span className="required">*</span>
               </div>
-              <input type="text" placeholder="Enter title" />
+              <input type="text" placeholder="Enter playlist title" />
             </label>
 
             <label>
               <div className="label-row">
                 Permalink <span className="required">*</span>
               </div>
-              <input type="text" placeholder="e.g. /my-song" />
+              <input type="text" placeholder="e.g. /my-playlist" />
             </label>
 
             <label>
@@ -92,10 +92,10 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
           </div>
         </div>
 
-        {/* Lyrics and Caption */}
+        {/* Description and Caption */}
         <label>
-          Lyrics
-          <textarea placeholder="Enter lyrics" />
+          Description
+          <textarea placeholder="Enter playlist description" />
         </label>
 
         <label>
@@ -120,7 +120,7 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
                 />
               </div>
               <div className="privacy-desc">
-                Anyone will be able to listen to this track.
+                Anyone will be able to view this playlist.
               </div>
             </div>
           </label>
@@ -151,4 +151,4 @@ const SongUploadForm: React.FC<SongUploadFormProps> = ({ onCancel }) => {
   );
 };
 
-export default SongUploadForm;
+export default EditPlaylistForm;
