@@ -1,137 +1,69 @@
-import React from "react";
-import { usePlayer } from "../context/PlayerContext";
+// import React from "react";
+// import Header from "./Header";
+// import Sidebar from "./Sidebar";
+import Tab from "./UI_Profile/Tab";
+// import Footer from "./Footer";
+import SongRight from "./UI_Profile/Song_right";
+import Song from "./UI_Profile/All";
+import PopularTracks from "./UI_Profile/Popular_Tracks";
+import Tracks from "./UI_Profile/Tracks";
+import Playlists from "./UI_Profile/Playlist";
 
-import bacphan from "../assets/audio/BacPhanRapVersion-TuiHat-6184759.mp3";
-import banhmikhong from "../assets/audio/Bánh Mì Không.mp3";
-import codangdeyeuthuong from "../assets/audio/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
+import ProfileSlide from "./UI_Profile/Profile_Slide";
+import ProfileStat from "./UI_Profile/Profile_Stats";
 
-import img1 from "../assets/images/bacphan.jpg";
-import img2 from "../assets/images/banhmikhong.jpg";
-import img3 from "../assets/images/anhmau.png";
+// import css
 
-import "../styles/ProfileSection.css";
+// import "../styles/ProfileSlide.css";
+// import "../styles/Song_Side.css";
+// import "../styles/MidSection.css";
+// import "../styles/BottomSection.css";
+import "../styles/ProfileLayout.css";
 
-const likedTracks = [
-  {
-    id: 1,
-    title: "Bạc Phận",
-    artist: "Jack",
-    image: img1,
-    audio: bacphan,
-    plays: 1000,
-    likes: 2000,
-    shares: 3000,
-  },
-  {
-    id: 2,
-    title: "Bánh Mì Không",
-    artist: "Đạt G",
-    image: img2,
-    audio: banhmikhong,
-    plays: 800,
-    likes: 1200,
-    shares: 900,
-  },
-];
 
-const recentTracks = [
-  {
-    id: 1,
-    title: "Có Đáng Để Yêu Thương",
-    artist: "Đức Anh, Du Uyên",
-    image: img3,
-    audio: codangdeyeuthuong,
-  },
-  {
-    id: 2,
-    title: "Bánh Mì Không",
-    artist: "Đạt G",
-    image: img2,
-    audio: banhmikhong,
-  },
-  {
-    id: 3,
-    title: "Bạc Phận",
-    artist: "Jack",
-    image: img1,
-    audio: bacphan,
-  },
-];
 
 const ProfileSection = () => {
-  const { setPlaylist, setCurrentIndex } = usePlayer();
-
-  const handleClick = (list: any[], index: number) => {
-    setPlaylist(list);
-    setCurrentIndex(index);
-  };
-
   return (
-    <div className="profile-section">
-      <div className="profile-header">
-        <div className="avatar" />
-        <div className="info">
-          <p className="label">Hồ Sơ</p>
-          <h2>Hưng Nguyễn</h2>
-        </div>
-      </div>
+    <div>
+      <div className="container">
+        {/* <Header />
+        <Sidebar /> */}
+        <div className="song_side_profile">
+            {/* -------------------------UI profile------------------------------------------- */}
+            <div className="profile_slide">
+                <ProfileSlide />
 
-      <div className="profile-tabs">
-        <span className="tab active">All</span>
-        <span className="tab">Popular tracks</span>
-        <span className="tab">Tracks</span>
-        <span className="tab">Playlist</span>
-      </div>
+                <div className="mid_section">
+                    <Tab />
+                    <ProfileStat />
 
-      <div className="profile-stats">
-        <div>Follower <strong>0</strong></div>
-        <div>Following <strong>3</strong></div>
-        <div>Tracks <strong>5</strong></div>
-      </div>
+                    <div className="tabs_below">
+                        <span>Recent</span>
+                    </div>
+                </div>
 
-      <div className="profile-content">
-        <div className="recent-tracks">
-          <p className="section-title">Recent</p>
-          {recentTracks.map((track, index) => (
-            <div
-              className="track"
-              key={track.id}
-              onClick={() => handleClick(recentTracks, index)}
-            >
-              <img src={track.image} alt="track" />
-              <div className="meta">
-                <strong>{track.title}</strong>
-                <p>{track.artist}</p>
-              </div>
-              <img src="/assets/waveform.png" className="waveform" />
+                <div className="bottom_section">
+                    <div className="left_section">
+                    <Song />
+                    <PopularTracks />
+                    <Tracks />
+                    <Playlists />
+                    </div>
+
+                    <SongRight />
+                </div>
             </div>
-          ))}
+            {/* -------------------------UI quản lí bài hát---------------------------------------- */}
+           {/* <div className="Management_song">
+                <SongHeader />
+                <Controls />
+                <Lyrics />
+                <Recommendations />
+                <PopularSongs />
+            </div>  */}
+            {/* -------------------------------------------------------------------- */}
         </div>
-
-        <div className="liked-tracks">
-          <div className="liked-header">
-            <p>{likedTracks.length} Likes</p>
-            <a href="#">View all</a>
-          </div>
-          {likedTracks.map((track, index) => (
-            <div
-              className="liked-track"
-              key={track.id}
-              onClick={() => handleClick(likedTracks, index)}
-            >
-              <img src={track.image} alt="track" />
-              <div className="meta">
-                <strong>{track.title}</strong>
-                <p>{track.artist}</p>
-              </div>
-              <div className="stats">
-                <span>▶ {track.plays}</span>
-                <span>❤️ {track.likes}</span>
-                <span>🔁 {track.shares}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* <Footer /> */}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
@@ -10,6 +10,13 @@ interface HomeLayoutProps {
 }
 
 const HomeLayout: React.FC<HomeLayoutProps> = ({ children }) => {
+  useEffect(() => {
+    document.body.classList.add("home-page");
+    return () => {
+      document.body.classList.remove("home-page");
+    };
+  }, []);
+
   return (
     <div className="main-background"> 
       <div className="main-layout">

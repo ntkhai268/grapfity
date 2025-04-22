@@ -1,108 +1,141 @@
+
+/* Tổng thể footer */
 .footer {
-    display: grid;
-    grid-template-columns: 300px 1fr 300px;  /* ✅ 3 cột cố định trái, giữa, phải */
-    align-items: center;
-    padding: 10px 20px;
-    background: black;
-    color: white;
-    width: 100vw;
-    box-sizing: border-box;
-  }
-  
-  .left-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  
-  .footer-img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 6px;
-    flex-shrink: 0;
-  }
-  
-  .footer-title {
-    font-weight: bold;
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 180px;
-  }
-  
-  .footer-artist {
-    font-size: 12px;
-    color: #ccc;
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 180px;
-  }
-  
-  .icon-small {
-    width: 16px;
-    height: 16px;
-    margin-left: 10px;
-    flex-shrink: 0;
-  }
-  
-  .icon-button {
-    background: none;
-    border: none;
-    padding: 0;
-    margin-left: 8px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .center-controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    width: 100%;  /* ✅ giúp seek-bar kéo dài */
-  }
-  
-  .control-icons {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  
-  .control-icons img {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    opacity: 0.85;
-  }
-  
-  .play-button {
-    background: black;
-    border: 2px solid white;
-    border-radius: 50%;
-    padding: 8px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-  }
-  
-  .play-button img {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-  }
-  
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;  /* Chiều cao hợp lý */
+  background-color: black;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+}
+
+/* Phần bên trái */
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 30%;
+  height: 100%;
+}
+
+.playing-song {
+  width: 50px;
+  height: 50px;
+}
+
+.playing-song img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.title-playing-song {
+  font-size: 14px;
+  color: white;
+}
+
+.song-title {
+  font-weight: bold;
+}
+
+.song-artist {
+  font-size: 12px;
+  color: gray;
+}
+
+/* Phần điều khiển chính giữa */
+.music-player {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+/* Nút điều khiển nhạc */
+.music-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  gap: 8px; /* Giảm khoảng cách giữa các nút */
+}
+.music-controls button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  margin: 0;  
+}
+
+.music-controls button:hover {
+  color: #1DB954; /* Màu xanh Spotify */
+}
+
+/* Thanh thời gian */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 300px;
+  margin-top: 5px;
+}
+
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 5px;
+  background: gray;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.current-progress {
+  position: absolute;
+  height: 100%;
+  background: #1db954;
+  top: 0;
+  left: 0;
+  transition: width 0.2s linear;
+}
+
+.current-time, .total-time {
+  color: white;
+  font-size: 12px;
+}
+
+.footer-right-progress{
+  display: flex;
+  background-color: black;
+  max-width: 30%;
+  margin-left: auto;
+  width: 30%;
+  height: 100%;
+}
+
+/* Nút thêm */
+.btn-DC{
+  background: black;
+  margin-left: 10px;
+  border: none;
+  outline: none; /* Loại bỏ viền khi nhấn */
+}
+.btn-DC img {
+  width: 30px;
+  height: 30px;
+  /* border-radius: 50%; */
+  /* box-shadow: none;
+  filter: none; */
+
+  background: black; /*Xóa nền */
+  padding: 0; /* Đảm bảo không có vùng padding gây màu nền */
+}
+
   .seek-row {
     display: flex;
     align-items: center;
@@ -119,16 +152,5 @@
     background: #444;
     border-radius: 10px;
   }
-  
-  .time {
-    font-size: 12px;
-    color: #ccc;
-    min-width: 30px;
-    text-align: center;
-  }
-  
-  .right-info {
-    width: 100%; /* không cần fix cứng nếu dùng grid column cố định */
-    height: 1px;
-  }
+
   

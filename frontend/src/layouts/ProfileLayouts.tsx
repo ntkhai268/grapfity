@@ -1,15 +1,19 @@
-import React, { ReactNode } from "react";
-import Header from "../components/Header"; // Assuming Header component exists
-import Sidebar from "../components/Sidebar"; // Assuming Sidebar component exists
-import Footer from "../components/Footer"; // Assuming Footer component exists
-import ProfileSection from "../components/ProfileSection"; // Assuming ProfileSection component exists
-import "../styles/ProfileLayout.css"; // Ensure you have the corresponding CSS file for layout
+// src/layouts/ProfileLayouts.tsx
+import React, { useEffect } from "react";
+import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
+import Footer from "../components/Footer";
+import ProfileSection from "../components/ProfileSection";
+import "../styles/ProfileLayout.css";
 
-interface ProfileLayoutProps {
-  children: ReactNode; // Define children prop as ReactNode
-}
-
-const ProfileLayout: React.FC<ProfileLayoutProps> = ({ children }) => {
+const ProfileLayout: React.FC = () => {
+  useEffect(() => {
+    import("../hooks/Trans_Tab").then((module) => {
+      if (typeof module.initTabs === "function") {
+        module.initTabs(); // Gọi lại tab init mỗi khi vào profile
+      }
+    });
+  }, []);
   return (
     <div className="main-background">
       <div className="main-layout">
