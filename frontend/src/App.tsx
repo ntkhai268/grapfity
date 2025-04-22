@@ -19,12 +19,25 @@ import UploadLayouts from "./layouts/UploadLayouts";
 import StatsLayouts from "./layouts/StatsLayouts";
 import ListeningLayouts from "./layouts/ListeningLayouts";
 
+import LoginForm from "./container/Login";  // Đảm bảo có nhập đúng đường dẫn
+import LoginLayout from "./layouts/LoginLayouts";  // Layout dành cho trang đăng nhập
+
 const App = () => {
   return (
     <Routes>
       {/* ✅ Tự chuyển hướng từ / sang /mainpage */}
-      <Route path="/" element={<Navigate to="/mainpage" replace />} />
+      {/* Chuyển hướng từ / đến /login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
+{/* Trang đăng nhập với Login Layout */}
+<Route
+  path="/login"
+  element={
+    <LoginLayout>
+      <LoginForm /> {/* Trang đăng nhập */}
+    </LoginLayout>
+  }
+/>
       <Route
         path="/mainpage"
         element={
