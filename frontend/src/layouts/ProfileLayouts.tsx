@@ -21,8 +21,7 @@ const ProfileLayout: React.FC = () => {
         <div className="main-content">
           <Sidebar />
           <div className="page-content">
-            <ProfileSection /> {/* This will render the ProfileSection component */}
-            {children} {/* This will render the children passed to the layout (like ProfilePage content) */}
+            <ProfileSection /> {/* Thay Section bằng ProfileSection */}
           </div>
         </div>
         <Footer />

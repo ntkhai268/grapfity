@@ -3,11 +3,11 @@ import { useNavigate } from "react-router-dom";
 import UploadSong from "../components/Manager_Songs/Upload_Song"; // Import UploadSong component
 import "../styles/Header.css";
 
-import spotifyLogo from "../assets/spotify.png";
-import homeIcon from "../assets/home.png";
-import bellIcon from "../assets/bell.png";
-import userIcon from "../assets/iconnguoidung.png";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import spotifyLogo from "../assets/images/spotify.png";
+import homeIcon from "../assets/images/home.png";
+import bellIcon from "../assets/images/bell.png";
+import userIcon from "../assets/images/iconnguoidung.png"; 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 import { faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 const Header: React.FC = () => {

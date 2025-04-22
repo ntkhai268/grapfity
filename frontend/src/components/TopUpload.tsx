@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";  // Thêm Link từ react-router-dom
-import "/Users/dangkhoii/Documents/Graptify/frontend/src/styles/TopUpload.css";
+import "../styles/TopUpload.css";
 
 const TopUpload: React.FC = () => {
   // Time tab state
