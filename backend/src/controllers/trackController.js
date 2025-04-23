@@ -7,6 +7,7 @@ import {
     deleteTrack,
     getTrackWithUploaderById
 } from '../services/track_service.js';
+import { verityJWT } from '../middleware/JWTActions.js';
 
 const getAllTracksController = async (req, res) => {
     try {
@@ -54,12 +55,22 @@ const getTrackWithUploaderByIdController = async (req, res) => {
 };
 
 const createTrackController = async (req, res) => {
-    const { trackUrl, imageUrl, uploaderId } = req.body;
-    if (!trackUrl || !imageUrl || !uploaderId) {
+    const JWT = req.cookies;
+    const data = verityJWT(JWT.jwt);
+    const uploaderId = data.userId;
+    const trackUrl = req.files.audio[0].destination + '/' + req.files.audio[0].filename
+    const imageUrl = req.files.image[0].destination + '/' + req.files.image[0].filename
+    const metadata = eval(req.body.metadata)
+    metadata.trackname = req.body.title
+    metadata.release_date = req.body.releaseDate || new Date().toISOString().split('T')[0];
+    metadata.year = eval(req.body.releaseDate.slice(0, 4))
+
+    console.log(trackUrl, imageUrl)
+    if (!trackUrl || !imageUrl || !uploaderId || !metadata.trackname || metadata.release_date) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
     try {
-        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId);
+        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, metadata);
         return res.status(200).json({
             message: 'Create track succeed!',
             data: newTrack
