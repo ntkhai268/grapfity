@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import '/Users/dangkhoii/Documents/Graptify/frontend/src/styles/LoginForm.css'; // Đảm bảo đường dẫn đúng với file CSS bạn vừa dùng
+import '../styles/LoginForm.css'; // Đảm bảo đường dẫn đúng với file CSS bạn vừa dùng
 
 const LoginLayout = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {

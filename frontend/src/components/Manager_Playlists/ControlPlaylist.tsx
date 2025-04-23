@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import useSongManager from "../../hooks/Manager_Song_Play";
-import SongUploadForm from "../../components/Manager_Playlists/Edit_Playlist_Form"
+import EditPlaylistForm from "../../components/Manager_Playlists/Edit_Playlist_Form"
 
 interface ISongManagerOutput {
   audioRef: React.RefObject<HTMLAudioElement | null>;
@@ -48,7 +48,7 @@ const ControlPlaylist: React.FC = () => {
       {isEditing && (
         <div className="popup-backdrop">
           <div className="popup-content">
-            <SongUploadForm onCancel={() => setIsEditing(false)} />
+            <EditPlaylistForm onCancel={() => setIsEditing(false)} />
             <button className="popup-close-btn" onClick={() => setIsEditing(false)}>
               &times;
             </button>

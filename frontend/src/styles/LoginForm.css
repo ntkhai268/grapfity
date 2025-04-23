@@ -1,4 +1,4 @@
-
+/* Đảm bảo rằng trang login không bị ảnh hưởng bởi trang profile */
 .login-background {
   position: fixed;
   inset: 0;
@@ -6,38 +6,59 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: -1;
+  z-index: 10; /* Đảm bảo trang login luôn ở trên */
 }
 
- .login-background *{
+.login-background * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
   text-decoration: none;
   list-style: none;
-} .login-background body{
+}
+
+/* Đảm bảo thân trang đăng nhập được căn giữa */
+.login-background body {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
   background: linear-gradient(90deg, #e2e2e2, #54e3b1);
-} .login-background .container{
+}
+
+/* Bố cục container */
+.login-background .container {
   position: relative;
   width: 850px;
   height: 550px;
   background: #fff;
   margin: 0 auto;
   border-radius: 30px;
-  box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-} .login-background .container h1{
-      font-size: 36px;
-      margin: -10px 0;
-  } .login-background .container p{
-      font-size: 14.5px;
-      margin: 15px 0;
-  } .login-background form{ width: 100%; } .login-background .form-box{
+  z-index: 20;
+}
+
+/* Tiêu đề trong container */
+.login-background .container h1 {
+  font-size: 36px;
+  margin: -10px 0;
+}
+
+/* Đoạn văn bản mô tả trong container */
+.login-background .container p {
+  font-size: 14.5px;
+  margin: 15px 0;
+}
+
+/* Bố cục form */
+.login-background form {
+  width: 100%;
+}
+
+/* Bố cục form-box (phần đăng nhập và đăng ký) */
+.login-background .form-box {
   position: absolute;
   right: 0;
   width: 50%;
@@ -50,32 +71,63 @@
   padding: 40px;
   z-index: 1;
   transition: .6s ease-in-out 1.2s, visibility 0s 1s;
-} .login-background .container.active .form-box{ right: 50%; } .login-background .form-box.register{ visibility: hidden; } .login-background .container.active .form-box.register{ visibility: visible; } .login-background .input-box{
+}
+
+.login-background .container.active .form-box {
+  right: 50%;
+}
+
+.login-background .form-box.register {
+  visibility: hidden;
+}
+
+.login-background .container.active .form-box.register {
+  visibility: visible;
+}
+
+/* Các ô input */
+.login-background .input-box {
   position: relative;
   margin: 30px 0;
-} .login-background .input-box input{
-      width: 100%;
-      padding: 13px 50px 13px 20px;
-      background: #eee;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      font-size: 16px;
-      color: #333;
-      font-weight: 500;
-  } .login-background .input-box input::placeholder{
-          color: #888;
-          font-weight: 400;
-      } .login-background .input-box i{
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 20px;
-  } .login-background .forgot-link{ margin: -15px 0 15px; } .login-background .forgot-link a{
-      font-size: 14.5px;
-      color: #333;
-  } .login-background .btn{
+}
+
+.login-background .input-box input {
+  width: 100%;
+  padding: 13px 50px 13px 20px;
+  background: #eee;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.login-background .input-box input::placeholder {
+  color: #888;
+  font-weight: 400;
+}
+
+.login-background .input-box i {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+}
+
+/* Đường link quên mật khẩu */
+.login-background .forgot-link {
+  margin: -15px 0 15px;
+}
+
+.login-background .forgot-link a {
+  font-size: 14.5px;
+  color: #333;
+}
+
+/* Nút đăng nhập */
+.login-background .btn {
   width: 100%;
   height: 48px;
   background: #088b3e;
@@ -86,37 +138,51 @@
   font-size: 16px;
   color: #fff;
   font-weight: 600;
-} .login-background .social-icons{
+}
+
+/* Các icon mạng xã hội */
+.login-background .social-icons {
   display: flex;
   justify-content: center;
-} .login-background .social-icons a{
-      display: inline-flex;
-      padding: 10px;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      font-size: 24px;
-      color: #333;
-      margin: 0 8px;
-  } .login-background .toggle-box{
+}
+
+.login-background .social-icons a {
+  display: inline-flex;
+  padding: 10px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 24px;
+  color: #333;
+  margin: 0 8px;
+}
+
+/* Toggle giữa login và register */
+.login-background .toggle-box {
   position: absolute;
   width: 100%;
   height: 100%;
-} .login-background .toggle-box::before{
-      content: '';
-      position: absolute;
-      left: -250%;
-      width: 300%;
-      height: 100%;
-      background: #088b3e;
-      /* border: 2px solid red; */
-      border-radius: 150px;
-      z-index: 2;
-      transition: 1.8s ease-in-out;
-  } .login-background .container.active .toggle-box::before{ left: 50%; } .login-background .toggle-panel{
+}
+
+.login-background .toggle-box::before {
+  content: '';
+  position: absolute;
+  left: -250%;
+  width: 300%;
+  height: 100%;
+  background: #088b3e;
+  border-radius: 150px;
+  z-index: 2;
+  transition: 1.8s ease-in-out;
+}
+
+.login-background .container.active .toggle-box::before {
+  left: 50%;
+}
+
+.login-background .toggle-panel {
   position: absolute;
   width: 50%;
   height: 100%;
-  /* background: seagreen; */
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -124,55 +190,107 @@
   align-items: center;
   z-index: 2;
   transition: .6s ease-in-out;
-} .login-background .toggle-panel.toggle-left{ 
-      left: 0;
-      transition-delay: 1.2s; 
-  } .login-background .container.active .toggle-panel.toggle-left{
-          left: -50%;
-          transition-delay: .6s;
-      } .login-background .toggle-panel.toggle-right{ 
-      right: -50%;
-      transition-delay: .6s;
-  } .login-background .container.active .toggle-panel.toggle-right{
-          right: 0;
-          transition-delay: 1.2s;
-      } .login-background .toggle-panel p{ margin-bottom: 20px; } .login-background .toggle-panel .btn{
-      width: 160px;
-      height: 46px;
-      background: transparent;
-      border: 2px solid #fff;
-      box-shadow: none;
-  }
-
-@media screen and (max-width: 650px){
-  .container{ height: calc(100vh - 40px); } .login-background .form-box{
-      bottom: 0;
-      width: 100%;
-      height: 70%;
-  } .login-background .container.active .form-box{
-          right: 0;
-          bottom: 30%;
-      } .login-background .toggle-box::before{
-      left: 0;
-      top: -270%;
-      width: 100%;
-      height: 300%;
-      border-radius: 20vw;
-  } .login-background .container.active .toggle-box::before{
-          left: 0;
-          top: 70%;
-      } .login-background .container.active .toggle-panel.toggle-left{
-          left: 0;
-          top: -30%;
-      } .login-background .toggle-panel{ 
-      width: 100%;
-      height: 30%;
-  } .login-background .toggle-panel.toggle-left{ top: 0; } .login-background .toggle-panel.toggle-right{
-          right: 0;
-          bottom: -30%;
-      } .login-background .container.active .toggle-panel.toggle-right{ bottom: 0; }
 }
 
-@media screen and (max-width: 400px){
-  .form-box { padding: 20px; } .login-background .toggle-panel h1{font-size: 30px; }
+.login-background .toggle-panel.toggle-left {
+  left: 0;
+  transition-delay: 1.2s;
+}
+
+.login-background .container.active .toggle-panel.toggle-left {
+  left: -50%;
+  transition-delay: .6s;
+}
+
+.login-background .toggle-panel.toggle-right {
+  right: -50%;
+  transition-delay: .6s;
+}
+
+.login-background .container.active .toggle-panel.toggle-right {
+  right: 0;
+  transition-delay: 1.2s;
+}
+
+.login-background .toggle-panel p {
+  margin-bottom: 20px;
+}
+
+.login-background .toggle-panel .btn {
+  width: 160px;
+  height: 46px;
+  background: transparent;
+  border: 2px solid #fff;
+  box-shadow: none;
+}
+
+/* Responsive */
+@media screen and (max-width: 650px) {
+  .login-background .container {
+    height: calc(100vh - 40px);
+  }
+
+  .login-background .form-box {
+    bottom: 0;
+    width: 100%;
+    height: 70%;
+  }
+
+  .login-background .container.active .form-box {
+    right: 0;
+    bottom: 30%;
+  }
+
+  .login-background .toggle-box::before {
+    left: 0;
+    top: -270%;
+    width: 100%;
+    height: 300%;
+    border-radius: 20vw;
+  }
+
+  .login-background .container.active .toggle-box::before {
+    left: 0;
+    top: 70%;
+  }
+
+  .login-background .container.active .toggle-panel.toggle-left {
+    left: 0;
+    top: -30%;
+  }
+
+  .login-background .toggle-panel {
+    width: 100%;
+    height: 30%;
+  }
+
+  .login-background .toggle-panel.toggle-left {
+    top: 0;
+  }
+
+  .login-background .toggle-panel.toggle-right {
+    right: 0;
+    bottom: -30%;
+  }
+
+  .login-background .container.active .toggle-panel.toggle-right {
+    bottom: 0;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .form-box {
+    padding: 20px;
+  }
+
+  .login-background .toggle-panel h1 {
+    font-size: 30px;
+  }
+}
+
+/* CSS cho trang profile, tránh ảnh hưởng đến trang login */
+.profile-page {
+  background-color: #000; /* Nền của trang profile */
+  color: #fff; /* Màu chữ trang profile */
+  z-index: 0; /* Đảm bảo trang profile nằm dưới trang login */
 }
