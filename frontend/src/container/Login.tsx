@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     const container = document.querySelector('.container');
@@ -26,8 +27,7 @@ const LoginForm: React.FC = () => {
       const response = await fetch('http://localhost:8080/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: "include",
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ username, password })
       });
       const data = await response.json();
       if (response.ok) {
@@ -63,6 +63,28 @@ const LoginForm: React.FC = () => {
     }
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const roleId = 1;  // Mặc định roleId là 1
+    try {
+      const response = await fetch('http://localhost:8080/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, roleId })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert('Đăng ký thành công!');
+        window.location.href = 'http://localhost:5173/mainpage'; // Chuyển hướng sau khi đăng ký thành công
+      } else {
+        alert(data.error || 'Đăng ký thất bại!');
+      }
+    } catch (err) {
+      console.error('Lỗi kết nối server:', err);
+      alert('Không thể kết nối đến máy chủ.');
+    }
+  };
+
   return (
     <div className="container">
       <div className="form-box login">
@@ -89,18 +111,18 @@ const LoginForm: React.FC = () => {
       </div>
 
       <div className="form-box register">
-        <form>
+        <form onSubmit={handleRegister}>
           <h1>Registration</h1>
           <div className="input-box">
-            <input type="text" placeholder="Username" required />
+            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
             <i className='bx bxs-user'></i>
           </div>
           <div className="input-box">
-            <input type="email" placeholder="Email" required />
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <i className='bx bxs-envelope'></i>
           </div>
           <div className="input-box">
-            <input type="password" placeholder="Password" required />
+            <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             <i className='bx bxs-lock-alt'></i>
           </div>
           <button type="submit" className="btn">Register</button>
