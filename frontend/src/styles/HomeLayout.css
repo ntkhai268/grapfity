@@ -1,0 +1,31 @@
+body.home-body{
+  margin: 0;
+}
+.main-background {
+  background-color: black;
+  min-height: 100vh;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  margin-top: 80px; /* Header height */
+  margin-bottom: 80px; /* Footer height */
+  overflow: hidden;
+}
+
+.sidebar {
+  flex-shrink: 0;
+}
+        
+.song_side {
+  flex: 1;
+  overflow-y: auto;
+}
