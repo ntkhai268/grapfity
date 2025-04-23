@@ -24,7 +24,6 @@ const getTrackWithUploaderById = async (id) => {
 const createTrack = async (trackUrl, imageUrl, uploaderId, metadata) => {
     const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId });
     metadata.track_id = newTrack.id
-    console.log(metadata)
     const {
         trackname, track_id, explicit, danceability,
         energy, key, loudness, mode, speechiness,
