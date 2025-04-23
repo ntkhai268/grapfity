@@ -19,7 +19,7 @@ const sequelize = new Sequelize(
       }
     },
     freezeTableName: true,
-    timestamp: true,
+    timestamps: true, // sửa lại "timestamp" thành "timestamps"
     logging: true
   }
 );
@@ -34,27 +34,36 @@ const connectToDB = async () => {
   }
 };
 
-// Khởi tạo object chứa các model
-const db = {
-  sequelize,
-  Sequelize,
-  connectToDB,
-  Track: (await import('./track.js')).default(sequelize, Sequelize.DataTypes),
-  User: (await import('./user.js')).default(sequelize, Sequelize.DataTypes),
-  Like: (await import('./like.js')).default(sequelize, Sequelize.DataTypes),
-  Playlist: (await import('./playlist.js')).default(sequelize, Sequelize.DataTypes),
-  Role: (await import('./role.js')).default(sequelize, Sequelize.DataTypes),
-  listeningHistory: (await import('./listeninghistory.js')).default(sequelize, Sequelize.DataTypes),
-  searchHistory: (await import('./searchhistory.js')).default(sequelize, Sequelize.DataTypes),
-  Metadata: (await import('./metadata.js')).default(sequelize, Sequelize.DataTypes),
-  PlaylistTrack: (await import('./playlisttrack.js')).default(sequelize, Sequelize.DataTypes),
+// Hàm khởi tạo các model và trả về db
+const initDb = async () => {
+  const db = {
+    sequelize,
+    Sequelize,
+    connectToDB,
+  };
+
+  // Tải tất cả các model một cách bất đồng bộ
+  db.Track = (await import('./track.js')).default(sequelize, Sequelize.DataTypes);
+  db.User = (await import('./user.js')).default(sequelize, Sequelize.DataTypes);
+  db.Like = (await import('./like.js')).default(sequelize, Sequelize.DataTypes);
+  db.Playlist = (await import('./playlist.js')).default(sequelize, Sequelize.DataTypes);
+  db.Role = (await import('./role.js')).default(sequelize, Sequelize.DataTypes);
+  db.listeningHistory = (await import('./listeninghistory.js')).default(sequelize, Sequelize.DataTypes);
+  db.searchHistory = (await import('./searchhistory.js')).default(sequelize, Sequelize.DataTypes);
+  db.Metadata = (await import('./metadata.js')).default(sequelize, Sequelize.DataTypes);
+  db.PlaylistTrack = (await import('./playlisttrack.js')).default(sequelize, Sequelize.DataTypes);
+
+  // Khởi tạo các quan hệ (associations) nếu có
+  Object.keys(db).forEach(modelName => {
+    if (db[modelName] && db[modelName].associate) {
+      db[modelName].associate(db);
+    }
+  });
+
+  return db;
 };
 
-// Gọi hàm associate nếu có
-Object.keys(db).forEach(modelName => {
-  if (db[modelName] && db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
+// Khởi tạo db và xuất ra đối tượng db
+const db = await initDb(); // Chờ đến khi tất cả các model được tải xong
 
 export default db;
