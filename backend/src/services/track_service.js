@@ -47,8 +47,7 @@ const updateTrack = async (id, updateData) => {
 };
 
 const deleteTrack = async (id) => {
-    // TODO: cần xử lý nếu có khóa ngoại liên quan
-    // return await db.Track.destroy({ where: { id } });
+    return await db.Track.destroy({ where: { id } });
 };
 
 export {

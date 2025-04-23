@@ -99,7 +99,15 @@ const updateTrackController = async (req, res) => {
 };
 
 const deleteTrackController = async (req, res) => {
-    // TODO: Implement logic if needed
+    try{
+        await deleteTrack(req.params.id)
+        return res.status(200).json({
+            message: 'Delete track succeed!',
+        });
+    } catch (err){
+        console.error('Database connection failed:', err);
+        res.status(500).send('Internal Server Error');
+    }
 };
 
 export {

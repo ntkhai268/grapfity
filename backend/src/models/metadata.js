@@ -14,15 +14,11 @@ export default (sequelize, DataTypes) => {
 
   Metadata.init({
     trackname: DataTypes.STRING,
-<<<<<<< HEAD
-    track_id: DataTypes.INTEGER,
-=======
     track_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
     },
->>>>>>> main
     explicit: DataTypes.BOOLEAN,
     danceability: DataTypes.FLOAT,
     energy: DataTypes.FLOAT,
@@ -34,19 +30,11 @@ export default (sequelize, DataTypes) => {
     instrumentalness: DataTypes.FLOAT,
     liveness: DataTypes.FLOAT,
     valence: DataTypes.FLOAT,
-<<<<<<< HEAD
-    tempo: DataTypes.FLOAT,
-    duration_ms: DataTypes.INTEGER,
-    time_signature: DataTypes.INTEGER,
-    year: DataTypes.INTEGER,
-    release_date: DataTypes.DATE
-=======
     tempo: DataTypes.FLOAT, 
     duration_ms: DataTypes.INTEGER,
     time_signature: DataTypes.INTEGER,
     year: DataTypes.INTEGER,
     release_date: DataTypes.DATEONLY
->>>>>>> main
   }, {
     sequelize,
     modelName: 'Metadata'
