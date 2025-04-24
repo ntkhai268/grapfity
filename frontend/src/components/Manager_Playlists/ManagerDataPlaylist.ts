@@ -22,7 +22,7 @@ let playlists: PlaylistData[] = [
     title: "MUSICAS PARA CHURRASCO 🔥",
     artist: "Funk Trapstar",
     timeAgo: "11 months ago",
-    cover: "/assets/anhmau.png",
+    cover: "/assets/blue.png",
     tracks: [
       {
         title: "Em Gì Ơi (Jack)",
@@ -52,7 +52,7 @@ let playlists: PlaylistData[] = [
         title: "Cô Thắm Không Về (Chưa Xác Định)",
         src: "/assets/CoThamKhongVe.mp3",
         artist: "Chưa Xác Định",
-        cover: "/assets/anhmau.png",
+        cover: "/assets/blue.png",
       },
       {
         title: "Bạc Phận (version rap)",
@@ -73,7 +73,7 @@ let playlists: PlaylistData[] = [
     title: "Chill Vibes",
     artist: "Lo-fi Beats",
     timeAgo: "2 months ago",
-    cover: "/assets/anhmau.png",
+    cover: "/assets/blue.png",
     tracks: [
       {
         title: "Sự Nghiệp Chướng (Pháo)",

@@ -35,21 +35,19 @@
     scrollbar-color: #888 transparent;
     background-color: white;
 }
-  .Management_playlist {
-    flex: 1;
-    height: calc(100vh - 90px);
-    /* overflow-y: auto; */
-    background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 30%);
-    
-    
-  }
+.Management_playlist {
+  flex: 1;
+  height: calc(100vh - 90px);
+  
+}
 
 /* Playlist Header Styles */
 .playlist-header {
     display: flex;
     align-items: flex-end;
     padding: 32px;
-    background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 60%);
+    /* background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 60%); */
+    background-color: none;
     box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
   }
   
@@ -114,7 +112,9 @@
   }
   .song-list-manager {
     padding-left: 16px;
-    background-color: var(--spotify-dark-grey) ;
+    /* background-color: var(--spotify-dark-grey) ; */
+   
+
   }
   /* Nút play hình tròn màu xanh */
 .play-button-circle {
@@ -168,4 +168,3 @@
     color: white;
     font-size: 16px;
   }
-  
