@@ -191,6 +191,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
+.content {
+    display: none;
+}
 
 .content.active {
     display: block;

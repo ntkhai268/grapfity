@@ -23,16 +23,25 @@ h1 img {
     margin-bottom: 10px;
 }
 .btn-MP {
-    background: none; /* Xóa nền mặc định */
-    border: none; /* Xóa viền */
+    background-color: #1F1F1F; /* Màu nền xanh lá */
+    color: white; /* Màu chữ (nếu có) để tương phản với nền xanh */
+    border-radius: 50%; /* Tạo hình tròn */
+    width: 50px; /* Đặt chiều rộng */
+    height: 50px; /* Đặt chiều cao bằng chiều rộng để tạo hình tròn đều */
+    display: flex; /* Để căn giữa nội dung bên trong (ví dụ: ảnh) */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    border: none; /* Xóa viền mặc định (nếu bạn không muốn) */
     cursor: pointer;
-    margin-left: 20px;
-}
-.btn-MP img {
-    width: 30px;
-    height: 30px;
-   
-}
+    margin-left: 20px; /* Giữ lại margin-left hiện tại */
+    padding: 0; /* Loại bỏ padding mặc định có thể ảnh hưởng đến hình tròn */
+  }
+  
+  .btn-MP img {
+    width: 70%; /* Điều chỉnh kích thước ảnh bên trong cho phù hợp với nút tròn */
+    height: 70%; /* Điều chỉnh kích thước ảnh bên trong cho phù hợp với nút tròn */
+    object-fit: contain; /* Đảm bảo ảnh không bị méo và nằm gọn trong nút */
+  }
 
 
 .search-bar {
@@ -65,13 +74,20 @@ h1 img {
     margin-left: 10px;
 }
 
-.search-bar .divider {
+.search-bar .vertical-divider {
     width: 1px;
     height: 20px; /* Tăng chiều cao vạch ngăn */
     background-color: gray;
     margin: 0 12px;
 }
-
+.e-9812-icon.e-9812-baseline {
+    width: 24px; /* Hoặc kích thước bạn muốn */
+    height: 24px;
+    /* Bạn có thể thêm các thuộc tính CSS khác cho icon SVG ở đây, ví dụ: fill, color */
+  }
+  .e-9812-button__icon-wrapper {
+    margin-left: 10px; /* Điều chỉnh giá trị này để có khoảng cách mong muốn */
+  }
 .btn {
     padding: 10px 20px;
     font-size: 20px;
@@ -154,8 +170,8 @@ h1 img {
 .btn-upload {
     margin-left: auto; /* đẩy nút upload sang bên phải, sát icon TB */
     margin-right: 120px; /* cách 1 chút so với icon thông báo */
-    background-color: #1db954;
-    color: white;
+    background-color: white;
+    color: black;
     border: none;
     border-radius: 20px;
     padding: 8px 16px;

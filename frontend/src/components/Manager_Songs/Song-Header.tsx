@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import useImageColor from "../../hooks/useImageColor";
 
 interface Song {
   title: string;
@@ -8,16 +9,29 @@ interface Song {
   src: string;
 }
 
-const SongHeader: React.FC = () => {
+interface SongHeaderProps {
+  onColorExtract?: (color: string) => void;
+}
+
+const SongHeader: React.FC<SongHeaderProps> = ({ onColorExtract }) => {
   const location = useLocation();
   const { currentSong }: { currentSong?: Song } = location.state || {};
+
+  const bgColor = useImageColor(currentSong?.cover || null);
 
   useEffect(() => {
     if (currentSong?.src) {
       localStorage.setItem("currentSong", currentSong.src);
-      window.dispatchEvent(new Event("storage")); // Thông báo cho Controls
+      window.dispatchEvent(new Event("storage"));
     }
   }, [currentSong]);
+
+  // Truyền màu ra ngoài sau khi đã lấy được
+  useEffect(() => {
+    if (bgColor && onColorExtract) {
+      onColorExtract(bgColor);
+    }
+  }, [bgColor, onColorExtract]);
 
   if (!currentSong) {
     return <div>Không tìm thấy thông tin bài hát.</div>;
