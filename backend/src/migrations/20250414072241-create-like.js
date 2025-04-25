@@ -22,8 +22,6 @@ module.exports = {
           model: 'Tracks',
           key: 'id'
         },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       },
       createdAt: {
         allowNull: false,

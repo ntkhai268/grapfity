@@ -66,14 +66,6 @@ const handleUserLogin = async (username, password) => {
 };
 
 const updateUser = async (id, userName, email, password, roleId) => {
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        password = hashedPassword;
-    } catch (err) {
-        console.error('Error hashing password:', err);
-        throw new Error('Error hashing password');
-    }
-
     const user = await db.User.findByPk(id);
     if (!user) {
         return { message: 'User not found' };
@@ -83,12 +75,15 @@ const updateUser = async (id, userName, email, password, roleId) => {
     return updatedUser;
 };
 
-// ✅ Xuất các hàm theo chuẩn ES module
+const deleteUser = async (userId) => {
+    return await db.User.destroy({ where: { id: userId }, individualHooks: true})
+}
+
 export {
     getAllUsers,
     getUserById,
     createUser,
     handleUserLogin,
     updateUser,
-    // deleteUser (nếu có)
+    deleteUser
 };

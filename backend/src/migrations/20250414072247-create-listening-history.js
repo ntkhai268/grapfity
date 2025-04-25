@@ -15,9 +15,6 @@ module.exports = {
           model: 'Users',
           key: 'id'
         },
-        //Việc set onDelete và onUpdate là không cần thiết bởi 
-        // vì khi update hoặc delete một bộ trong bảng User thì Track sẽ tự động làm theo, 
-        // và listening history cũng tự động sửa theo
       },
       trackId: {
         type: Sequelize.INTEGER,
@@ -25,8 +22,6 @@ module.exports = {
           model: 'Tracks',
           key: 'id'
         },
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       },
       listenCount: {
         type: Sequelize.INTEGER

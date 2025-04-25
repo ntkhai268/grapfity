@@ -1,3 +1,4 @@
+import { Sequelize, Transaction } from 'sequelize';
 import db from '../models/index.js';
 
 const getAllTracks = async () => {
@@ -47,7 +48,9 @@ const updateTrack = async (id, updateData) => {
 };
 
 const deleteTrack = async (id) => {
-    return await db.Track.destroy({ where: { id } });
+    return await Sequelize.Transaction(async (t) => {
+        await db.Track.destroy({ where: { id }, individualHooks: true, transaction: t });
+    })
 };
 
 export {
