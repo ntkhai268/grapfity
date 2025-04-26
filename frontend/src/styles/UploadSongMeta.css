@@ -442,3 +442,16 @@ input[type="date"].meta-form-input::-webkit-calendar-picker-indicator {
      margin-bottom: 8px; /* Tạo khoảng cách dưới chữ Privacy */
      width: auto; /* Để legend không chiếm hết chiều rộng */
   }
+
+  .meta-input-button-wrapper {
+    display: flex;         /* Sắp xếp input và button nằm ngang */
+    align-items: center;   /* Căn giữa các item theo chiều dọc */
+    gap: 8px;            /* Khoảng cách giữa input và button (có thể chỉnh lại) */
+  }
+  
+  /* Cho phép input chiếm phần lớn không gian */
+  .meta-input-button-wrapper .meta-form-input {
+    flex-grow: 1;         /* Cho phép input co giãn */
+    /* Quan trọng: Đảm bảo input và button có cùng chiều cao */
+    /* Ví dụ: height: 38px; hoặc padding phù hợp */
+  }

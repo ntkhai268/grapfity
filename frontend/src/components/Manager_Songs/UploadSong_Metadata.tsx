@@ -104,6 +104,12 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
     if (!title.trim()) { alert("Vui lòng nhập Title."); return; }
     if (!selectedAudioFile) { alert("Vui lòng chọn file nhạc (MP3)."); return; }
     if (!selectedImageFile) { alert("Vui lòng chọn ảnh."); return; }
+    if (!audioFeatures) {
+      alert("Vui lòng nhập hoặc xác nhận dữ liệu ở tab Metadata (MetaDataSong).");
+      // Optionally, switch to the metadata tab automatically
+      // setActiveTab('metadata');
+      return; // Dừng lại nếu chưa có dữ liệu metadata
+    }
 
     // Tạo FormData
     const formData = new FormData();
@@ -221,16 +227,27 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
 
       {/* --- Ô INPUT METASONG (HIỂN THỊ DỮ LIỆU TỪ TAB METADATA, READONLY) --- */}
       <label className="meta-form-label">
-          <div className="meta-label-content">MetaDataSong (Collected)</div> {/* Đổi label cho rõ */}
-          <input
-              type="text"
-              className="meta-form-input"
-              // Hiển thị object audioFeatures thành chuỗi JSON
-              value={audioFeatures ? JSON.stringify(audioFeatures) : ''}
-              readOnly // Chỉ đọc
-              placeholder="Data from Metadata tab appears here"
-              aria-label="Collected data from Metadata tab"
-          />
+          <div className="meta-label-content">MetaDataSong (Collected)  <span className="meta-required-indicator">*</span></div> {/* Đổi label cho rõ */}
+          <div className="meta-input-button-wrapper"> {/* Wrapper vẫn giữ nguyên */}
+              <input
+                  type="text"
+                  className="meta-form-input"
+                  value={audioFeatures ? JSON.stringify(audioFeatures) : ''}
+                  readOnly
+                  placeholder="Data from Metadata tab appears here"
+                  aria-label="Collected data from Metadata tab"
+              />
+              {/* Đổi className của button này */}
+              <button
+                  type="button"
+                  className="meta-choose-file-button" // <<< THAY ĐỔI Ở ĐÂY: Dùng class giống nút Permalink
+                  onClick={() => setActiveTab('metadata')}
+                  title="Go to Metadata tab to edit/view"
+              >
+                  Edit/View
+              </button>
+          </div>
+          
       </label>
       {/* --- KẾT THÚC Ô METASONG --- */}
 
@@ -323,7 +340,9 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
       {activeTab === 'metadata' && (
          <Metadata onCancel={onCancel} onOk={handleMetadataOk} />
       )}
-      {renderFooter()}
+      {/* --- Chỉ render Footer khi tab 'basic' đang active --- */}
+     {activeTab === 'basic' && renderFooter()}
+     {/* --- Footer sẽ không hiển thị khi activeTab là 'metadata' --- */}
     </div>
   );
 };
