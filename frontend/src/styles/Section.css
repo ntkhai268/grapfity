@@ -1,6 +1,94 @@
+/* Sidebar container */
+.sidebar {
+    position: fixed;
+    width: 25px; /* mặc định nhỏ */
+    height: 77vh;
+    background-color: #121212;
+    color: white;
+    padding: 20px 0;
+    left: 10px;
+    top: 80px;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+/* Sidebar khi mở rộng */
+.sidebar.expanded {
+    width: 275px;
+}
+
+/* Các nút Library, Music, Create Playlist */
+.btn-YL,
+.btn-NN,
+.btn-CrePlaylist {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 10px;
+    margin: 0;
+    position: relative; /* để position cho icon */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Icon khi sidebar nhỏ */
+.sidebar:not(.expanded) .btn-icon {
+    position: absolute;
+    left: -4px; /* icon sát trái khi nhỏ */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon khi sidebar mở rộng */
+.sidebar.expanded .btn-icon {
+    position: absolute;
+    left: 10px; /* icon cách trái đẹp khi mở */
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Icon image hoặc svg */
+.btn-icon img,
+.btn-icon svg {
+    width: 30px;
+    height: 30px;
+    filter: brightness(0) invert(1);
+}
+
+/* Label chữ bên phải icon */
+.btn-label {
+    margin-left: 50px;
+    font-size: 16px;
+    color: white;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Ẩn label khi sidebar nhỏ */
+.sidebar:not(.expanded) .btn-label {
+    opacity: 0;
+    transform: scale(0);
+    display: none;
+}
+
+/* Section chứa bài hát */
 .song_side {
     position: absolute;
-    left: 80px; /* tránh sidebar */
+    left: 80px;
     top: 80px;
     right: 10px;
     height: 80vh;
@@ -10,8 +98,15 @@
     scrollbar-color: #888 transparent;
     background-color: #000;
     padding-right: 10px;
+    transition: left 0.3s ease;
 }
 
+/* Section né ra khi sidebar mở */
+.song_side.shrink {
+    left: 290px;
+}
+
+/* Scrollbar style */
 .song_side::-webkit-scrollbar {
     width: 6px;
 }
@@ -21,12 +116,15 @@
     border-radius: 10px;
 }
 
-.song_side h1, .song_side h2 {
-    font-size: 50px;
+/* Tiêu đề trong section */
+.song_side h1,
+.song_side h2 {
+    font-size: 30px;
     font-weight: bold;
     color: white;
 }
 
+/* Danh sách bài hát */
 .song-list {
     display: flex;
     gap: 15px;
@@ -34,6 +132,7 @@
     padding: 10px;
 }
 
+/* Mỗi bài hát */
 .song-item {
     background: none;
     border: none;
@@ -46,24 +145,43 @@
     flex-direction: column;
     gap: 5px;
 }
-
+/* Default ảnh bài hát (vuông) */
 .song-item img {
-    width: 250px;
-    height: 250px;
+    width: 200px;
+    height: 200px;
     object-fit: cover;
     border-radius: 8px;
 }
 
+/* Riêng phần Recently released: hình tròn */
+.song-list-circle .song-item img {
+    border-radius: 50%; /* chuyển thành hình tròn */
+    width: 100px;
+    height: 100px;
+}
+
+/* Ảnh bài hát */
+.song-item img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Tiêu đề bài hát */
 .song-item .title {
     font-size: 18px;
     font-weight: bold;
 }
 
+/* Tên nghệ sĩ */
 .song-item .artist {
+    margin-top: 10px;
     font-size: 14px;
     color: #ccc;
 }
 
+/* Hover bài hát */
 .song-item:hover {
     opacity: 0.85;
     transform: scale(1.02);

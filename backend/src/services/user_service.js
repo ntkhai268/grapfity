@@ -44,28 +44,24 @@ const createUser = async (userName, email, password, roleId) => {
 
 const handleUserLogin = async (username, password) => {
     try {
-        // Tìm tài khoản người dùng theo tên đăng nhập
         const user = await db.User.findOne({ where: { userName: username } });
 
-        // Kiểm tra xem tài khoản có tồn tại không
         if (!user) {
-            return { message: 'Tài khoản không tồn tại' }; // Nếu tài khoản không có trong database
+            return { message: 'Username does not exist' };
         }
 
-        // Kiểm tra mật khẩu
         const passwordMatch = await bcrypt.compare(password, user.password);
         if (!passwordMatch) {
-            return { message: 'Mật khẩu không đúng' }; // Nếu mật khẩu sai
+            return { message: 'Incorrect password' };
         }
 
-        // Tạo và trả về JWT nếu đăng nhập thành công
         const payload = { userId: user.id };
         const token = createJWT(payload);
 
-        return { message: 'Đăng nhập thành công', token: token }; // Đăng nhập thành công
+        return { message: 'Login successful', token: token };
     } catch (err) {
-        console.error('Lỗi khi đăng nhập:', err);
-        throw new Error('Lỗi khi kiểm tra tài khoản');
+        console.error('Error during login:', err);
+        throw new Error('Error checking username');
     }
 };
 

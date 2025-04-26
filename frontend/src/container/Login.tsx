@@ -23,40 +23,28 @@ const LoginForm: React.FC = () => {
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();  // Ngừng hành động mặc định của form
-
+    e.preventDefault();
     try {
-        // Gửi yêu cầu đăng nhập đến server
-        const response = await fetch('http://localhost:8080/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })  // Gửi username để xác thực
-        });
-
-        const data = await response.json();  // Nhận dữ liệu trả về từ server
-
-        if (!response.ok) {
-            // Nếu phản hồi từ server không thành công, hiển thị thông báo lỗi
-            setErrorMessage(data.error || 'Tài khoản không tồn tại!');
-            return;
-        }
-
-        // Nếu đăng nhập thành công, kiểm tra roleId và điều hướng người dùng
-        const roleId = data.roleId;
-        if (roleId === 1) {
-            window.location.href = 'http://localhost:5173/mainpage'; // Điều hướng đến trang chính cho roleId = 1
-        } else if (roleId === 2) {
-            window.location.href = 'http://localhost:5173/otherpage'; // Điều hướng đến trang khác cho roleId = 2
-        } else {
-            setErrorMessage('Không có quyền truy cập');  // Nếu roleId không hợp lệ
-        }
-
+      const response = await fetch('http://localhost:8080/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await response.json();
+      if (response.ok && data.message === 'Login successful') {
+        // Lưu token vào localStorage để sử dụng cho các yêu cầu sau
+        localStorage.setItem('token', data.token);
+        alert(data.message); // Hiển thị "Login successful"
+        window.location.href = 'http://localhost:5173/mainpage';
+      } else {
+        alert(data.message); // Hiển thị "Username does not exist" hoặc "Incorrect password"
+      }
     } catch (err) {
-        console.error('Lỗi kết nối server:', err);
-        setErrorMessage('Không thể kết nối đến máy chủ.');  // Xử lý lỗi kết nối
+      console.error('Lỗi kết nối server:', err);
+      alert('Không thể kết nối đến máy chủ.');
     }
 };
-
 
   
 
