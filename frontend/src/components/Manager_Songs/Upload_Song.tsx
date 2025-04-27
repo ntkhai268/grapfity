@@ -10,13 +10,11 @@ const UploadSong: React.FC<SongUploadFormProps> = ({ onCancel }) => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [permalink, setPermalink] = useState("");
-  const [metadata, setMetadata] = useState("");
+  const [genre, setGenre] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [lyrics, setLyrics] = useState("");
   const [caption, setCaption] = useState("");
   const [mainArtist, setMainArtist] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
   const audioInputRef = useRef<HTMLInputElement | null>(null);
@@ -28,7 +26,6 @@ const UploadSong: React.FC<SongUploadFormProps> = ({ onCancel }) => {
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -37,48 +34,31 @@ const UploadSong: React.FC<SongUploadFormProps> = ({ onCancel }) => {
     }
   };
 
-  const handleAudioFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleAudioFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setAudioFile(file);
       const fileName = file.name;
+      const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
+
       setPermalink(fileName);
+      setTitle(fileNameWithoutExt);
     }
   };
 
-  const handleSaveChanges = async () => {
-    if (!audioFile || !imageFile) {
-      alert("Vui lòng chọn đầy đủ file nhạc và ảnh!");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("permalink", permalink);
-    formData.append("metadata", metadata);
-    formData.append("releaseDate", releaseDate);
-    formData.append("lyrics", lyrics);
-    formData.append("caption", caption);
-    formData.append("isPublic", String(isPublic));
-    formData.append("mainArtist", mainArtist);
-    formData.append("audio", audioFile); 
-    formData.append("image", imageFile);
-
-    try {
-      const res = await fetch("http://localhost:8080/api/create-track", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      console.log(formData);
-      const result = await res.json();
-      console.log("✅ Upload thành công:", result);
-      onCancel(); // hoặc reset form nếu muốn
-    } catch (err) {
-      console.error("❌ Lỗi upload:", err);
-    }
+  const handleSaveChanges = () => {
+    const formData = {
+      title,
+      permalink,
+      genre,
+      releaseDate,
+      lyrics,
+      caption,
+      isPublic,
+      previewImage,
+      mainArtist,
+    };
+    console.log("Dữ liệu gửi đi:", formData);
+    onCancel();
   };
 
   return (
@@ -178,12 +158,12 @@ const UploadSong: React.FC<SongUploadFormProps> = ({ onCancel }) => {
             </label>
 
             <label>
-              Metadata
+              Genre
               <input
                 type="text"
-                placeholder="Metadata"
-                value={metadata}
-                onChange={(e) => setMetadata(e.target.value)}
+                placeholder="Genre"
+                value={genre}
+                onChange={(e) => setGenre(e.target.value)}
               />
             </label>
 

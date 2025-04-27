@@ -48,6 +48,8 @@
   margin-top: auto;
   margin-bottom: 10px;
   cursor: pointer;
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .form-fields {

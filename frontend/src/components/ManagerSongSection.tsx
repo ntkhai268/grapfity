@@ -1,40 +1,30 @@
-// import React from "react";
-// import Header from "../components/Header";
-// import Sidebar from "../components/Sidebar";
-// import Footer from "../components/Footer";
-import Controls
-from "./Manager_Songs/Controls";
+import { useState } from "react";
+import Controls from "./Manager_Songs/Controls";
 import Lyrics from "./Manager_Songs/Lyrics";
 import PopularSongs from "./Manager_Songs/PopularSongs";
 import Recommendations from "./Manager_Songs/Recommendations";
 import SongHeader from "./Manager_Songs/Song-Header";
 
-
-// import "../styles/ManagerSongLayout.css";
-
-
-
-
-
 const ManagerSongSection = () => {
+  const [bgColor, setBgColor] = useState("#7D3218"); // màu mặc định
+
   return (
     <div>
       <div className="container">
-        {/* <Header />
-        <Sidebar /> */}
         <div className="song_side_profile">
-                
-            {/* -------------------------UI quản lí bài hát---------------------------------------- */}
-           <div className="Management_song">
-                <SongHeader />
-                <Controls />
-                <Lyrics />
-                <Recommendations />
-                <PopularSongs />
-            </div> 
-            {/* -------------------------------------------------------------------- */}
+          <div
+            className="Management_song"
+            style={{
+              background: `linear-gradient(to bottom, ${bgColor}, var(--spotify-black) 50%)`,
+            }}
+          >
+            <SongHeader onColorExtract={setBgColor} />
+            <Controls />
+            <Lyrics />
+            <Recommendations />
+            <PopularSongs />
+          </div>
         </div>
-        {/* <Footer /> */}
       </div>
     </div>
   );

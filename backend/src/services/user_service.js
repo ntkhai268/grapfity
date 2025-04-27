@@ -39,7 +39,11 @@ const createUser = async (userName, email, password, roleId) => {
         throw new Error('Error checking username');
     }
 
-    return await db.User.create({ email, password, userName, roleId });
+    const newUser = await db.User.create({ email, password, userName, roleId });
+    const payload = { userId: newUser.id };
+    const token = createJWT(payload);
+    return { message: 'Register successful', token: token };
+
 };
 
 const handleUserLogin = async (username, password) => {
@@ -58,7 +62,7 @@ const handleUserLogin = async (username, password) => {
         const payload = { userId: user.id };
         const token = createJWT(payload);
 
-        return { message: 'Login successful', token: token };
+        return { message: 'Login successful', token: token, roleId: user.roleId };
     } catch (err) {
         console.error('Error during login:', err);
         throw new Error('Error checking username');
