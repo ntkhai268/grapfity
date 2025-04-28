@@ -49,6 +49,7 @@
     /* background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 60%); */
     background-color: none;
     box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease-in-out;
   }
   
   .playlist-image {

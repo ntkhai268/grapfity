@@ -15,6 +15,12 @@ input[type="date"].meta-form-input::-webkit-calendar-picker-indicator {
     max-width: 900px;
     margin: 20px auto;
     font-family: sans-serif;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    -ms-overflow-style: none; 
+  }
+  .meta-upload-metadata-container ::-webkit-scrollbar {
+    display: none;
   }
   
   /* ----- Tabs ----- */
