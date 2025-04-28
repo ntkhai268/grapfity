@@ -1,158 +1,138 @@
-import {  useState } from "react";
+import  { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from './Sidebar'; 
-
+import Sidebar from './Sidebar';
 import GlobalAudioManager from "../hooks/GlobalAudioManager";
-import bacphan from "../assets/audio/BacPhanRapVersion-TuiHat-6184759.mp3";
-import banhmikhong from "../assets/audio/Bánh Mì Không.mp3";
-import codangdeyeuthuong from "../assets/audio/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3";
-import img1 from "../assets/images/bacphan.jpg";
-import img2 from "../assets/images/banhmikhong.jpg";
-import img3 from "../assets/images/anhmau.png";
+
+// Import service API và kiểu dữ liệu TrackData
+import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
+
 import "../styles/Section.css";
 
-/* Danh sách recommended */
-const songs = [
-  {
-    id: 1,
-    title: "Bạc phận",
-    artist: "Jack",
-    cover: img1,
-    src: bacphan,
-  },
-  {
-    id: 2,
-    title: "Bánh mì không",
-    artist: "Đạt G",
-    cover: img2,
-    src: banhmikhong,
-  },
-  {
-    id: 3,
-    title: "Có đáng để yêu thương",
-    artist: "Du Uyên",
-    cover: img3,
-    src: codangdeyeuthuong,
-  },
-  {
-    id: 4,
-    title: "Quá Lâu",
-    artist: "Vinh Khuất",
-    cover: "/assets/qualau.png",
-    src: "/assets/QuaLau.mp3",
-  },
-];
-
-/* Danh sách recently released */
-const songs_released = [
-  {
-    id: 5,
-    title: "Tháng Năm",
-    artist: "Soobin",
-    cover: img1,
-    src: "/assets/ThangNam.mp3",
-  },
-  {
-    id: 6,
-    title: "Waiting For You",
-    artist: "Mono",
-    cover: img2,
-    src: "/assets/WaitingForYou.mp3",
-  },
-  {
-    id: 7,
-    title: "Sau Lưng Anh Có Ai Kìa",
-    artist: "Thiều Bảo Trâm",
-    cover: img3,
-    src: "/assets/SauLungAiKia.mp3",
-  },
-];
-
-/* Danh sách popular albums and singles */
-const songs_popular = [
-  {
-    id: 8,
-    title: "Chạy Ngay Đi",
-    artist: "Sơn Tùng M-TP",
-    cover: img1,
-    src: "/assets/ChayNgayDi.mp3",
-  },
-  {
-    id: 9,
-    title: "Muộn Rồi Mà Sao Còn",
-    artist: "Sơn Tùng M-TP",
-    cover: img1,
-    src: "/assets/MuonRoiMaSaoCon.mp3",
-  },
-  {
-    id: 10,
-    title: "Anh Đã Quen Với Cô Đơn",
-    artist: "Soobin Hoàng Sơn",
-    cover: img1,
-    src: "/assets/AnhDaQuenVoiCoDon.mp3",
-  },
-];
-
 const Section = () => {
-  const navigate = useNavigate();
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+    const navigate = useNavigate();
+    const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
-  const handleSidebarExpandChange = (expanded: boolean) => {
-    setSidebarExpanded(expanded);
-  };
+    // State để lưu dữ liệu từ API
+    const [allTracks, setAllTracks] = useState<TrackData[]>([]); // Lưu tất cả track từ API
+    const [isLoading, setIsLoading] = useState<boolean>(true);   // Trạng thái loading
+    const [error, setError] = useState<string | null>(null);     // Lưu lỗi nếu có
 
-  const handleClick = (list: any[], index: number) => {
-    const song = list[index];
-    GlobalAudioManager.setPlaylist(list, index);
-    GlobalAudioManager.playSongAt(index);
-    navigate("/ManagerSong", {
-      state: {
-        songs: list,
-        currentIndex: index,
-        currentSong: song,
-      },
-    });
-  };
+    // Fetch dữ liệu khi component mount
+    useEffect(() => {
+        const fetchTracks = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const fetchedTracks = await getAllTracksAPI();
+                setAllTracks(fetchedTracks); // Lưu tất cả tracks vào state
+            } catch (err: any) {
+                console.error("Failed to fetch tracks:", err);
+                setError(err.message || "Không thể tải danh sách bài hát.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-  return (
-    <>
-      <Sidebar onExpandChange={handleSidebarExpandChange} />
-      <section className={`song_side ${sidebarExpanded ? "shrink" : ""}`}>
-        <h1>Recommended for today</h1>
-        <div className="song-list">
-          {songs.map((song, index) => (
-            <button key={song.id} className="song-item" onClick={() => handleClick(songs, index)}>
-              <img src={song.cover} alt={song.title} />
-              <p className="title">{song.title}</p>
-              <p className="artist">{song.artist}</p>
-            </button>
-          ))}
-        </div>
+        fetchTracks();
+    }, []); // Mảng rỗng đảm bảo chỉ chạy 1 lần
 
-        <h1>Recently released</h1>
-<div className="song-list song-list-circle">
-  {songs_released.map((song, index) => (
-    <button key={song.id} className="song-item" onClick={() => handleClick(songs_released, index)}>
-      <img src={song.cover} alt={song.title} />
+    // --- TẠM THỜI CHIA NHỎ DỮ LIỆU (PLACEHOLDER) ---
+    // !!! LƯU Ý: Logic slice này chỉ là tạm thời để giữ cấu trúc.
+    // !!! SAU NÀY: Bạn cần thay thế bằng cách lấy dữ liệu đúng cho từng mục.
+    const recommendedTracks = allTracks.slice(0, 3); // Ví dụ: Lấy 4 bài đầu
+    const recentTracks = allTracks.slice(3, 7);     // Ví dụ: Lấy 4 bài tiếp theo
+    const popularTracks = allTracks.slice(7, 10);   // Ví dụ: Lấy 4 bài tiếp theo
 
-    </button>
-  ))}
-</div>
+    const handleSidebarExpandChange = (expanded: boolean) => {
+        setSidebarExpanded(expanded);
+    };
 
+    // Hàm xử lý click, nhận danh sách tương ứng với mục được click
+    const handleClick = (list: TrackData[], index: number) => {
+        if (!list || list.length === 0 || index < 0 || index >= list.length) {
+            console.error("Invalid list or index for handleClick");
+            return;
+        }
+        const song = list[index];
+        GlobalAudioManager.setPlaylist(list, index); // Sử dụng danh sách của mục đó
+        GlobalAudioManager.playSongAt(index);
+        navigate("/ManagerSong", {
+            state: {
+                songs: list, // Gửi danh sách của mục đó
+                currentIndex: index,
+                currentSong: song,
+            },
+        });
+    };
 
-        <h1>Popular albums and singles</h1>
-        <div className="song-list">
-          {songs_popular.map((song, index) => (
-            <button key={song.id} className="song-item" onClick={() => handleClick(songs_popular, index)}>
-              <img src={song.cover} alt={song.title} />
-              <p className="title">{song.title}</p>
-              <p className="artist">{song.artist}</p>
-            </button>
-          ))}
-        </div>
-      </section>
-    </>
-  );
+    return (
+        <>
+            <Sidebar onExpandChange={handleSidebarExpandChange} />
+            <section className={`song_side ${sidebarExpanded ? "shrink" : ""}`}>
+
+                {/* Hiển thị trạng thái loading hoặc lỗi */}
+                {isLoading && <div>Đang tải...</div>}
+                {error && <div style={{ color: 'red' }}>Lỗi: {error}</div>}
+
+                {/* Chỉ hiển thị nội dung khi không loading và không có lỗi */}
+                {!isLoading && !error && (
+                    <>
+                        {/* --- SECTION 1: RECOMMENDED --- */}
+                        <h1>Recommended for today</h1>
+                        <div className="song-list">
+                            {/* Sử dụng recommendedTracks */}
+                            {recommendedTracks.length > 0 ? (
+                                recommendedTracks.map((song, index) => (
+                                    // Truyền recommendedTracks vào handleClick
+                                    <button key={`rec-${song.id}-${index}`} className="song-item" onClick={() => handleClick(recommendedTracks, index)}>
+                                        <img src={song.cover} alt={song.title} />
+                                        <p className="title">{song.title}</p>
+                                        <p className="artist">{song.artist || 'Unknown Artist'}</p>
+                                    </button>
+                                ))
+                            ) : (
+                                <p>Không có bài hát nào được đề xuất.</p>
+                            )}
+                        </div>
+
+                        {/* --- SECTION 2: RECENTLY RELEASED --- */}
+                        <h1>Recently released</h1>
+                        <div className="song-list song-list-circle">
+                            {/* Sử dụng recentTracks */}
+                            {recentTracks.length > 0 ? (
+                                recentTracks.map((song, index) => (
+                                    // Truyền recentTracks vào handleClick
+                                    <button key={`rel-${song.id}-${index}`} className="song-item" onClick={() => handleClick(recentTracks, index)}>
+                                        <img src={song.cover} alt={song.title} />
+                                    </button>
+                                ))
+                            ) : (
+                                <p>Chưa có bài hát mới.</p>
+                            )}
+                        </div>
+
+                        {/* --- SECTION 3: POPULAR --- */}
+                        <h1>Popular albums and singles</h1>
+                        <div className="song-list">
+                            {/* Sử dụng popularTracks */}
+                            {popularTracks.length > 0 ? (
+                                popularTracks.map((song, index) => (
+                                    // Truyền popularTracks vào handleClick
+                                    <button key={`pop-${song.id}-${index}`} className="song-item" onClick={() => handleClick(popularTracks, index)}>
+                                        <img src={song.cover} alt={song.title} />
+                                        <p className="title">{song.title}</p>
+                                        <p className="artist">{song.artist || 'Unknown Artist'}</p>
+                                    </button>
+                                ))
+                            ) : (
+                                <p>Chưa có album/single phổ biến.</p>
+                            )}
+                        </div>
+                    </>
+                )}
+            </section>
+        </>
+    );
 };
 
 export default Section;
