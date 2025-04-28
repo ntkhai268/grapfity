@@ -1,160 +1,207 @@
-import React, { useEffect, useState } from "react"; // Import useState, useEffect
-import { useParams, useNavigate } from "react-router-dom";
-// 1. Import hàm API lấy chi tiết playlist theo ID
-import { getPlaylistByIdAPI } from "../../services/playlistService";
-import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager"; // Import Song type if needed by GlobalAudioManager
+import React, { useEffect, useState, useCallback, useRef } from "react"; // Import thêm useRef
+import { useParams } from "react-router-dom";
+// 1. Import các hàm API cần thiết
+import { getPlaylistByIdAPI, removeTrackFromPlaylistAPI } from "../../services/playlistService";
+import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager";
+
 // 2. Import hoặc định nghĩa lại kiểu dữ liệu
 interface TrackItem {
     id: number | string;
     title: string;
     src: string;
-    artist: string;
-    cover: string;
+    artist?: string;
+    cover?: string;
 }
 interface PlaylistData {
-    id: number;
+    id: number | string;
     title: string;
-    artist: string;
-    timeAgo: string; // Vẫn giữ nếu API trả về hoặc bạn muốn hiển thị
-    cover: string;
+    artist?: string;
+    timeAgo?: string;
+    cover?: string;
     tracks: TrackItem[];
 }
 
 const DataPlaylist: React.FC = () => {
     const { playlistId } = useParams<{ playlistId: string }>();
-    const navigate = useNavigate();
 
-    // 3. Thêm state cho playlist, loading, error
+    // --- State ---
     const [playlist, setPlaylist] = useState<PlaylistData | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [openDropdownIndex, setOpenDropdownIndex] = useState<number | null>(null);
+    const [isDeleting, setIsDeleting] = useState<string | number | null>(null);
 
-    // 4. useEffect để fetch dữ liệu khi playlistId thay đổi
-    useEffect(() => {
-        // Chỉ fetch nếu playlistId có giá trị
+    // --- Refs ---
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    // --- Hàm Fetch Dữ Liệu ---
+    const fetchPlaylistDetails = useCallback(async () => {
         if (!playlistId) {
             setError("ID Playlist không hợp lệ.");
             setIsLoading(false);
             return;
         }
-
         const numericId = Number(playlistId);
-        // Kiểm tra xem có phải là số hợp lệ không
         if (isNaN(numericId)) {
-             setError("ID Playlist không phải là số hợp lệ.");
-             setIsLoading(false);
-             return;
+            setError("ID Playlist không phải là số hợp lệ.");
+            setIsLoading(false);
+            return;
         }
+        setIsLoading(true);
+        setError(null);
+        try {
+            const fetchedPlaylist = await getPlaylistByIdAPI(numericId);
+            if (fetchedPlaylist) {
+                setPlaylist(fetchedPlaylist);
+            } else {
+                setError("Không tìm thấy playlist.");
+                setPlaylist(null);
+            }
+        } catch (err: any) {
+            setError("Không thể tải chi tiết playlist. Vui lòng thử lại.");
+            setPlaylist(null);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [playlistId]);
 
+    // --- Effect để fetch dữ liệu ---
+    useEffect(() => {
+        fetchPlaylistDetails();
+    }, [fetchPlaylistDetails]);
 
-        const fetchPlaylistDetails = async () => {
-            setIsLoading(true);
-            setError(null);
-            setPlaylist(null); // Reset playlist trước khi fetch
+    // --- Handlers ---
+    const handlePlaySong = useCallback((index: number) => {
+        if (!playlist || !playlist.tracks || !playlist.tracks[index]) return;
+        const songsForManager: Song[] = playlist.tracks.map(track => ({
+            id: track.id,
+            src: track.src,
+            title: track.title,
+            artist: track.artist,
+            cover: track.cover,
+        }));
+        GlobalAudioManager.setPlaylist(songsForManager, index);
+        GlobalAudioManager.playSongAt(index);
+    }, [playlist]);
 
-            try {
-                console.log(`DataPlaylist: Calling getPlaylistByIdAPI for ID: ${numericId}`);
-                // Gọi API để lấy chi tiết playlist
-                const fetchedPlaylist = await getPlaylistByIdAPI(numericId);
+    // Mở/đóng dropdown
+    const toggleTrackDropdown = (event: React.MouseEvent, index: number) => {
+        event.stopPropagation();
+        setOpenDropdownIndex(prevIndex => (prevIndex === index ? null : index));
+    };
 
-                if (fetchedPlaylist) {
-                    setPlaylist(fetchedPlaylist); // Cập nhật state nếu tìm thấy
-                    console.log("DataPlaylist: Playlist details fetched successfully.");
-                } else {
-                    // API trả về null (thường là 404 Not Found)
-                    setError("Không tìm thấy playlist.");
-                    console.log(`DataPlaylist: Playlist with ID ${numericId} not found.`);
-                }
-            } catch (err: any) {
-                console.error(`DataPlaylist: Failed to fetch playlist details for ID ${numericId}:`, err);
-                // Xử lý lỗi khác (ví dụ: lỗi mạng, lỗi server 500)
-                 setError("Không thể tải chi tiết playlist. Vui lòng thử lại.");
-            } finally {
-                setIsLoading(false); // Kết thúc loading
+    // Xử lý xóa track
+    const handleDeleteTrack = useCallback(async (trackId: string | number) => {
+        if (!playlistId || isDeleting === trackId) return;
+        setIsDeleting(trackId);
+        setOpenDropdownIndex(null); // Đóng dropdown ngay khi bắt đầu xóa
+        try {
+            const numericPlaylistId = Number(playlistId);
+            if (isNaN(numericPlaylistId)) throw new Error("Playlist ID không hợp lệ.");
+            const result = await removeTrackFromPlaylistAPI(numericPlaylistId, trackId);
+            if (result.success) {
+                alert(result.message || "Đã xóa bài hát."); // Feedback tạm
+                fetchPlaylistDetails(); // Refresh list
+            } else {
+                alert(result.message || "Xóa thất bại."); // Feedback tạm
+            }
+        } catch (error: any) {
+            alert(error.message || "Lỗi khi xóa."); // Feedback tạm
+        } finally {
+            setIsDeleting(null);
+        }
+    }, [playlistId, fetchPlaylistDetails, isDeleting]);
+
+    // --- Effect để xử lý click outside dropdown ---
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            // Chỉ cần kiểm tra click ra ngoài dropdown menu là đủ
+            if (openDropdownIndex !== null && dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                // Xóa các dòng khai báo biến không dùng đến:
+                // const optionsElement = (event.target as Element).closest('.song-item-options');
+                // const clickedItemIndex = optionsElement ? Array.from(optionsElement.parentElement?.children ?? []).indexOf(optionsElement.parentElement as Element) : -1; // <<< XÓA
+                // const itemIndex = Array.from(dropdownRef.current.closest('.song-item-manager')?.parentElement?.children ?? []).indexOf(dropdownRef.current.closest('.song-item-manager') as Element); // <<< XÓA
+
+                 setOpenDropdownIndex(null); // Đóng dropdown
             }
         };
 
-        fetchPlaylistDetails(); // Gọi hàm fetch
-
-    }, [playlistId]); // Chạy lại useEffect khi playlistId thay đổi
-
-    // Hàm xử lý click vào bài hát (logic giữ nguyên, nhưng dùng state `playlist`)
-    const handleClick = (index: number) => {
-        // Đảm bảo playlist và tracks tồn tại trước khi xử lý
-        if (!playlist || !playlist.tracks || !playlist.tracks[index]) {
-             console.error("Cannot handle click: Playlist or track data is missing.");
-             return;
+        // Thêm/Xóa listener
+        if (openDropdownIndex !== null) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
         }
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openDropdownIndex]); // Phụ thuộc vào state mở/đóng dropdown
 
-        const clickedSong = playlist.tracks[index];
-
-        // Map lại tracks cho GlobalAudioManager nếu cần (đảm bảo đúng định dạng Song)
-        const songsForManager: Song[] = playlist.tracks.map(track => ({
-             id: track.id, // Thêm id nếu GlobalAudioManager cần
-             src: track.src,
-             title: track.title,
-             artist: track.artist, // Sử dụng artist của track
-             cover: track.cover,
-        }));
-
-
-        // Set playlist và play qua GlobalAudioManager
-        GlobalAudioManager.setPlaylist(songsForManager, index); // Truyền mảng đã map
-        GlobalAudioManager.playSongAt(index);
-
-        // Chuyển hướng đến trang phát chi tiết (nếu muốn)
-        navigate("/ManagerSong", {
-            state: {
-                songs: songsForManager, // Truyền mảng đã map
-                currentIndex: index,
-                currentSong: clickedSong, // Truyền bài hát đã click
-            },
-        });
-    };
-
-    // 5. Render có điều kiện
-    if (isLoading) {
+    // --- Render Logic ---
+    if (isLoading && !playlist) {
         return <div className="song-list-manager">Đang tải chi tiết playlist...</div>;
     }
-
-    if (error) {
+    if (error && !playlist) {
         return <div className="song-list-manager">Lỗi: {error}</div>;
     }
-
-    // Nếu không loading, không lỗi, nhưng không tìm thấy playlist
     if (!playlist) {
-        // Lỗi "Không tìm thấy playlist" đã được set ở trên, nên phần này có thể không cần
-        // Hoặc bạn có thể hiển thị một thông báo khác ở đây nếu muốn
         return <div className="song-list-manager">Không tìm thấy thông tin playlist.</div>;
     }
 
-    // 6. Render danh sách bài hát khi có dữ liệu
     return (
         <div className="song-list-manager">
-            {/* Có thể thêm tiêu đề playlist ở đây nếu muốn */}
-            {/* <h2>{playlist.title}</h2> */}
+            <h2>{playlist.title}</h2>
+            {isLoading && <div>Đang cập nhật...</div>}
+            {error && !isLoading && <div style={{ color: 'red' }}>Lỗi cập nhật: {error}</div>}
+
             {playlist.tracks.length === 0 ? (
-                 <div>Playlist này chưa có bài hát nào.</div>
+                <div>Playlist này chưa có bài hát nào.</div>
             ) : (
-                 playlist.tracks.map((song, index) => (
+                playlist.tracks.map((song, index) => (
                     <div
-                        key={song.id || index} // Ưu tiên dùng song.id
+                        key={song.id || index}
                         className="song-item-manager"
-                        onClick={() => handleClick(index)} // Gọi hàm xử lý click
+                        onClick={() => handlePlaySong(index)}
                     >
                         <div className="song-number">{index + 1}</div>
                         <img
-                             src={song.cover}
-                             alt={song.title}
-                             className="rec-song-image"
-                             onError={(e) => (e.currentTarget.src = '/assets/default_track_cover.png')} // Fallback ảnh lỗi
+                            src={song.cover}
+                            alt={song.title}
+                            className="rec-song-image"
+                            onError={(e) => (e.currentTarget.src = '/assets/default_track_cover.png')}
                         />
                         <div className="rec-song-info">
                             <div className="rec-song-title">{song.title}</div>
-                            <div className="rec-song-artist">{song.artist}</div>
+                            <div className="rec-song-artist">{song.artist || 'Unknown Artist'}</div>
                         </div>
+
+                        {/* --- Icon Ellipsis và Dropdown --- */}
+                        <div
+                            className="song-item-options"
+                            onClick={(e) => toggleTrackDropdown(e, index)}
+                        >
+                            <i className="fas fa-ellipsis-h"></i>
+
+                            {/* Dropdown Menu */}
+                            {openDropdownIndex === index && (
+                                <div
+                                    className="dropdown-menu"
+                                    ref={dropdownRef} // Gắn ref
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <div
+                                        className={`dropdown-menu-item ${isDeleting === song.id ? 'disabled' : ''}`}
+                                        onClick={() => handleDeleteTrack(song.id)}
+                                    >
+                                        {isDeleting === song.id ? 'Đang xóa...' : 'Xóa khỏi playlist'}
+                                    </div>
+                                    {/* Thêm các mục khác nếu cần */}
+                                </div>
+                            )}
+                        </div>
+                        {/* --- Kết thúc Icon Ellipsis và Dropdown --- */}
                     </div>
-                 ))
+                ))
             )}
         </div>
     );

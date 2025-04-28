@@ -1,4 +1,5 @@
-interface Song {
+export interface Song {
+  id: number | string;
   src: string;
   title?: string;
   artist?: string;
@@ -236,7 +237,7 @@ if (typeof window !== "undefined") {
 }
 
 export default GlobalAudioManager;
-export type { Song };
+// export type { Song };
 export const notifySongChanged = () => {
   window.dispatchEvent(new Event("songchanged"));
 };
