@@ -1,5 +1,6 @@
 body.home-body{
   margin: 0;
+  
 }
 .main-background {
   background-color: black;
@@ -9,7 +10,7 @@ body.home-body{
 .main-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 180vh;
   overflow: hidden;
 }
 

@@ -6,7 +6,7 @@ import musicNoteIcon from '../assets/images/notnhac.png';
 import { addPlaylist } from "../components/Manager_Playlists/ManagerDataPlaylist";
 
 interface SidebarProps {
-  onExpandChange: (expanded: boolean) => void;
+  onExpandChange?: (expanded: boolean) => void;
 }
 
 const Sidebar = ({ onExpandChange }: SidebarProps) => {
@@ -16,7 +16,7 @@ const Sidebar = ({ onExpandChange }: SidebarProps) => {
   const handleToggleExpand = () => {
     const newExpanded = !expanded;
     setExpanded(newExpanded);
-    onExpandChange(newExpanded);
+    onExpandChange?.(newExpanded);
   };
 
   const handleCreatePlaylist = () => {
