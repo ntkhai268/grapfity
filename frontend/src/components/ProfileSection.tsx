@@ -33,7 +33,7 @@ const ProfileSection = () => {
             <div className="profile_slide">
                 <ProfileSlide />
 
-                <div className="mid_section">
+                <div className="mid_section_profile">
                     <Tab />
                     <ProfileStat />
 
