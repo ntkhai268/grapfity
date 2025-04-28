@@ -169,3 +169,67 @@
     color: white;
     font-size: 16px;
   }
+
+  /* Container cho icon ba chấm và dropdown */
+.song-item-options {
+  position: relative; /* Cho phép định vị tuyệt đối cho dropdown */
+  margin-left: auto; /* Đẩy icon sang phải cùng */
+  padding: 0 10px; /* Khoảng cách xung quanh icon */
+  cursor: pointer; /* Biểu tượng con trỏ khi di chuột */
+  display: flex; /* Để căn giữa icon nếu cần */
+  align-items: center;
+  margin-right: 20px;
+}
+
+/* Icon ba chấm (có thể thêm style nếu muốn) */
+.song-item-options .fa-ellipsis-h {
+  color: #b3b3b3; /* Màu icon xám nhạt (ví dụ) */
+  transition: color 0.2s ease;
+}
+
+.song-item-options:hover .fa-ellipsis-h {
+  color: #ffffff; /* Màu icon trắng khi hover (ví dụ) */
+}
+
+
+/* Dropdown menu (xuất hiện khi state openDropdownIndex khớp) */
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* Hiện ngay dưới icon */
+  right: 0; /* Căn lề phải với container .song-item-options */
+  margin-top: 5px; /* Khoảng cách nhỏ phía trên */
+  background-color: #181818; /* Màu nền tối (giống Spotify) */
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5); /* Đổ bóng rõ hơn */
+  z-index: 10; /* Đảm bảo nổi lên trên */
+  min-width: 180px; /* Chiều rộng tối thiểu */
+  padding: 5px 0; /* Padding trên dưới */
+  /* Thêm animation nếu muốn */
+  /* animation: fadeIn 0.1s ease-out; */
+}
+
+/* Các mục bên trong dropdown menu */
+.dropdown-menu-item {
+  padding: 10px 15px; /* Padding cho từng mục */
+  cursor: pointer;
+  color: black; /* Màu chữ mặc định */
+  font-size: 14px;
+  white-space: nowrap; /* Không xuống dòng */
+  display: block; /* Hiển thị dạng block */
+  transition: background-color 0.2s ease, color 0.2s ease; /* Hiệu ứng chuyển đổi mượt */
+}
+
+/* Hiệu ứng hover cho các mục */
+.dropdown-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Nền sáng hơn khi hover */
+  color: #ffffff; /* Chữ trắng khi hover */
+}
+
+/* Style cho trạng thái đang xử lý (ví dụ: đang xóa) */
+/* Giả sử bạn thêm class 'disabled' hoặc dùng thuộc tính [disabled] */
+.dropdown-menu-item.disabled,
+.dropdown-menu-item[disabled] {
+   opacity: 0.5;
+   cursor: not-allowed;
+   pointer-events: none; /* Ngăn chặn hover và click */
+}
