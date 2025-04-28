@@ -1,17 +1,17 @@
 /* Sidebar container */
 .sidebar {
     position: fixed;
-    width: 25px; /* mặc định nhỏ */
+    width: 60px;
     height: 77vh;
     background-color: #121212;
     color: white;
-    padding: 20px 0;
+    padding: 20px;
     left: 10px;
     top: 80px;
     border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex; /* Kích hoạt Flexbox */
+    flex-direction: column; /* Xếp các phần tử theo cột */
+    align-items: center; /* Căn giữa theo chiều ngang */
     gap: 20px;
     transition: width 0.3s ease;
     overflow: hidden;
@@ -30,12 +30,13 @@
     border: none;
     cursor: pointer;
     padding: 10px 10px;
-    margin: 0;
+ 
     position: relative; /* để position cho icon */
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    margin: 10px 0px 0px -10.5px;
 }
 
 /* Icon khi sidebar nhỏ */
@@ -92,13 +93,14 @@
     top: 80px;
     right: 10px;
     height: 80vh;
-    border-radius: 8px;
+    border-radius: 15px;
     overflow: auto;
     scrollbar-width: thin;
     scrollbar-color: #888 transparent;
-    background-color: #000;
+    background-color: #121212;
     padding-right: 10px;
     transition: left 0.3s ease;
+
 }
 
 /* Section né ra khi sidebar mở */
@@ -122,6 +124,8 @@
     font-size: 30px;
     font-weight: bold;
     color: white;
+    margin-left: 30px;
+    margin-top: 10px;
 }
 
 /* Danh sách bài hát */
@@ -130,6 +134,7 @@
     gap: 15px;
     overflow-x: auto;
     padding: 10px;
+    margin-left: 40px;
 }
 
 /* Mỗi bài hát */

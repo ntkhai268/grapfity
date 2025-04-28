@@ -159,7 +159,7 @@ body.profile-page {
     font-size: 50px;
     font-weight: bold;
 }
-.mid_section {
+.mid_section_profile {
     display: flex;
     align-items: center; /* Căn giữa theo chiều dọc */
     justify-content: space-between; /* Tabs bên trái, Stats bên phải */
@@ -170,7 +170,7 @@ body.profile-page {
     width: 100%;
 }
 /* các tab tùy chọn: all, popular tracks, tracks, playlist */
-.tabs {
+.tabs_profile {
     display: flex;
     gap: 15px;
     font-size: 14px;
@@ -191,7 +191,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
-
+.content {
+    display: none;
+}
 
 .content.active {
     display: block;
@@ -229,7 +231,7 @@ body.profile-page {
     top: calc(50% + 5px); /* Đưa xuống dưới divider */
     right: 90px;
 }
-/* thanh kẻ ngang phân cách trong mid_section */
+/* thanh kẻ ngang phân cách trong mid_section_profile */
 .divider {
     position: absolute;
     width: 100%;

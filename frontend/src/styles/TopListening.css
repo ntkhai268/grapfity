@@ -6,7 +6,7 @@
   flex-wrap: wrap; /* Cho phép các phần tử xếp chồng lên nhau khi màn hình nhỏ */
   position: absolute; /* Đặt vị trí của container */
   bottom: 0; /* Đảm bảo container nằm ở dưới cùng của trang */
-  width: 97%; /* Chiếm toàn bộ chiều rộng của trang */
+  width: 100%; /* Chiếm toàn bộ chiều rộng của trang */
   top: 260px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
 }
 
@@ -46,6 +46,7 @@
   display: flex; /* Sử dụng flexbox cho các tab */
   border-bottom: 1px solid #e5e5e5; /* Đường viền dưới các tab */
   margin-bottom: 15px; /* Khoảng cách dưới các tab */
+  margin-top: 20px;
 }
 
 .tabs button {
@@ -77,6 +78,7 @@
   font-size: 14px; /* Kích thước font cho khoảng thời gian */
   color: #666; /* Màu sắc của khoảng thời gian */
   margin-bottom: 15px; /* Khoảng cách dưới khoảng thời gian */
+  margin-top: 20px;
 }
 
 .streams-label {
