@@ -1,5 +1,5 @@
 import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager";
-import React from "react"; // Keep React import if needed elsewhere, otherwise remove
+
 import WaveSurfer from "wavesurfer.js";
 
 // Define types from Playlist.tsx if not already shared
