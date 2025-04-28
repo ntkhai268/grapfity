@@ -28,7 +28,7 @@ const useSongManager = (songs?: Song[], initialIndex: number = 0) => {
         }
       });
   
-      return () => unsubscribe();
+      return () => {unsubscribe();};
     } else {
       const globalSong = GlobalAudioManager.getCurrentSong();
   
@@ -87,6 +87,7 @@ const useSongManager = (songs?: Song[], initialIndex: number = 0) => {
     songUrl: currentSong?.src,
     isPlaying,
     togglePlay,
+    currentTrackId: currentSong?.id,
   };
 };
 

@@ -6,7 +6,9 @@ import {
     getMyPlaylistsController,
     createPlaylistController,
     updatePlaylistController,
-    getPlaylistByIdController // <-- Thêm import controller này
+    getPlaylistByIdController,
+    addTrackToPlaylistController,
+    removeTrackFromPlaylistController // <<< BỎ COMMENT HOẶC THÊM DÒNG IMPORT NÀY
 } from '../controllers/playlistController.js';
 
 // Import middleware xác thực
@@ -14,23 +16,28 @@ import { authenticateUser } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// --- Định nghĩa Routes (Giả sử router này được gắn vào app với tiền tố /api/playlists) ---
+// --- Định nghĩa Routes ---
 
-// GET /api/playlists/ -> Lấy playlist của người dùng đã đăng nhập
+// GET / -> Lấy playlist của người dùng đã đăng nhập
 router.get('/', authenticateUser, getMyPlaylistsController);
 
-// POST /api/playlists/ -> Tạo playlist mới
+// POST / -> Tạo playlist mới
 router.post('/', authenticateUser, createPlaylistController);
 
-// --- THÊM ROUTE GET /:id ---
-// GET /api/playlists/:id -> Lấy chi tiết playlist theo ID
-// Bỏ comment authenticateUser nếu việc xem cần đăng nhập
-router.get('/:id', /* authenticateUser, */ getPlaylistByIdController); // <-- THÊM DÒNG NÀY
+// GET /:playlistId -> Lấy chi tiết playlist theo ID
+router.get('/:playlistId', /* authenticateUser, */ getPlaylistByIdController);
 
-// PUT /api/playlists/:id -> Cập nhật playlist theo ID
-router.put('/:id', authenticateUser, updatePlaylistController);
+// PUT /:playlistId -> Cập nhật playlist theo ID
+router.put('/:playlistId', authenticateUser, updatePlaylistController);
 
-// DELETE /api/playlists/:id -> (Tùy chọn) Thêm route xóa playlist nếu cần
-// router.delete('/:id', authenticateUser, deletePlaylistController);
+// POST /:playlistId/tracks -> Thêm track vào playlist
+router.post('/:playlistId/tracks', authenticateUser, addTrackToPlaylistController);
+
+// DELETE /:playlistId/tracks/:trackId -> Xóa track khỏi playlist
+router.delete('/:playlistId/tracks/:trackId', authenticateUser, removeTrackFromPlaylistController); // Dòng này giờ sẽ hoạt động
+
+// (Tùy chọn) Route xóa playlist
+// router.delete('/:playlistId', authenticateUser, deletePlaylistController);
+
 
 export default router; // Export router theo chuẩn ES module
