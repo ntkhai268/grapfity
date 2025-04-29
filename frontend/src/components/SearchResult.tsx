@@ -1,12 +1,13 @@
-"use client";
-
+// components/SearchResult.tsx
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from "../styles/search-result.module.css";
 import {
-  mockTopResult,
-  mockSongs,
-  mockFeaturingPlaylists,
-  mockArtists,
-  mockAlbums,
+  getMockTopResult,
+  getMockSongs,
+  getMockFeaturingPlaylists,
+  getMockArtists,
+  getMockAlbums,
 } from "../services/mockData";
 
 export interface Artist {
@@ -32,41 +33,51 @@ interface SearchResultProps {
 }
 
 const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
+  const [params] = useSearchParams();
+  const query = params.get("query") || "";
+
+  const topResult = getMockTopResult(query);
+  const songs     = getMockSongs(query);
+  const artists   = getMockArtists(query);
+  const playlists = getMockFeaturingPlaylists(query);
+  const albums    = getMockAlbums(query);
+
   return (
     <div className={`${styles.search_result_section} ${sidebarExpanded ? styles.shrink : ""}`}>
       
-      {/* Top row: Top Result + Songs */}
+      {/* -- Bọc thành 1 hàng ngang -- */}
       <div className={styles.top_row}>
+        
         {/* Top Result */}
         <div className={styles.topResultSection_result}>
           <h2 className={styles.sectionTitle_result}>Top result</h2>
-          {mockTopResult.type === "artist" ? (
+          {topResult.type === "artist" ? (
             <div className={styles.artistCard_result}>
               <div className={styles.artistImageContainer_result}>
                 <img
-                  src={mockTopResult.imageUrl}
-                  alt={mockTopResult.name}
+                  src={topResult.imageUrl}
+                  alt={topResult.name}
                   width={150}
                   height={150}
                   className={styles.artistImage_result}
                 />
               </div>
-              <h1 className={styles.artistName_result}>{mockTopResult.name}</h1>
+              <h1 className={styles.artistName_result}>{topResult.name}</h1>
               <p className={styles.artistLabel_result}>Artist</p>
             </div>
           ) : (
             <div className={styles.songCard_result}>
               <div className={styles.songInfoTop_result}>
                 <img
-                  src={(mockTopResult as Song).coverUrl}
-                  alt={(mockTopResult as Song).title}
+                  src={(topResult as Song).coverUrl}
+                  alt={(topResult as Song).title}
                   width={150}
                   height={150}
                   className={styles.songCoverTop_result}
                 />
                 <div className={styles.songDetails_result}>
-                  <h1 className={styles.songTitleTop_result}>{(mockTopResult as Song).title}</h1>
-                  <p className={styles.songArtistTop_result}>{(mockTopResult as Song).artist}</p>
+                  <h1 className={styles.songTitleTop_result}>{(topResult as Song).title}</h1>
+                  <p className={styles.songArtistTop_result}>{(topResult as Song).artist}</p>
                 </div>
               </div>
             </div>
@@ -76,85 +87,68 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         {/* Songs List */}
         <div className={styles.songsSection_result}>
           <h2 className={styles.sectionTitle_result}>Songs</h2>
-          <div className={styles.songCardList_result}>
-            <ul className={styles.songsList_result}>
-              {mockSongs.map((song) => (
-                <li key={song.id} className={styles.songItem_result}>
-                  <div className={styles.songInfo_result}>
-                    <img
-                      src={song.coverUrl}
-                      alt={song.title}
-                      width={50}
-                      height={50}
-                      className={styles.songCover_result}
-                    />
-                    <div className={styles.songDetails_result}>
-                      <p className={styles.songTitle_result}>{song.title}</p>
-                      <p className={styles.songArtist_result}>{song.artist}</p>
-                    </div>
+          <ul className={styles.songsList_result}>
+            {songs.map((s) => (
+              <li key={s.id} className={styles.songItem_result}>
+                <div className={styles.songInfo_result}>
+                  <img
+                    src={s.coverUrl}
+                    alt={s.title}
+                    width={50}
+                    height={50}
+                    className={styles.songCover_result}
+                  />
+                  <div className={styles.songDetails_result}>
+                    <p className={styles.songTitle_result}>{s.title}</p>
+                    <p className={styles.songArtist_result}>{s.artist}</p>
                   </div>
-                  <span className={styles.songDuration_result}>{song.duration}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+                </div>
+                <span className={styles.songDuration_result}>{s.duration}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+      </div> {/* -- end top_row -- */}
+
+      {/* Các section tiếp theo vẫn giữ nguyên */}
+      <div className={styles.artistsSection_result}>
+        <h2 className={styles.sectionTitle_result}>Artists</h2>
+        <div className={styles.artist_grid}>
+          {artists.map((a) => (
+            <div key={a.id} className={styles.artist_card}>
+              <img src={a.imageUrl} alt={a.name} className={styles.artist_avatar} />
+              <p className={styles.grid_item_title}>{a.name}</p>
+              <p className={styles.grid_item_sub}>Artist</p>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Featuring Section */}
       <div className={styles.featuringSection_result}>
         <h2 className={styles.sectionTitle_result}>Featuring</h2>
         <div className={styles.grid_list}>
-          {mockFeaturingPlaylists.map((playlist) => (
-            <div key={playlist.id} className={styles.grid_item}>
-              <img
-                src={playlist.imageUrl}
-                alt={playlist.title}
-                className={styles.grid_item_img}
-              />
-              <p className={styles.grid_item_title}>{playlist.title}</p>
+          {playlists.map((p) => (
+            <div key={p.id} className={styles.grid_item}>
+              <img src={p.imageUrl} alt={p.title} className={styles.grid_item_img} />
+              <p className={styles.grid_item_title}>{p.title}</p>
             </div>
           ))}
         </div>
       </div>
-          {/* Artists Section */}
-<div className={styles.artistsSection_result}>
-  <h2 className={styles.sectionTitle_result}>Artists</h2>
-  <div className={styles.artist_grid}>
-    {mockArtists.map((artist) => (
-      <div key={artist.id} className={styles.artist_card}>
-        <img
-          src={artist.imageUrl}
-          alt={artist.name}
-          className={styles.artist_avatar}
-        />
-        <p className={styles.grid_item_title}>{artist.name}</p>
-        <p className={styles.grid_item_sub}>Artist</p>
-      </div>
-    ))}
-  </div>
-</div>
 
-      {/* Album Section */}
       <div className={styles.albumSection_result}>
         <h2 className={styles.sectionTitle_result}>Albums</h2>
         <div className={styles.grid_list}>
-          {mockAlbums.map((album) => (
-            <div key={album.id} className={styles.grid_item}>
-              <img
-                src={album.imageUrl}
-                alt={album.title}
-                className={styles.grid_item_img}
-              />
-              <p className={styles.grid_item_title}>{album.title}</p>
-              <p className={styles.grid_item_sub}>
-                {album.year} • {album.artist}
-              </p>
+          {albums.map((al) => (
+            <div key={al.id} className={styles.grid_item}>
+              <img src={al.imageUrl} alt={al.title} className={styles.grid_item_img} />
+              <p className={styles.grid_item_title}>{al.title}</p>
+              <p className={styles.grid_item_sub}>{al.year} • {al.artist}</p>
             </div>
           ))}
         </div>
       </div>
-
     </div>
   );
 };

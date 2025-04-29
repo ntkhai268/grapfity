@@ -1,17 +1,10 @@
-// mockData.ts
+// services/mockData.ts
 
-import { SearchResultItem, Song } from "../components/SearchResult"; // import type chính xác
+import { SearchResultItem, Song, Artist } from "../components/SearchResult";
 import img1 from "../assets/images/bacphan.jpg";
-// Top Result
-export const mockTopResult: SearchResultItem = {
-  id: "1",
-  name: "Sơn Tùng M-TP",
-  type: "artist",
-  imageUrl: img1, // phải để trong thư mục public/images
-};
 
-// Songs List
-export const mockSongs: Song[] = [
+// ---- Dữ liệu mẫu chung cho tất cả songs ----
+const ALL_SONGS: Song[] = [
   {
     id: "1",
     title: "Đừng Làm Trái Tim Anh Đau",
@@ -30,112 +23,114 @@ export const mockSongs: Song[] = [
   },
   {
     id: "3",
-    title: "Buông Đôi Tay Nhau Ra",
+    title: "Chắc Ai Đó Sẽ Về",
     artist: "Sơn Tùng M-TP",
-    duration: "3:47",
+    duration: "4:22",
     coverUrl: img1,
     type: "song",
   },
   {
     id: "4",
-    title: "Nắng Ấm Xa Dần",
+    title: "Anh Sai Rồi",
     artist: "Sơn Tùng M-TP",
-    duration: "3:11",
+    duration: "4:12",
+    coverUrl: img1,
+    type: "song",
+  },
+  {
+    id: "100",
+    title: "Lạc trôi",
+    artist: "Sơn Tùng M-TP",
+    duration: "4:02",
     coverUrl: img1,
     type: "song",
   },
 ];
 
-// Featuring Playlists
-export const mockFeaturingPlaylists = [
-  {
-    id: "playlist1",
-    title: "Mãi Yêu Sơn Tùng M-TP",
-    imageUrl: img1, 
-  },
-  {
-    id: "playlist2",
-    title: "Sơn Tùng M-TP Radio",
+// ---- Hàm trả về Top result ----
+export function getMockTopResult(query: string): SearchResultItem {
+  if (query === "Sơn Tùng") {
+    return {
+      id: "artist1",
+      name: "Sơn Tùng M-TP",
+      type: "artist",
+      imageUrl: img1,
+    };
+  }
+  if (query === "Lạc trôi") {
+    return {
+      id: "song100",
+      title: "Lạc trôi",
+      artist: "Sơn Tùng M-TP",
+      duration: "4:02",
+      coverUrl: img1,
+      type: "song",
+    };
+  }
+  // fallback nếu không khớp query
+  return {
+    id: "artist0",
+    name: "Không tìm thấy",
+    type: "artist",
+    imageUrl: img1,
+  };
+}
 
-    imageUrl: img1,
-  },
-  {
-    id: "playlist3",
-    title: "Tiến Lên Việt Nam Ơi",
+// ---- Hàm trả về danh sách Songs (luôn 4 bài) ----
+export function getMockSongs(query: string): Song[] {
+  const top = getMockTopResult(query);
 
-    imageUrl: img1,
-  },
-  {
-    id: "playlist4",
-    title: "EDM Gây Nghiện",
+  let filtered: Song[];
+  if (top.type === "song") {
+    // nếu Top result là song, lấy tất cả bài cùng artist
+    filtered = ALL_SONGS.filter((s) => s.artist === top.artist);
+  } else {
+    // nếu Top result là artist, lấy theo tên artist
+    filtered = ALL_SONGS.filter((s) => s.artist === top.name);
+  }
 
-    imageUrl: img1,
-  },
-];
+  // nếu không có bài nào, fallback về 4 bài đầu của ALL_SONGS
+  if (filtered.length === 0) {
+    return ALL_SONGS.slice(0, 4);
+  }
 
-// Albums
-export const mockAlbums = [
-  {
-    id: "album1",
-    title: "Khuôn Mặt Đáng Thương",
-    year: "2015",
-    artist: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-  {
-    id: "album2",
-    title: "Anh Sai Rồi",
-    year: "2015",
-    artist: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-  {
-    id: "album3",
-    title: "Đừng Làm Trái Tim Anh Đau",
-    year: "2024",
-    artist: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-  {
-    id: "album4",
-    title: "m-tp M-TP",
-    year: "2017",
-    artist: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-  {
-    id: "album5",
-    title: "Chúng Ta Của Tương Lai",
-    year: "2024",
-    artist: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-];
-export const mockArtists = [
-  {
-    id: "artist1",
-    name: "Sơn Tùng M-TP",
-    imageUrl: img1,
-  },
-  {
-    id: "artist2",
-    name: "tlinh",
-    imageUrl: img1,
-  },
-  {
-    id: "artist3",
-    name: "Minh Tốc & Lam",
-    imageUrl: img1,
-  },
-  {
-    id: "artist4",
-    name: "Pháp Kiều",
-    imageUrl: img1,
-  },
-  {
-    id: "artist5",
-    name: "Low G",
-    imageUrl: img1,
-  },
-];
+  // luôn trả về tối đa 4 bài
+  return filtered.slice(0, 4);
+}
 
+// ---- Hàm trả về Artists ----
+export function getMockArtists(query: string): Artist[] {
+  const top = getMockTopResult(query);
+
+  // dù top là artist hay song, đều lấy artist theo tên
+  const artistName = top.type === "artist" ? top.name : (top as Song).artist;
+
+  return [
+    {
+      id: `artist_${artistName.replace(/\s+/g, "")}`,
+      name: artistName,
+      type: "artist",
+      imageUrl: img1,
+    },
+  ];
+}
+
+// ---- Các section khác (giữ tĩnh hoặc filter tuỳ ý) ----
+export function getMockFeaturingPlaylists(_q: string) {
+  return [
+    { id: "playlist1", title: "Mãi Yêu Sơn Tùng M-TP", imageUrl: img1 },
+    { id: "playlist2", title: "EDM Gây Nghiện",         imageUrl: img1 },
+  ];
+}
+
+export function getMockAlbums(_q: string) {
+  return [
+    {
+      id: "album1",
+      title: "Khuôn Mặt Đáng Thương",
+      year: "2015",
+      artist: "Sơn Tùng M-TP",
+      imageUrl: img1,
+    },
+  ];
+}

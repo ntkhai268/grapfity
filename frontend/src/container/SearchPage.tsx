@@ -1,11 +1,8 @@
+// pages/SearchPage.tsx
 import SearchLayout from "../layouts/SearchLayout";
 
 const SearchPage = () => {
-  return (
-    <div>
-      <SearchLayout />
-    </div>
-  );
+  return <SearchLayout />;
 };
 
 export default SearchPage;

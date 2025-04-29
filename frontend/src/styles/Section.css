@@ -1,3 +1,5 @@
+/* Sidebar.css */
+
 /* Sidebar container */
 .sidebar {
     position: fixed;
@@ -110,7 +112,6 @@
 .song_side::-webkit-scrollbar {
     width: 6px;
 }
-
 .song_side::-webkit-scrollbar-thumb {
     background: #888;
     border-radius: 10px;
@@ -160,14 +161,6 @@
     height: 100px;
 }
 
-/* Ảnh bài hát */
-.song-item img {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
 /* Tiêu đề bài hát */
 .song-item .title {
     font-size: 18px;
@@ -186,4 +179,94 @@
     opacity: 0.85;
     transform: scale(1.02);
     transition: all 0.2s ease-in-out;
+}
+
+/* ==== Tabs Playlists / Artists ==== */
+.sidebar .sidebar-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 16px;
+    margin: 16px 0;
+}
+.sidebar .sidebar-tabs button {
+    flex: 1;
+    background: #181818;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 12px;
+    color: #b3b3b3;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+}
+.sidebar .sidebar-tabs button.active {
+    background: #282828;
+    color: #fff;
+}
+
+/* ==== Danh sách Playlists / Artists ==== */
+.sidebar .sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+.sidebar .sidebar-list .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+.sidebar .sidebar-list .sidebar-item:hover {
+    background: #282828;
+}
+
+/* Hình vuông cho playlist */
+.sidebar .sidebar-list .playlist-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Hình tròn cho artist */
+.sidebar .sidebar-list .artist-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Text bên phải ảnh */
+.sidebar .sidebar-list .item-texts {
+    display: flex;
+    flex-direction: column;
+}
+.sidebar .sidebar-list .item-texts .item-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+}
+.sidebar .sidebar-list .item-texts .item-sub {
+    margin: 0;
+    font-size: 12px;
+    color: #b3b3b3;
+}
+
+/* Khi sidebar chưa expand, ẩn tabs và text, vẫn show ảnh */
+.sidebar:not(.expanded) .sidebar-tabs {
+    display: none;
+}
+.sidebar:not(.expanded) .item-texts {
+    display: none;
+}
+/* Center icon-only items when collapsed */
+.sidebar:not(.expanded) .sidebar-item {
+    justify-content: flex-start;    /* không center nữa */
+  padding-left: 8px;              /* đẩy icon sát lề trong */
 }

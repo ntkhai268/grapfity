@@ -1,31 +1,26 @@
-/* Khối tổng chứa SearchResult */
+/* styles/search-result.module.css */
+
 .search_result_section {
   position: absolute;
-  left: 80px;
   top: 80px;
+  left: 80px;
   right: 10px;
-  height: auto; /* 🆕 để auto theo chiều dài nội dung */
-  border-radius: 8px;
-  overflow: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #888 transparent;
+  min-height: calc(100vh - 90px);
   background-color: #000;
+  border-radius: 8px;
   padding: 24px;
+  color: #fff;
+  overflow: auto;
   display: flex;
-  flex-direction: column; /* 🆕 flex dọc */
+  flex-direction: column;
   gap: 32px;
-  transition: left 0.3s ease;
-  color: #ffffff;
-  transition: left 0.3s ease, padding 0.3s ease, margin 0.3s ease;
-
+  transition: left 0.3s ease, padding 0.3s ease;
 }
 
-/* Khi sidebar mở rộng */
 .search_result_section.shrink {
   left: 290px;
 }
 
-/* Scrollbar đẹp */
 .search_result_section::-webkit-scrollbar {
   width: 6px;
 }
@@ -33,181 +28,198 @@
   background: #888;
   border-radius: 10px;
 }
+.search_result_section {
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
 
-/* Tiêu đề của mỗi section */
 .sectionTitle_result {
   font-size: 24px;
   font-weight: 700;
   margin-bottom: 16px;
-  color: #ffffff;
+  color: #fff;
 }
 
-/* Top row chứa TopResult + Songs */
 .top_row {
   display: flex;
   gap: 32px;
 }
 
-/* Cột Top Result */
 .topResultSection_result {
   flex: 1;
-  max-width: 500px;
+  max-width: 400px;
 }
 
-/* Cột Songs List */
 .songsSection_result {
   flex: 2;
 }
 
-/* Card artist hoặc bài hát */
 .artistCard_result,
 .songCard_result {
   background-color: #181818;
   border-radius: 8px;
   padding: 24px;
-  transition: background-color 0.3s ease;
-  min-height: 312px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 10px;
+  gap: 16px;
+  height: 300px;
 }
-
 .artistCard_result:hover,
 .songCard_result:hover {
   background-color: #282828;
 }
 
-/* Ảnh nghệ sĩ */
 .artistImageContainer_result {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
   margin-bottom: 16px;
 }
 .artistImage_result {
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  width: 150px;
-  height: 150px;
 }
 
-/* Nếu Top Result là bài hát */
+/* Khi Top result là bài hát */
 .songInfoTop_result {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 16px; /* matching artistCard_result gap */
+  margin-bottom: 16px;
 }
 .songCoverTop_result {
-  border-radius: 8px;
-  margin-bottom: 16px;
-  object-fit: cover;
   width: 150px;
   height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+  /* tạo khoảng cách dưới ảnh giống artist */
+  margin-bottom: 16px;
 }
 .songTitleTop_result {
   font-size: 24px;
   font-weight: 700;
-  margin-bottom: 4px;
-  color: #ffffff;
+  color: #fff;
 }
 .songArtistTop_result {
   font-size: 14px;
   color: #b3b3b3;
+  margin-top: 10px;
 }
 
-/* Card chứa Songs List */
 .songCardList_result {
-  background-color: #000000;
-  border-radius: 8px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 12px;
-  max-width: 1100px; /* 🆕 giới hạn chiều rộng */
-  margin-left: auto; /* 🆕 đẩy sang phải */
+  width: 100%;
+  background-color: transparent;
+  padding: 0;
 }
-
-/* Danh sách bài hát */
 .songsList_result {
   list-style: none;
-  padding: 0;
   margin: 0;
-  width: 100%;
+  padding: 0;
 }
-
-/* Từng bài hát */
 .songItem_result {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 12px;
   border-radius: 8px;
-  transition: background-color 0.3s ease;
-  width: 100%;
-  color: #ffffff;
+  transition: background-color 0.2s ease;
 }
-
 .songItem_result:hover {
   background-color: #282828;
 }
 
-/* Thông tin bài hát */
 .songInfo_result {
   display: flex;
   align-items: center;
   gap: 16px;
 }
-
-/* Ảnh nhỏ bài hát */
 .songCover_result {
   width: 50px;
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
 }
-
-/* Chi tiết bài hát */
 .songDetails_result {
   display: flex;
   flex-direction: column;
 }
-
 .songTitle_result {
   font-size: 16px;
   font-weight: 500;
   margin: 0;
-  color: #ffffff;
+  color: #fff;
 }
-
 .songArtist_result {
   font-size: 14px;
   color: #b3b3b3;
   margin-top: 4px;
 }
-
-/* Thời lượng bài hát */
 .songDuration_result {
-  color: #b3b3b3;
   font-size: 14px;
+  color: #b3b3b3;
 }
 
-/* Featuring và Album section (nằm dọc) */
 .featuringSection_result,
 .albumSection_result {
-  width: 100%; /* full chiều ngang */
+  width: 100%;
+}
+.grid_list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+  gap: 24px;
+}
+.grid_item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.grid_item_img {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.grid_item_title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0;
+}
+.grid_item_sub {
+  font-size: 14px;
+  color: #b3b3b3;
 }
 
-/* Scroll Responsive nhỏ */
+.artistsSection_result {
+  width: 100%;
+  margin-top: 32px;
+}
+.artist_grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+  gap: 24px;
+}
+.artist_card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.artist_avatar {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
 @media (max-width: 768px) {
   .search_result_section {
-    flex-direction: column;
     left: 10px;
     right: 10px;
-    top: 80px;
     padding: 16px;
-    height: auto;
   }
   .top_row {
     flex-direction: column;
@@ -215,57 +227,4 @@
   .topResultSection_result {
     max-width: 100%;
   }
-}
-.grid_list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 24px;
-  width: 100%;
-}
-
-.grid_item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.grid_item_img {
-  width: 100%;
-  border-radius: 8px;
-  object-fit: cover;
-}
-
-.grid_item_title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.grid_item_sub {
-  font-size: 14px;
-  color: #b3b3b3;
-}
-.artistsSection_result {
-  width: 100%;
-  margin-top: 32px;
-}
-
-.artist_grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 24px;
-}
-
-.artist_card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.artist_avatar {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%; /* hình tròn */
-  object-fit: cover;
 }
