@@ -13,7 +13,7 @@ import ManagerPlaylistLayout from "./layouts/ManagerPlaylistLayout";
 import SeeMoreLayouts from "./layouts/SeeMoreLayouts";  // Import layout
 import TopArtistsLisPage from "./container/TopArtistsLisPage";  // Import các trang
 import TopTracksLisPage from "./container/TopTracksLisPage";
-import TopGenresLisPage from "./container/TopGenresLisPage";
+
 import TopTracksPage from "./container/TopTracksPage";
 
 import UploadLayouts from "./layouts/UploadLayouts";
@@ -84,7 +84,7 @@ const App = () => {
         {/* Các route bọc trong SeeMoreLayouts để sử dụng chung Nav */}
         <Route path="/top-artists" element={<SeeMoreLayouts><TopArtistsLisPage /></SeeMoreLayouts>} />
         <Route path="/top-tracks" element={<SeeMoreLayouts><TopTracksLisPage /></SeeMoreLayouts>} />
-        <Route path="/top-genres" element={<SeeMoreLayouts><TopGenresLisPage /></SeeMoreLayouts>} />
+
         <Route path="/top-tracks-page" element={<SeeMoreLayouts><TopTracksPage /></SeeMoreLayouts>} />
         <Route path="/search" element={<SearchPage />} />
       </Routes>
@@ -93,4 +93,3 @@ const App = () => {
 };
 
 export default App;
-

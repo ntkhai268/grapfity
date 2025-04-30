@@ -106,7 +106,7 @@ const TopStats = () => {
     <div className="top-stats-container">
       {renderStatsSection_listening("Top Track", "tracks")}
       {renderStatsSection_listening("Top Artists", "artists")}
-      {renderStatsSection_listening("Top Genres", "genres")}
+      
     </div>
   )
 }

@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
             <li
               key={ar.id}
               className="sidebar-item"
-              onClick={() => navigate(`/artist/${ar.id}`)}
+              onClick={() => navigate(`/profile`)}
             >
               <img
                 src={ar.imageUrl}
