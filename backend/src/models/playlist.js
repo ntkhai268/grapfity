@@ -28,5 +28,10 @@ export default (sequelize, DataTypes) => {
     modelName: 'Playlist'
   });
 
+  Playlist.addHook('afterDestroy', async (playlist, options) => {
+    const { Playlist } = sequelize.models;
+    await Playlist.destroy({ where: { playlistId: playlist.id }, transaction: options.transaction });
+  })
+
   return Playlist;
 };
