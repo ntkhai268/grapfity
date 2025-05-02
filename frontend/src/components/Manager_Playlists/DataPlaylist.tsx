@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react"; // Import thêm useRef
 import { useParams } from "react-router-dom";
 // 1. Import các hàm API cần thiết
-import { getPlaylistByIdAPI, removeTrackFromPlaylistAPI } from "../../services/playlistService";
+import { getPlaylistByIdAPI } from "../../services/playlistService";
+import {removeTrackFromPlaylistAPI} from "../../services/trackServiceAPI"
 import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager";
 
 // 2. Import hoặc định nghĩa lại kiểu dữ liệu

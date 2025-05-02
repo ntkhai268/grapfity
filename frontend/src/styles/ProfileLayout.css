@@ -566,6 +566,9 @@ body.profile-page {
   }
   
   .album-art {
+    width: 160px;
+    height: 160px;
+   /* margin-right: 15px; */
     flex-shrink: 0;
   }
   
@@ -576,6 +579,28 @@ body.profile-page {
     border-radius: 12px;
     object-fit: cover;
   }
+
+  .default-icon-container {
+    width: 100%;
+    height: 60px;
+    border-radius: 4px; /* Giống bo góc ảnh thật */
+    background-color: #333; /* Màu nền tối */
+    display: flex; /* Dùng flexbox để căn giữa SVG */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    justify-content: center; /* Căn giữa theo chiều ngang */
+    cursor: pointer; /* Đổi con trỏ khi hover */
+    transition: background-color 0.2s ease; /* Hiệu ứng chuyển nền */
+  }
+  .default-icon-container:hover {
+    background-color: #444; /* Đổi màu nền tối hơn một chút */
+ }
+
+ .default-icon-container svg {
+  width: 30px; /* Kích thước icon nhỏ hơn cho danh sách */
+  height: 30px;
+  fill: #b3b3b3; /* Màu icon (xám nhạt) */
+  transition: fill 0.2s ease; /* Hiệu ứng chuyển màu fill (tùy chọn) */
+}
   
   .track-details {
     flex: 1;
