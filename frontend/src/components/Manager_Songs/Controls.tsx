@@ -3,7 +3,8 @@ import useSongManager from "../../hooks/Manager_Song_Play"; // Hook quản lý n
 
 // Import API và kiểu dữ liệu Playlist từ service của bạn
 // *** Đảm bảo đường dẫn import đúng và PlaylistData đã được export ***
-import { getMyPlaylistsAPI, addTrackToPlaylistAPI } from "../../services/playlistService";
+import { getMyPlaylistsAPI } from "../../services/playlistService";
+import {addTrackToPlaylistAPI} from "../../services/trackServiceAPI";
 // Giả sử PlaylistData được export từ đây theo yêu cầu trước đó
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
 // Hoặc nếu nó thực sự ở ManagerDataPlaylist:

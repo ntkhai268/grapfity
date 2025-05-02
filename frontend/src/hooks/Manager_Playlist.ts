@@ -15,7 +15,7 @@ interface PlaylistData {
     title: string;
     artist: string; // Artist of the playlist creator
     timeAgo: string;
-    cover: string;
+    cover: string | null;
     tracks: TrackItem[];
 }
 
@@ -113,6 +113,7 @@ const handlePlayTrack = (
   }
 
   const songs: Song[] = currentPlaylist.tracks.map((track) => ({
+      id: track.id,
       src: track.src,
       title: track.title,
       artist: track.artist,
