@@ -74,14 +74,15 @@ const updatePlaylist = async (id, title, imageUrl) => {
     return playlist;
 };
 
-const deleteTrack = async (id) => {
-    const playlist = await db.Playlist.findByPk(id);
-    // Logic chưa được implement
+const deletePlaylist = async (id) => {
+    return await Sequelize.Transaction(async (t) => {
+        await db.Playlist.destroy({ where: { id }, individualHooks: true, transaction: t });
+    })
 };
 
-// ✅ Export theo chuẩn ES module
 export {
     getAllPlaylistsByUserId,
     createPlaylist,
-    updatePlaylist
+    updatePlaylist,
+    deletePlaylist
 };

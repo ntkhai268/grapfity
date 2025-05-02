@@ -4,8 +4,12 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class PlaylistTrack extends Model {
     static associate(models) {
-      PlaylistTrack.belongsTo(models.Track, { foreignKey: 'trackId' });
-      PlaylistTrack.belongsTo(models.Playlist, { foreignKey: 'playlistId' });
+      PlaylistTrack.belongsTo(models.Track, { 
+        foreignKey: 'trackId',
+      });
+      PlaylistTrack.belongsTo(models.Playlist, { 
+        foreignKey: 'playlistId' ,
+      });
     }
   }
 
