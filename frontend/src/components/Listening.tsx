@@ -1,64 +1,70 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import "../styles/Recent_LnU.css";
+// src/components/Recent_LnU.tsx
+import React, { useState, useEffect } from 'react';
+import '../styles/Recent_LnU.css';
+import {
+  fetchListeningHistory,
+  fetchAllTracks,
+  HistoryRecord,
+  TrackRecord
+} from '../services/listeningService';
 
-// Cấu hình Axios
-axios.defaults.baseURL = "http://localhost:8080";
-axios.defaults.withCredentials = true;
-
-interface HistoryRecord { id: number; userId: number; trackId: number; listenCount: number; createdAt: string; }
-interface TrackRecord { id: number; trackUrl: string; imageUrl: string; uploaderId: number; }
-interface ListeningItem { id: number; title: string; artist: string; imageUrl: string; trackUrl: string; listenCount: number; timestamp: string; }
-
-// Đọc tất cả ảnh trong src/assets/images qua Vite import
+// Import động ảnh từ thư mục assets/images (Vite)
 const imageModules = import.meta.glob(
-  "../assets/images/*.{jpg,jpeg,png,svg}",
-  { eager: true, as: "url" }
+  '../assets/images/*.{jpg,jpeg,png,svg}',
+  { eager: true, as: 'url' }
 ) as Record<string, string>;
 const imageMap: Record<string, string> = {};
 Object.entries(imageModules).forEach(([path, url]) => {
-  const parts = path.split("/");
-  const filename = parts[parts.length - 1];
+  const filename = path.split('/').pop()!;
   imageMap[filename] = url;
 });
 
+interface ListeningItem {
+  id: number;
+  title: string;
+  artist: string;
+  imageUrl: string;
+  trackUrl: string;
+  listenCount: number;
+  timestamp: string;
+}
+
 const Recent_LnU: React.FC = () => {
   const [items, setItems] = useState<ListeningItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
-        const [histRes, tracksRes] = await Promise.all([
-          axios.get<{ histories: HistoryRecord[] }>("/api/listening-history"),
-          axios.get<{ data: TrackRecord[] }>("/api/tracks"),
+        // Gọi đồng thời hai service
+        const [histories, tracks] = await Promise.all([
+          fetchListeningHistory(),
+          fetchAllTracks(),
         ]);
-        const histories = histRes.data.histories;
-        const tracks = tracksRes.data.data;
 
-        const merged = histories.map(h => {
-          const t = tracks.find(track => track.id === h.trackId);
-          // Lấy filename từ imageUrl trả về (ví dụ "bacphan.jpg")
-          const filename = t?.imageUrl.split("/").pop() || "";
+        // Ghép lịch sử nghe với thông tin track
+        const merged = histories.map((h: HistoryRecord) => {
+          const t = tracks.find((tr: TrackRecord) => tr.id === h.trackId);
+          const filename = t?.imageUrl.split('/').pop() || '';
           return {
             id: h.id,
-            title: t ? `Track ${t.id}` : "Unknown",
-            artist: t ? `Uploader ${t.uploaderId}` : "Unknown",
-            imageUrl: imageMap[filename] || "", // URL do Vite cung cấp
-            trackUrl: t?.trackUrl || "",
+            title: t ? `Track ${t.id}` : 'Unknown',
+            artist: t ? `Uploader ${t.uploaderId}` : 'Unknown',
+            imageUrl: imageMap[filename] || '',
+            trackUrl: t?.trackUrl || '',
             listenCount: h.listenCount,
             timestamp: h.createdAt,
           };
         });
 
         setItems(merged);
-      } catch {
+      } catch (e) {
+        console.error('Fetch error', e);
         setItems([]);
       } finally {
         setLoading(false);
       }
-    };
-    fetchData();
+    })();
   }, []);
 
   if (loading) return <div className="Recent_LnU">Đang tải lịch sử nghe...</div>;
