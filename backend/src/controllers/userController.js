@@ -3,8 +3,10 @@ import {
     getAllUsers,
     createUser,
     handleUserLogin,
-    updateUser
+    updateUser,
+    deleteUser
 } from '../services/user_service.js';
+import { verityJWT } from '../middleware/JWTActions.js';
 
 const getAllUsersController = async (req, res) => {
     try {
@@ -41,8 +43,9 @@ const handleUserLoginController = async (req, res) => {
 
 
 const updateUserController = async (req, res) => {
-    const { id } = req.params;
-    console.log('updateUserData', id);
+    const JWT = req.cookies;
+    const data = verityJWT(JWT.jwt);
+    const id = data.userId;
     const updateUserData = req.body;
     try {
         const data = await updateUser(
@@ -59,11 +62,27 @@ const updateUserController = async (req, res) => {
     }
 };
 
-// ✅ Xuất theo chuẩn ES module
+const deleteUserController = async(req, res) => {
+    const JWT = req.cookies;
+    const data = verityJWT(JWT.jwt);
+    const userId = data.userId;
+    console.log(userId)
+    try{
+        await deleteUser(userId);
+        res.cookie('jwt', '');
+        return res.status(200).json({
+            message: 'Delete user succeed!',
+        });
+    } catch (err) {
+        console.error('Database connection failed:', err);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 export {
     getAllUsersController,
     createUserController,
     handleUserLoginController,
-    updateUserController
-    // deleteUserController, getUserByIdController nếu bạn thêm sau
+    updateUserController,
+    deleteUserController
 };
