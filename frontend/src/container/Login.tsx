@@ -6,7 +6,7 @@ const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  
 
   useEffect(() => {
     const container = document.querySelector('.container');
@@ -31,20 +31,39 @@ const LoginForm: React.FC = () => {
         credentials: 'include',
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
+  
+      const data: {
+        message: string;
+        token: string;
+        roleId: number;
+      } = await response.json();
+  
       if (response.ok && data.message === 'Login successful') {
-        // Lưu token vào localStorage để sử dụng cho các yêu cầu sau
+        // Lưu token và roleId nếu cần cho các request sau
         localStorage.setItem('token', data.token);
-        alert(data.message); // Hiển thị "Login successful"
-        window.location.href = 'http://localhost:5173/mainpage';
+        localStorage.setItem('roleId', data.roleId.toString());
+  
+        alert(data.message); // Thông báo đăng nhập thành công
+  
+        // Điều hướng theo roleId
+        if (data.roleId === 1) {
+          window.location.href = 'http://localhost:5173/mainpage';
+        } else if (data.roleId === 2) {
+          window.location.href = 'http://localhost:5173/adminpage';
+        } else {
+          // Trường hợp role khác
+          window.location.href = 'http://localhost:5173/';
+        }
       } else {
-        alert(data.message); // Hiển thị "Username does not exist" hoặc "Incorrect password"
+        // Đăng nhập thất bại
+        alert(data.message);
       }
     } catch (err) {
       console.error('Lỗi kết nối server:', err);
       alert('Không thể kết nối đến máy chủ.');
     }
-};
+  };
+  
 
   
 

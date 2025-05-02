@@ -43,7 +43,7 @@ const Recent_LnU: React.FC = () => {
         ]);
 
         // Ghép lịch sử nghe với thông tin track
-        const merged = histories.map((h: HistoryRecord) => {
+        const merged: ListeningItem[] = histories.map((h: HistoryRecord) => {
           const t = tracks.find((tr: TrackRecord) => tr.id === h.trackId);
           const filename = t?.imageUrl.split('/').pop() || '';
           return {
@@ -57,7 +57,12 @@ const Recent_LnU: React.FC = () => {
           };
         });
 
-        setItems(merged);
+        // Sắp xếp theo timestamp giảm dần và chỉ lấy 5 mục gần nhất
+        const topFive = merged
+          .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+          .slice(0, 5);
+
+        setItems(topFive);
       } catch (e) {
         console.error('Fetch error', e);
         setItems([]);

@@ -145,3 +145,18 @@
     margin-bottom: 30px; /* Khoảng cách dưới mỗi section khi xếp theo cột */
   }
 }
+/* Thu nhỏ ảnh trong các card Top Tracks */
+.top-tracks-grid .track-card img {
+  width: 100%;       /* vẫn đầy chiều ngang card */
+  height: 120px;     /* cố định cao 120px */
+  object-fit: cover; /* cắt gọn, giữ tỉ lệ */
+  border-radius: 4px;
+}
+
+/* Thu nhỏ thumbnail trong list Top Artists */
+.stats-list .item-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
+}
