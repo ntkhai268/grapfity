@@ -1,0 +1,8 @@
+models/
+├── index.js              ← Khởi tạo Sequelize & export tất cả model
+├── User.js               ← Định nghĩa bảng Users
+├── Track.js              ← Định nghĩa bảng Tracks
+├── Playlist.js           ← Định nghĩa bảng Playlists
+├── Like.js               ← Định nghĩa bảng Likes (quan hệ User - Track)
+├── SearchHistory.js      ← Định nghĩa bảng Search_History
+
