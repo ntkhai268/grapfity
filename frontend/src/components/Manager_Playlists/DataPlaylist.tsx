@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from "react"; // Import thêm useRef
 import { useParams } from "react-router-dom";
 // 1. Import các hàm API cần thiết
-import { getPlaylistByIdAPI, removeTrackFromPlaylistAPI } from "../../services/playlistService";
+// import { getPlaylistByIdAPI } from "../../services/playlistService";
+import {getTracksInPlaylistAPI, removeTrackFromPlaylistAPI } from "../../services/trackPlaylistService"
 import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager";
 
 // 2. Import hoặc định nghĩa lại kiểu dữ liệu
@@ -50,7 +51,7 @@ const DataPlaylist: React.FC = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const fetchedPlaylist = await getPlaylistByIdAPI(numericId);
+            const fetchedPlaylist = await getTracksInPlaylistAPI(numericId);
             if (fetchedPlaylist) {
                 setPlaylist(fetchedPlaylist);
             } else {

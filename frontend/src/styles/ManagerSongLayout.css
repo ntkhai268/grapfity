@@ -1,176 +1,176 @@
-  * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    :root {
-      --spotify-black: #121212;
-      --spotify-dark-grey: #181818;
-      --spotify-light-grey: #282828;
-      --spotify-green: #1DB954;
-      --spotify-white: #FFFFFF;
-      --spotify-text-grey: #b3b3b3;
-    }
-    
-    body.managersong-page {
-      background-color: var(--spotify-black);
-      color: var(--spotify-white);
-      min-height: 100vh;
-      position: relative;
-      /* background-color: aliceblue; */
-    }
-  
-  
-  
-  
-  /* Main Content Styles */
-  .Management_song {
-    flex: 1;
-    height: calc(100vh - 90px);
-    /* overflow-y: auto; */
-    /* background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 30%); */
-  }
-  
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
-  .user-profile {
-    background-color: rgba(0, 0, 0, 0.7);
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .user-profile span {
-    color: var(--spotify-white);
-    font-weight: bold;
-  }
-  
-  /* Song Header Section */
-  .song-header {
-    display: flex;
-    padding: 24px 32px;
-    align-items: flex-end;
-  }
-  
-  .song-image {
-    width: 232px;
-    height: 232px;
-    box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
-    margin-right: 24px;
-    border-radius: 10px;
-  }
-  
-  .song-details {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .song-type {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-  
-  .song-title-track {
-    font-size: 6rem;
-    font-weight: 900;
-    line-height: 6rem;
-    margin-bottom: 16px;
-    font-family: 'Sans-serif';
-  }
-  
-  .song-meta {
-    display: flex;
-    align-items: center;
-    font-size: 14px;
-  }
-  
-  .artist-image {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin-right: 8px;
-  }
-  
-  .dot-separator {
-    margin: 0 4px;
-  }
-  
-  /* Controls Section */
-  .controls {
-    padding: 24px 32px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .play-button {
-    width: 56px;
-    height: 56px;
-    background-color: var(--spotify-green);
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 32px;
-    cursor: pointer;
-  }
-  
-  .control-icon {
-    margin-right: 24px;
-    cursor: pointer;
-  }
-  
-  
+:root {
+  --spotify-black: #121212;
+  --spotify-dark-grey: #181818;
+  --spotify-light-grey: #282828;
+  --spotify-green: #1DB954;
+  --spotify-white: #FFFFFF;
+  --spotify-text-grey: #b3b3b3;
+}
+
+body.managersong-page {
+  background-color: var(--spotify-black);
+  color: var(--spotify-white);
+  min-height: 100vh;
+  position: relative;
+  /* background-color: aliceblue; */
+}
+
+
+
+
+/* Main Content Styles */
+.Management_song {
+flex: 1;
+height: calc(100vh - 90px);
+/* overflow-y: auto; */
+/* background: linear-gradient(to bottom, #7D3218, var(--spotify-black) 30%); */
+}
+
+
+.user-profile {
+background-color: rgba(0, 0, 0, 0.7);
+border-radius: 50%;
+width: 32px;
+height: 32px;
+display: flex;
+justify-content: center;
+align-items: center;
+cursor: pointer;
+}
+
+.user-profile span {
+color: var(--spotify-white);
+font-weight: bold;
+}
+
+/* Song Header Section */
+.song-header {
+display: flex;
+padding: 24px 32px;
+align-items: flex-end;
+}
+
+.song-image {
+width: 232px;
+height: 232px;
+box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+margin-right: 24px;
+border-radius: 10px;
+}
+
+.song-details {
+display: flex;
+flex-direction: column;
+}
+
+.song-type {
+font-size: 12px;
+margin-bottom: 8px;
+}
+
+.song-title-track {
+font-size: 6rem;
+font-weight: 900;
+line-height: 6rem;
+margin-bottom: 16px;
+font-family: 'Sans-serif';
+}
+
+.song-meta {
+display: flex;
+align-items: center;
+font-size: 14px;
+}
+
+.artist-image {
+width: 24px;
+height: 24px;
+border-radius: 50%;
+margin-right: 8px;
+}
+
+.dot-separator {
+margin: 0 4px;
+}
+
+/* Controls Section */
+.controls {
+padding: 24px 32px;
+display: flex;
+align-items: center;
+}
+
+.play-button {
+width: 56px;
+height: 56px;
+background-color: var(--spotify-green);
+border-radius: 50%;
+display: flex;
+justify-content: center;
+align-items: center;
+margin-right: 32px;
+cursor: pointer;
+}
+
+.control-icon {
+margin-right: 24px;
+cursor: pointer;
+}
+
+
 
 /* --- CSS HIỆN TẠI CỦA BẠN --- */
 .dropdown {
-  margin-left: 8px; /* Giữ lại nếu cần */
-  position: relative;
-  display: inline-block; /* Giữ lại */
+margin-left: 8px; /* Giữ lại nếu cần */
+position: relative;
+display: inline-block; /* Giữ lại */
 }
 
 .dropdown-content {
-  display: none; /* Mặc định ẩn */
-  position: absolute;
-  background-color: var(--spotify-light-grey); /* Sử dụng biến màu của bạn */
-  min-width: 200px; /* Giữ lại */
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Giữ lại */
-  z-index: 1; /* Giữ lại z-index cho dropdown chính */
-  border-radius: 4px; /* Giữ lại */
-  /* Thêm vị trí để nó xổ xuống dưới icon ellipsis (ví dụ) */
-  top: 100%; /* Ngay dưới phần tử trigger */
-  margin-top: 5px; /* Khoảng cách nhỏ */
-  left: 0; /* Căn lề phải với icon (hoặc left: 0 tùy thiết kế) */
+display: none; /* Mặc định ẩn */
+position: absolute;
+background-color: var(--spotify-light-grey); /* Sử dụng biến màu của bạn */
+min-width: 200px; /* Giữ lại */
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Giữ lại */
+z-index: 1; /* Giữ lại z-index cho dropdown chính */
+border-radius: 4px; /* Giữ lại */
+/* Thêm vị trí để nó xổ xuống dưới icon ellipsis (ví dụ) */
+top: 100%; /* Ngay dưới phần tử trigger */
+margin-top: 5px; /* Khoảng cách nhỏ */
+left: 0; /* Căn lề phải với icon (hoặc left: 0 tùy thiết kế) */
 }
 
 /* Style cho các thẻ <a> bên trong dropdown chính */
 .dropdown-content a {
-  color: var(--spotify-white); /* Sử dụng biến màu của bạn */
-  padding: 12px 16px; /* Giữ lại padding */
-  text-decoration: none;
-  display: block;
-  font-size: 14px; /* Giữ lại font-size */
-  white-space: nowrap; /* Thêm để tránh xuống dòng */
+color: var(--spotify-white); /* Sử dụng biến màu của bạn */
+padding: 12px 16px; /* Giữ lại padding */
+text-decoration: none;
+display: block;
+font-size: 14px; /* Giữ lại font-size */
+white-space: nowrap; /* Thêm để tránh xuống dòng */
 }
 
 /* Hiển thị dropdown chính khi có class active */
 .dropdown.active .dropdown-content {
-  display: block;
+display: block;
 }
 
 /* Hiệu ứng hover cho thẻ <a> trong dropdown chính */
 .dropdown-content a:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Giữ lại hiệu ứng hover */
+background-color: rgba(255, 255, 255, 0.1); /* Giữ lại hiệu ứng hover */
 }
 
 /* BỎ QUY TẮC NÀY NẾU CHỈ MUỐN MỞ BẰNG CLICK */
 /*
 .dropdown:hover .dropdown-content {
-  display: block;
+display: block;
 }
 */
 
@@ -179,196 +179,195 @@
 
 /* Style cho item chứa submenu (thay thế thẻ <a> Add To Playlist) */
 .dropdown-item.has-submenu {
-  position: relative; /* Quan trọng để định vị submenu */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px; /* Đồng bộ padding với thẻ <a> */
-  cursor: default; /* Hoặc pointer */
-  color: var(--spotify-white); /* Đồng bộ màu chữ */
-  font-size: 14px; /* Đồng bộ font-size */
-  white-space: nowrap;
+position: relative; /* Quan trọng để định vị submenu */
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 12px 16px; /* Đồng bộ padding với thẻ <a> */
+cursor: default; /* Hoặc pointer */
+color: var(--spotify-white); /* Đồng bộ màu chữ */
+font-size: 14px; /* Đồng bộ font-size */
+white-space: nowrap;
 }
 
 /* Hiệu ứng hover cho item cha của submenu */
 .dropdown-item.has-submenu:hover {
-   background-color: rgba(255, 255, 255, 0.1); /* Đồng bộ hiệu ứng hover */
+background-color: rgba(255, 255, 255, 0.1); /* Đồng bộ hiệu ứng hover */
 }
 
 /* Icon mũi tên (tùy chọn) */
 .submenu-arrow {
-  font-size: 0.8em; /* Kích thước mũi tên */
-  margin-left: 10px;
-  color: rgba(255, 255, 255, 0.7); /* Màu mũi tên nhạt hơn */
+font-size: 0.8em; /* Kích thước mũi tên */
+margin-left: 10px;
+color: rgba(255, 255, 255, 0.7); /* Màu mũi tên nhạt hơn */
 }
 
 /* --- SUBMENU --- */
 .submenu {
-  display: none; /* Mặc định ẩn */
-  position: absolute;
-  left: 100%; /* Vị trí bên phải item cha */
-  top: -5px; /* Căn theo chiều dọc (điều chỉnh nếu cần) */
-             /* Ví dụ: top: 0; để bắt đầu từ đỉnh của item cha */
-  min-width: 200px; /* Chiều rộng tối thiểu */
-  background-color: var(--spotify-light-grey); /* Đồng bộ màu nền */
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Đồng bộ đổ bóng */
-  padding: 5px 0; /* Padding trên dưới cho submenu */
-  border-radius: 4px; /* Đồng bộ bo góc */
-  z-index: 2; /* Cao hơn dropdown chính */
+display: none; /* Mặc định ẩn */
+position: absolute;
+left: 100%; /* Vị trí bên phải item cha */
+top: -5px; /* Căn theo chiều dọc (điều chỉnh nếu cần) */
+         /* Ví dụ: top: 0; để bắt đầu từ đỉnh của item cha */
+min-width: 200px; /* Chiều rộng tối thiểu */
+background-color: var(--spotify-light-grey); /* Đồng bộ màu nền */
+box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Đồng bộ đổ bóng */
+padding: 5px 0; /* Padding trên dưới cho submenu */
+border-radius: 4px; /* Đồng bộ bo góc */
+z-index: 2; /* Cao hơn dropdown chính */
 }
 
 /* HIỂN THỊ SUBMENU KHI HOVER VÀO ITEM CHA */
 .dropdown-item.has-submenu:hover > .submenu {
-  display: block;
+display: block;
 }
 
 /* --- Các mục bên trong submenu --- */
 .submenu-item {
-  padding: 10px 16px; /* Điều chỉnh padding cho các mục submenu */
-  color: var(--spotify-white); /* Đồng bộ màu chữ */
-  display: flex; /* Sử dụng flex để căn icon và text */
-  align-items: center;
-  cursor: pointer;
-  white-space: nowrap;
-  font-size: 14px; /* Đồng bộ font-size */
+padding: 10px 16px; /* Điều chỉnh padding cho các mục submenu */
+color: var(--spotify-white); /* Đồng bộ màu chữ */
+display: flex; /* Sử dụng flex để căn icon và text */
+align-items: center;
+cursor: pointer;
+white-space: nowrap;
+font-size: 14px; /* Đồng bộ font-size */
 }
 
 .submenu-item:hover {
-  background-color: rgba(255, 255, 255, 0.1); /* Đồng bộ hiệu ứng hover */
+background-color: rgba(255, 255, 255, 0.1); /* Đồng bộ hiệu ứng hover */
 }
 
 /* Style cho các icon trong submenu item (nếu có) */
 .submenu-item i {
-   margin-right: 10px; /* Khoảng cách giữa icon và text */
-   width: 16px; /* Đặt chiều rộng cố định cho icon để căn chỉnh */
-   text-align: center;
-   color: rgba(255, 255, 255, 0.7); /* Màu icon nhạt hơn */
+margin-right: 10px; /* Khoảng cách giữa icon và text */
+width: 16px; /* Đặt chiều rộng cố định cho icon để căn chỉnh */
+text-align: center;
+color: rgba(255, 255, 255, 0.7); /* Màu icon nhạt hơn */
 }
 
 /* Style cho mục tìm kiếm */
 .submenu-item.search-item {
-  /* Giữ lại các style flex từ .submenu-item */
-  padding: 8px 10px; /* Padding riêng nếu cần */
+/* Giữ lại các style flex từ .submenu-item */
+padding: 8px 10px; /* Padding riêng nếu cần */
 }
 .submenu-item.search-item input {
-  border: none;
-  outline: none;
-  background: transparent;
-  width: 100%;
-  color: var(--spotify-white); /* Màu chữ input */
-  margin-left: -2px; /* Chỉnh lại khoảng cách nếu icon đã có margin */
+border: none;
+outline: none;
+background: transparent;
+width: 100%;
+color: var(--spotify-white); /* Màu chữ input */
+margin-left: -2px; /* Chỉnh lại khoảng cách nếu icon đã có margin */
 }
 .submenu-item.search-item input::placeholder {
-  color: rgba(255, 255, 255, 0.5); /* Màu placeholder */
+color: rgba(255, 255, 255, 0.5); /* Màu placeholder */
 }
 .submenu-item.search-item i {
-   color: rgba(255, 255, 255, 0.7); /* Màu icon search */
+color: rgba(255, 255, 255, 0.7); /* Màu icon search */
 }
-  
-  /* Lyrics Section */
-  .lyrics {
-    padding: 0 32px 24px;
-    background-color: var(--spotify-black);
-  }
-  
-  .lyrics h3 {
-    margin-bottom: 16px;
-    font-size: 18px;
-  }
-  
-  .lyrics p {
-    line-height: 1.6;
-    margin-bottom: 8px;
-    color: var(--spotify-text-grey);
-  }
-  
-  .see-more {
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: color 0.3s ease;
-  }
-  .see-more:hover {
-    color: #1db954; /* Đổi màu xanh khi hover */
-  }
-  
-  /* Recommendations Section */
-  .recommendations {
-    padding: 24px 32px;
-    background-color: var(--spotify-black);
-  }
-  
-  .recommendations h2 {
-    margin-bottom: 16px;
-    font-size: 24px;
-  }
-  
-  .song-list-manager {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .song-item-manager {
-    display: flex;
-    padding: 8px 0;
-    align-items: center;
-    border-radius: 4px;
-  }
-  
-  .song-item-manager:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    opacity: 0.85;
-    transform: scale(1.02);
-    transition: all 0.2s ease-in-out;
-  }
-  
-  
-  .song-number {
-    width: 16px;
-    text-align: right;
-    margin-right: 16px;
-    color: var(--spotify-text-grey);
-  }
-  
-  .rec-song-image {
-    width: 40px;
-    height: 40px;
-    margin-right: 16px;
-  }
-  
-  .rec-song-info {
-    flex: 1;
-  }
-  
-  .rec-song-title {
-    font-size: 16px;
-    margin-bottom: 4px;
-  }
-  
-  .rec-song-artist {
-    font-size: 14px;
-    color: var(--spotify-text-grey);
-  }
-  
-  .song-stats {
-    color: var(--spotify-text-grey);
-    margin-right: 16px;
-  }
-  
-  .song-duration {
-    color: var(--spotify-text-grey);
-  }
-  
-  /* Popular Songs Section */
-  .popular-songs {
-    padding: 24px 32px;
-    background-color: var(--spotify-black);
-  }
-  
-  .popular-songs h2 {
-    margin-bottom: 16px;
-    font-size: 24px;
-  }
-  
-  
+
+/* Lyrics Section */
+.lyrics {
+padding: 0 32px 24px;
+background-color: var(--spotify-black);
+}
+
+.lyrics h3 {
+margin-bottom: 16px;
+font-size: 18px;
+}
+
+.lyrics p {
+line-height: 1.6;
+margin-bottom: 8px;
+color: var(--spotify-text-grey);
+}
+
+.see-more {
+color: white;
+font-size: 14px;
+cursor: pointer;
+font-weight: bold;
+transition: color 0.3s ease;
+}
+.see-more:hover {
+color: #1db954; /* Đổi màu xanh khi hover */
+}
+
+/* Recommendations Section */
+.recommendations {
+padding: 24px 32px;
+background-color: var(--spotify-black);
+}
+
+.recommendations h2 {
+margin-bottom: 16px;
+font-size: 24px;
+}
+
+.song-list-manager {
+display: flex;
+flex-direction: column;
+}
+
+.song-item-manager {
+display: flex;
+padding: 8px 0;
+align-items: center;
+border-radius: 4px;
+}
+
+.song-item-manager:hover {
+background-color: rgba(255, 255, 255, 0.1);
+opacity: 0.85;
+transform: scale(1.02);
+transition: all 0.2s ease-in-out;
+}
+
+
+.song-number {
+width: 16px;
+text-align: right;
+margin-right: 16px;
+color: var(--spotify-text-grey);
+}
+
+.rec-song-image {
+width: 40px;
+height: 40px;
+margin-right: 16px;
+}
+
+.rec-song-info {
+flex: 1;
+}
+
+.rec-song-title {
+font-size: 16px;
+margin-bottom: 4px;
+}
+
+.rec-song-artist {
+font-size: 14px;
+color: var(--spotify-text-grey);
+}
+
+.song-stats {
+color: var(--spotify-text-grey);
+margin-right: 16px;
+}
+
+.song-duration {
+color: var(--spotify-text-grey);
+}
+
+/* Popular Songs Section */
+.popular-songs {
+padding: 24px 32px;
+background-color: var(--spotify-black);
+}
+
+.popular-songs h2 {
+margin-bottom: 16px;
+font-size: 24px;
+}
+
