@@ -17,7 +17,7 @@ export default (sequelize, DataTypes) => {
       });
 
       Track.hasMany(models.Like, {
-        foreignKey: 'trackId'
+        foreignKey: 'trackId',
       });
 
       Track.hasMany(models.listeningHistory, {
@@ -40,6 +40,11 @@ export default (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Track'
   });
+
+  Track.addHook('afterDestroy', async (track, options) => {
+    const {Track} = sequelize.models;
+    await Track.destroy({ where: { trackId: track.id }, transaction: options.transaction});
+  })
 
   return Track;
 };

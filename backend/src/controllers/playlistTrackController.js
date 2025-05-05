@@ -1,55 +1,153 @@
+// src/controllers/playlistTrackController.js
+
+// Import các hàm service cần thiết
+// Đảm bảo đường dẫn này đúng và file service export các hàm này
 import {
     addTrackToPlaylist,
     removeTrackFromPlaylist,
-    getTracksInPlaylist
-} from '../services/playlist_track_service.js';
+    // getTracksInPlaylist 
+    getPlaylistDetailsById
+} from '../services/playlist_track_service.js'; // <-- Sử dụng service riêng nếu có
 
+/**
+ * Controller để thêm track vào playlist hiện có.
+ * Endpoint: POST /api/playlists/:playlistId/tracks
+ */
 const addTrackToPlaylistController = async (req, res) => {
-    const { playlistId } = req.params;
-    const { trackId } = req.body;
-
     try {
-        const result = await addTrackToPlaylist(playlistId, trackId);
-        res.status(200).json({
-            message: 'Đã thêm bài hát',
-            data: result
+        const userId = req.userId;
+        const { playlistId } = req.params;
+        const { trackId } = req.body;
+
+        // Validate inputs (giữ nguyên)
+        if (!userId) return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
+        if (!playlistId || isNaN(Number(playlistId))) return res.status(400).json({ error: 'Bad Request: Playlist ID không hợp lệ.' });
+        if (!trackId || isNaN(Number(trackId))) return res.status(400).json({ error: 'Bad Request: Track ID không hợp lệ hoặc thiếu.' });
+
+        console.log(`Controller: User ${userId} thêm track ${trackId} vào playlist ${playlistId}`);
+
+        // Gọi service function
+        const newPlaylistTrack = await addTrackToPlaylist(Number(playlistId), Number(trackId), userId);
+
+        // Trả về thành công
+        return res.status(201).json({ // Sử dụng 201 Created sẽ hợp lý hơn
+            message: 'Đã thêm bài hát vào playlist thành công!',
+            data: newPlaylistTrack
         });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+
+    } catch (error) {
+        // Bắt lỗi từ service và trả về status code phù hợp
+        console.error(`Lỗi trong addTrackToPlaylistController cho user ${req.userId}, playlist ${req.params?.playlistId}, track ${req.body?.trackId}:`, error.message);
+
+        // Ưu tiên sử dụng statusCode từ lỗi nếu service cung cấp
+        const statusCode = error.statusCode || 500;
+        // Lấy message từ lỗi hoặc cung cấp message mặc định
+        let errorMessage = error.message || 'Lỗi server khi thêm track vào playlist.';
+
+        // Có thể giữ lại các kiểm tra message cụ thể nếu service không nhất quán về statusCode
+        if (statusCode === 404) {
+             if (error.message.includes('Playlist')) errorMessage = 'Không tìm thấy playlist.';
+             else if (error.message.includes('Track')) errorMessage = 'Không tìm thấy bài hát.';
+        } else if (statusCode === 403) {
+             errorMessage = 'Bạn không có quyền thêm vào playlist này.';
+        } else if (statusCode === 409) {
+             errorMessage = 'Bài hát này đã có trong playlist.';
+        } else if (statusCode === 400) {
+             errorMessage = 'Dữ liệu không hợp lệ.';
+        }
+
+        return res.status(statusCode).json({ error: errorMessage });
     }
 };
 
+
+/**
+ * Controller để xóa track khỏi playlist.
+ * Endpoint: DELETE /api/playlists/:playlistId/tracks/:trackId
+ */
 const removeTrackFromPlaylistController = async (req, res) => {
-    const { playlistId } = req.params;
-    const { trackId } = req.body;
-
     try {
-        const deleted = await removeTrackFromPlaylist(playlistId, trackId);
-        res.status(200).json({
-            message: 'Xóa thành công',
-            data: deleted
+        const userId = req.userId;
+        const { playlistId, trackId } = req.params;
+
+        // Validate inputs (giữ nguyên)
+        if (!userId) return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
+        if (!playlistId || isNaN(Number(playlistId))) return res.status(400).json({ error: 'Bad Request: Playlist ID không hợp lệ.' });
+        if (!trackId || isNaN(Number(trackId))) return res.status(400).json({ error: 'Bad Request: Track ID không hợp lệ.' });
+
+        console.log(`Controller: User ${userId} xóa track ${trackId} khỏi playlist ${playlistId}`);
+
+        // Gọi service function
+        const result = await removeTrackFromPlaylist(Number(playlistId), Number(trackId), userId);
+
+        // Trả về thành công (có thể dùng 204 No Content)
+        return res.status(200).json({
+            message: result.message || 'Đã xóa bài hát khỏi playlist thành công!'
         });
-    } catch (err) {
-        res.status(400).json({ error: err.message });
+        // Hoặc: return res.status(204).send();
+
+    } catch (error) {
+        // Bắt lỗi từ service và trả về status code phù hợp
+        console.error(`Lỗi trong removeTrackFromPlaylistController cho user ${req.userId}, playlist ${req.params?.playlistId}, track ${req.params?.trackId}:`, error.message);
+
+        const statusCode = error.statusCode || 500;
+        let errorMessage = error.message || 'Lỗi server khi xóa track khỏi playlist.';
+
+        if (statusCode === 404) {
+             if (error.message.includes('Playlist')) errorMessage = 'Không tìm thấy playlist.';
+             else if (error.message.includes('Track')) errorMessage = 'Không tìm thấy bài hát này trong playlist.';
+        } else if (statusCode === 403) {
+             errorMessage = 'Bạn không có quyền xóa khỏi playlist này.';
+        } else if (statusCode === 400) {
+             errorMessage = 'Dữ liệu không hợp lệ.';
+        }
+
+        return res.status(statusCode).json({ error: errorMessage });
     }
 };
 
-const getTracksInPlaylistController = async (req, res) => {
-    const { playlistId } = req.params;
-
+/**
+ * Controller để lấy danh sách các track trong một playlist.
+ * Endpoint: GET /api/playlists/:playlistId/tracks
+ */
+const getPlaylistDetailsController = async (req, res) => { // <-- Đổi tên controller cho rõ ràng (tùy chọn)
     try {
-        const tracks = await getTracksInPlaylist(playlistId);
-        res.status(200).json({
-            data: tracks
-        });
+        const { playlistId } = req.params;
+
+        // --- VALIDATION ---
+        if (!playlistId || isNaN(Number(playlistId))) {
+            return res.status(400).json({ error: 'Bad Request: Playlist ID không hợp lệ.' });
+        }
+        // ------------------
+
+        console.log(`Controller: Lấy chi tiết playlist ID: ${playlistId}`);
+
+        // --- THAY ĐỔI QUAN TRỌNG ---
+        // Gọi hàm service mới đã sửa để lấy đầy đủ thông tin
+        const fullPlaylistData = await getPlaylistDetailsById(Number(playlistId)); // <-- Gọi hàm service mới
+        // --------------------------
+
+        // Hàm service mới sẽ ném lỗi 404 nếu không tìm thấy, nên khối catch sẽ xử lý
+        // Không cần kiểm tra null ở đây nữa
+
+        // --- TRẢ VỀ KẾT QUẢ ĐẦY ĐỦ TỪ SERVICE ---
+        res.status(200).json(fullPlaylistData); // <-- Trả về object playlist đầy đủ
+        // --------------------------
+
     } catch (err) {
-        res.status(400).json({ error: err.message });
+        // Bắt lỗi từ service (bao gồm cả lỗi 404 nếu playlist không tồn tại từ service)
+        console.error(`Lỗi trong getPlaylistDetailsController cho playlist ${req.params?.playlistId}:`, err.message); // <-- Cập nhật tên controller trong log lỗi
+        const statusCode = err.statusCode || 500; // Lấy statusCode từ lỗi (ví dụ 404, 400 từ service) hoặc mặc định 500
+        const errorMessage = err.message || 'Lỗi server khi lấy thông tin playlist.';
+        // Trả về lỗi với status code phù hợp
+        res.status(statusCode).json({ error: errorMessage });
     }
 };
-
-// ✅ Xuất theo chuẩn ES module
+// Export các controller trong file này
 export {
     addTrackToPlaylistController,
     removeTrackFromPlaylistController,
-    getTracksInPlaylistController
+    // getTracksInPlaylistController 
+    getPlaylistDetailsController
+    // Bỏ getPlaylistByIdController khỏi đây nếu nó đã chuyển về playlistController.js
 };

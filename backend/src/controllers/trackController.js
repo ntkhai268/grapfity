@@ -7,6 +7,8 @@ import {
     deleteTrack,
     getTrackWithUploaderById
 } from '../services/track_service.js';
+import { verityJWT } from '../middleware/JWTActions.js';
+import * as mm from 'music-metadata';
 
 const getAllTracksController = async (req, res) => {
     try {
@@ -54,12 +56,27 @@ const getTrackWithUploaderByIdController = async (req, res) => {
 };
 
 const createTrackController = async (req, res) => {
-    const { trackUrl, imageUrl, uploaderId } = req.body;
-    if (!trackUrl || !imageUrl || !uploaderId) {
+    const JWT = req.cookies;
+    const data = verityJWT(JWT.jwt);
+    const uploaderId = data.userId;
+    const trackUrl = req.files.audio[0].destination + '/' + req.files.audio[0].filename
+    const imageUrl = req.files.image[0].destination + '/' + req.files.image[0].filename
+    console.log(req.body.audioFeatures)
+    const metadata = eval('('+ req.body.audioFeatures + ')')
+    console.log(metadata)
+    //thêm các metadata có thể lấy tự động
+    metadata.trackname = req.body.title
+    metadata.release_date = req.body.releaseDate || new Date().toISOString().split('T')[0];
+    metadata.year = eval(req.body.releaseDate.slice(0, 4))
+    const metadataAudio = await mm.parseFile(trackUrl);
+    metadata.duration_ms = Math.floor((metadataAudio.format.duration || 0) * 1000);
+
+    console.log(trackUrl, imageUrl, uploaderId, metadata.trackname, metadata.release_date)
+    if (!trackUrl || !imageUrl || !uploaderId || !metadata.trackname || !metadata.release_date) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
     try {
-        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId);
+        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, metadata);
         return res.status(200).json({
             message: 'Create track succeed!',
             data: newTrack
@@ -88,7 +105,15 @@ const updateTrackController = async (req, res) => {
 };
 
 const deleteTrackController = async (req, res) => {
-    // TODO: Implement logic if needed
+    try{
+        await deleteTrack(req.params.id)
+        return res.status(200).json({
+            message: 'Delete track succeed!',
+        });
+    } catch (err){
+        console.error('Database connection failed:', err);
+        res.status(500).send('Internal Server Error');
+    }
 };
 
 export {

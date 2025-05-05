@@ -6,14 +6,10 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       listeningHistory.belongsTo(models.User, {
         foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
 
       listeningHistory.belongsTo(models.Track, {
         foreignKey: 'trackId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
     }
   }

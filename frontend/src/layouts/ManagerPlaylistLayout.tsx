@@ -9,7 +9,7 @@ import "../styles/ManagerPlaylistLayout.css";
 
 const ManagerPlaylistLayout: React.FC = () => {
   const { playlistId } = useParams<{ playlistId: string }>(); // ⬅️ lấy từ URL
-  const numericId = Number(playlistId);
+  // const numericId = Number(playlistId);
   useEffect(() => {
       document.body.classList.add("managerPlaylist-page");
       return () => {
@@ -24,7 +24,7 @@ const ManagerPlaylistLayout: React.FC = () => {
           <Sidebar />
           <div className="page-content">
             {playlistId ? (
-              <ManagerPlaylistSection playlistId={numericId} />
+              <ManagerPlaylistSection />
             ) : (
               <div>Không có playlistId được cung cấp.</div>
             )}

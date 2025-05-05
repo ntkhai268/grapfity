@@ -146,6 +146,7 @@ export interface PlaylistData {
   artist: string;      // Có thể lấy từ playlist.User.userName hoặc bỏ đi nếu không cần ở cấp playlist
   timeAgo: string;     // Sẽ được tính toán ở frontend từ createDate của API
   cover: string;       // Sẽ map với playlist.imageUrl từ API
+  imageUrl?: string | null;
   tracks: TrackItem[];   // Danh sách các track lấy từ API
   // Có thể thêm các trường khác mà API trả về, ví dụ:
   // createDate?: string | Date;
