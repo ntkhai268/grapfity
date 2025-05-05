@@ -6,14 +6,10 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       Like.belongsTo(models.User, {
         foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
 
       Like.belongsTo(models.Track, {
         foreignKey: 'trackId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
     }
   }

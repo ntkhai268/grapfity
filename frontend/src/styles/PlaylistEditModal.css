@@ -1,0 +1,197 @@
+/* PlaylistEditModal.css - CSS cho component sửa playlist */
+
+.playlist-edit-modal__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Nền mờ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Đảm bảo nằm trên cùng */
+}
+
+.playlist-edit-modal__container {
+    background-color: #282828; /* Nền tối cho modal */
+    color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 550px; /* Giới hạn chiều rộng tối đa */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+}
+
+.playlist-edit-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #404040; /* Đường kẻ mờ */
+}
+
+.playlist-edit-modal__header h2 {
+    margin: 0;
+    font-size: 1.4em;
+}
+
+.playlist-edit-modal__close-btn {
+    background: none;
+    border: none;
+    color: #b3b3b3; /* Màu icon đóng */
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+}
+
+ .playlist-edit-modal__close-btn:hover {
+    color: #fff;
+ }
+
+.playlist-edit-modal__body {
+    display: flex;
+    gap: 20px; /* Khoảng cách giữa ảnh và text */
+    margin-bottom: 25px;
+}
+
+.playlist-edit-modal__image-section {
+    width: 180px; /* Kích thước vùng ảnh */
+    height: 180px;
+    background-color: #333; /* Nền khi không có ảnh */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative; /* Để định vị lớp phủ */
+    overflow: hidden; /* Ẩn phần thừa của ảnh */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    flex-shrink: 0; /* Không bị co lại */
+}
+
+ .playlist-edit-modal__cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ảnh che phủ */
+    display: block;
+ }
+
+ .playlist-edit-modal__default-icon {
+     width: 100%;
+     height: 100%;
+     display: flex;
+     flex-direction: column; /* Hiển thị chữ dưới icon */
+     align-items: center;
+     justify-content: center;
+     text-align: center;
+     color: #b3b3b3; /* Màu chữ phụ */
+ }
+ .playlist-edit-modal__default-icon svg {
+    margin-bottom: 8px; /* Khoảng cách giữa icon và chữ */
+ }
+
+
+ .playlist-edit-modal__image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.6); /* Lớp phủ mờ */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0; /* Ẩn ban đầu */
+    transition: opacity 0.2s ease;
+    color: #fff;
+ }
+
+ .playlist-edit-modal__image-section:hover .playlist-edit-modal__image-overlay {
+    opacity: 1; /* Hiện khi hover */
+ }
+
+ .playlist-edit-modal__edit-label {
+     font-size: 0.9em;
+     margin-top: 8px;
+     font-weight: bold;
+ }
+
+
+.playlist-edit-modal__info-section {
+    flex-grow: 1; /* Chiếm phần còn lại */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Khoảng cách giữa input và textarea */
+}
+
+.playlist-edit-modal__title-input,
+.playlist-edit-modal__desc-input {
+    background-color: #3e3e3e; /* Nền input */
+    border: 1px solid #535353;
+    border-radius: 4px;
+    padding: 12px;
+    color: #fff;
+    font-size: 0.95em;
+    width: 100%; /* Chiếm hết chiều rộng */
+    box-sizing: border-box; /* Tính cả padding, border vào width */
+    font-family: inherit; /* Kế thừa font chữ */
+}
+
+ .playlist-edit-modal__title-input:focus,
+ .playlist-edit-modal__desc-input:focus {
+     outline: none;
+     border-color: #777;
+     background-color: #4a4a4a;
+ }
+
+ .playlist-edit-modal__desc-input {
+     resize: vertical; /* Cho phép thay đổi chiều cao textarea */
+     min-height: 80px; /* Chiều cao tối thiểu */
+ }
+
+.playlist-edit-modal__footer {
+    display: flex;
+    justify-content: flex-end; /* Đẩy nút Lưu về bên phải */
+    margin-top: 10px;
+}
+
+.playlist-edit-modal__save-btn {
+    background-color: #fff; /* Nút Lưu màu trắng */
+    color: #181818; /* Chữ đen */
+    border: none;
+    border-radius: 500px; /* Bo tròn */
+    padding: 12px 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.2s ease;
+}
+
+ .playlist-edit-modal__save-btn:hover {
+     transform: scale(1.04); /* Hiệu ứng phóng to nhẹ */
+     background-color: #f0f0f0;
+ }
+
+ .playlist-edit-modal__save-btn:active {
+    transform: scale(1); /* Thu nhỏ lại khi nhấn */
+ }
+
+ /* Responsive cho màn hình nhỏ hơn */
+ @media (max-width: 600px) {
+    .playlist-edit-modal__body {
+         flex-direction: column; /* Xếp ảnh và text theo chiều dọc */
+         align-items: center; /* Căn giữa */
+    }
+    .playlist-edit-modal__image-section {
+         margin-bottom: 20px; /* Thêm khoảng cách dưới ảnh */
+         width: 150px; /* Giảm kích thước ảnh */
+         height: 150px;
+    }
+    .playlist-edit-modal__info-section {
+        width: 100%; /* Chiếm hết chiều rộng */
+    }
+ }
