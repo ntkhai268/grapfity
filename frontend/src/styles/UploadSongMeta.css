@@ -1,444 +1,463 @@
 input[type="date"].meta-form-input::-webkit-calendar-picker-indicator {
-    filter: invert(1) brightness(1);
-    /* Hoặc thử các giá trị filter khác */
-    /* color: white;  */
-    cursor: pointer;
+  filter: invert(1) brightness(1);
+  /* Hoặc thử các giá trị filter khác */
+  /* color: white;  */
+  cursor: pointer;
 }
 /* UploadSongMeta.css - Đã cập nhật cho cấu trúc JSX mới */
 
 /* ----- Base Container ----- */
 .meta-upload-metadata-container {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-    padding: 24px;
-    border-radius: 8px;
-    max-width: 900px;
-    margin: 20px auto;
-    font-family: sans-serif;
-  }
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 20px auto;
+  font-family: sans-serif;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none; 
+}
+.meta-upload-metadata-container ::-webkit-scrollbar {
+  display: none;
+}
+
+/* ----- Tabs ----- */
+.meta-tabs-container {
+  display: flex;
+  border-bottom: 1px solid #444;
+  margin-bottom: 24px;
+}
+
+.meta-tab-button {
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  color: #aaa;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.meta-tab-button:hover {
+  color: #fff;
+}
+
+.meta-tab-button.meta-active {
+  color: #fff;
+  font-weight: 600;
+  border-bottom-color: #fff;
+}
+
+/* ----- Main Content Area (Image + Form) ----- */
+.meta-main-content-area {
+  display: flex;
+  gap: 32px;
+}
+
+/* ----- Image Upload ----- */
+.meta-image-upload-container {
+  width: 192px;
+  height: 192px;
+  background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f97316);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.meta-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(55, 65, 81, 0.5);
   
-  /* ----- Tabs ----- */
-  .meta-tabs-container {
-    display: flex;
-    border-bottom: 1px solid #444;
-    margin-bottom: 24px;
-  }
+}
+
+.meta-upload-button {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  bottom: 20px; /* Đặt khoảng cách từ đáy khung chứa. Điều chỉnh 20px nếu muốn gần/xa hơn */
+  left: 50%;   /* Đẩy cạnh trái của nút vào giữa theo chiều ngang */
+  transform: translateX(-50%); /* Dịch nút sang trái 1 nửa chiều rộng của chính nó để căn giữa hoàn hảo */
+  white-space: nowrap;
+}
+
+.meta-upload-button:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* ----- Form Fields ----- */
+.meta-form-fields-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Khoảng cách giữa các nhóm label/input */
+}
+
+/* Giữ lại cho nhóm Radio Button (Privacy) */
+.meta-form-group {
+  display: flex;
+  flex-direction: column;
   
-  .meta-tab-button {
-    padding: 8px 16px;
-    background: none;
-    border: none;
-    color: #aaa;
-    cursor: pointer;
-    font-size: 1rem;
-    margin-bottom: -1px;
-    border-bottom: 2px solid transparent;
-    transition: color 0.2s ease, border-color 0.2s ease;
-  }
-  
-  .meta-tab-button:hover {
-    color: #fff;
-  }
-  
-  .meta-tab-button.meta-active {
-    color: #fff;
-    font-weight: 600;
-    border-bottom-color: #fff;
-  }
-  
-  /* ----- Main Content Area (Image + Form) ----- */
-  .meta-main-content-area {
-    display: flex;
-    gap: 32px;
-  }
-  
-  /* ----- Image Upload ----- */
-  .meta-image-upload-container {
-    width: 192px;
-    height: 192px;
-    background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f97316);
-    border-radius: 4px;
-    display: flex;
-    flex-direction: column;
+}
+
+/* Style cho thẻ <label> bao ngoài (thay thế .meta-form-group cũ) */
+.meta-form-label {
+  display: block; /* Để mỗi nhóm chiếm một hàng */
+}
+
+/* Style cho div chứa text label và dấu * */
+.meta-label-content {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ccc;
+  margin-bottom: 4px; /* Khoảng cách giữa label text và input/select */
+  /* Sử dụng inline-flex để đảm bảo text và dấu * thẳng hàng */
+  display: inline-flex;
+  align-items: baseline;
+}
+
+/* Style cho dấu * */
+.meta-required-indicator {
+  color: #ef4444;
+  margin-left: 4px;
+  /* Không cần display: inline hay line-height nữa */
+}
+
+/* Input, Select, Textarea Base Styles */
+.meta-form-input,
+.meta-form-select,
+.meta-form-textarea {
+  width: 100%;
+  background-color: #2d2d2d;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.meta-form-input::placeholder,
+.meta-form-textarea::placeholder {
+  color: #888;
+}
+
+.meta-form-input:focus,
+.meta-form-select:focus,
+.meta-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+.meta-permalink-input-wrapper {
+  display: flex;            /* Đặt input và nút trên cùng hàng */
+  align-items: center;     /* Căn giữa theo chiều dọc */
+  width: 100%;             /* Chiếm toàn bộ chiều rộng */
+}
+
+/* Điều chỉnh input khi nằm trong wrapper */
+.meta-permalink-input-wrapper .meta-form-input {
+  flex-grow: 1; /* Input chiếm phần lớn không gian còn lại */
+  /* Có thể không cần width: 100% nữa */
+}
+
+.meta-choose-file-button {
+  flex-shrink: 0;        /* Không co nút lại */
+  margin-left: 8px;      /* Khoảng cách giữa input và nút */
+  padding: 6px 12px;     /* Kích thước bên trong nút */
+  background-color: #555; /* Màu nền nút (ví dụ) */
+  color: #fff;           /* Màu chữ */
+  border: 1px solid #777; /* Viền nút (ví dụ) */
+  border-radius: 4px;    /* Bo góc */
+  cursor: pointer;
+  font-size: 0.875rem;   /* Cỡ chữ */
+  white-space: nowrap;   /* Đảm bảo chữ không xuống dòng */
+  transition: background-color 0.2s ease;
+}
+
+.meta-choose-file-button:hover {
+  background-color: #666; /* Màu nền khi hover */
+}
+
+/* Specifics for Select */
+.meta-select-wrapper { /* Wrapper này vẫn nằm trong <label> */
+  position: relative;
+}
+/* Select giờ nằm trong wrapper, nên style cơ bản chuyển lên trên */
+.meta-form-select {
+  /* appearance, padding-right giữ nguyên */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 32px;
+}
+.meta-select-arrow {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #aaa;
+}
+
+/* Specifics for Input with Icon */
+.meta-input-with-icon-wrapper { /* Wrapper này vẫn nằm trong <label> */
+    position: relative;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    flex-shrink: 0;
-  }
-  
-  .meta-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(55, 65, 81, 0.5);
-    
-  }
-  
-  .meta-upload-button {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    font-size: 0.875rem;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    bottom: 20px; /* Đặt khoảng cách từ đáy khung chứa. Điều chỉnh 20px nếu muốn gần/xa hơn */
-    left: 50%;   /* Đẩy cạnh trái của nút vào giữa theo chiều ngang */
-    transform: translateX(-50%); /* Dịch nút sang trái 1 nửa chiều rộng của chính nó để căn giữa hoàn hảo */
-    white-space: nowrap;
-  }
-  
-  .meta-upload-button:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-  }
-  
-  /* ----- Form Fields ----- */
-  .meta-form-fields-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px; /* Khoảng cách giữa các nhóm label/input */
-  }
-  
-  /* Giữ lại cho nhóm Radio Button (Privacy) */
-  .meta-form-group {
-    display: flex;
-    flex-direction: column;
-    
-  }
-  
-  /* Style cho thẻ <label> bao ngoài (thay thế .meta-form-group cũ) */
-  .meta-form-label {
-    display: block; /* Để mỗi nhóm chiếm một hàng */
-  }
-  
-  /* Style cho div chứa text label và dấu * */
-  .meta-label-content {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #ccc;
-    margin-bottom: 4px; /* Khoảng cách giữa label text và input/select */
-    /* Sử dụng inline-flex để đảm bảo text và dấu * thẳng hàng */
-    display: inline-flex;
-    align-items: baseline;
-  }
-  
-  /* Style cho dấu * */
-  .meta-required-indicator {
-    color: #ef4444;
-    margin-left: 4px;
-    /* Không cần display: inline hay line-height nữa */
-  }
-  
-  /* Input, Select, Textarea Base Styles */
-  .meta-form-input,
-  .meta-form-select,
-  .meta-form-textarea {
-    width: 100%;
-    background-color: #2d2d2d;
-    border: 1px solid #555;
-    border-radius: 4px;
-    padding: 8px 12px;
-    color: #fff;
-    font-size: 1rem;
-    box-sizing: border-box;
-  }
-  
-  .meta-form-input::placeholder,
-  .meta-form-textarea::placeholder {
-    color: #888;
-  }
-  
-  .meta-form-input:focus,
-  .meta-form-select:focus,
-  .meta-form-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 1px #3b82f6;
-  }
-  .meta-permalink-input-wrapper {
-    display: flex;            /* Đặt input và nút trên cùng hàng */
-    align-items: center;     /* Căn giữa theo chiều dọc */
-    width: 100%;             /* Chiếm toàn bộ chiều rộng */
-  }
-  
-  /* Điều chỉnh input khi nằm trong wrapper */
-  .meta-permalink-input-wrapper .meta-form-input {
-    flex-grow: 1; /* Input chiếm phần lớn không gian còn lại */
-    /* Có thể không cần width: 100% nữa */
-  }
-  
-  .meta-choose-file-button {
-    flex-shrink: 0;        /* Không co nút lại */
-    margin-left: 8px;      /* Khoảng cách giữa input và nút */
-    padding: 6px 12px;     /* Kích thước bên trong nút */
-    background-color: #555; /* Màu nền nút (ví dụ) */
-    color: #fff;           /* Màu chữ */
-    border: 1px solid #777; /* Viền nút (ví dụ) */
-    border-radius: 4px;    /* Bo góc */
-    cursor: pointer;
-    font-size: 0.875rem;   /* Cỡ chữ */
-    white-space: nowrap;   /* Đảm bảo chữ không xuống dòng */
-    transition: background-color 0.2s ease;
-  }
-  
-  .meta-choose-file-button:hover {
-    background-color: #666; /* Màu nền khi hover */
-  }
-  
-  /* Specifics for Select */
-  .meta-select-wrapper { /* Wrapper này vẫn nằm trong <label> */
-    position: relative;
-  }
-  /* Select giờ nằm trong wrapper, nên style cơ bản chuyển lên trên */
-  .meta-form-select {
-    /* appearance, padding-right giữ nguyên */
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 32px;
-  }
-  .meta-select-arrow {
+}
+/* Input giờ nằm trong wrapper, style padding-right áp dụng cho nó */
+.meta-input-with-icon-wrapper .meta-form-input {
+    padding-right: 36px;
+}
+
+.meta-image-upload-container {
+  width: 192px;
+  height: 192px;
+  background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f97316);
+  border-radius: 4px;
+  /* display: flex; flex-direction: column; align-items: center; justify-content: center; */ /* Có thể bỏ flex nếu không cần nữa */
+  position: relative; /* Vẫn cần cho absolute positioning */
+  flex-shrink: 0;
+  overflow: hidden; /* Giúp bo góc áp dụng cho cả ảnh con */
+}
+
+.meta-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(55, 65, 81, 0.5);
+  /* margin-bottom: 12px; */ /* Đã xóa */
+}
+
+.meta-upload-button {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 0.875rem;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.meta-upload-button:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* --- STYLE MỚI CHO ẢNH ĐÃ UPLOAD --- */
+.meta-uploaded-image {
+  display: block; /* Để chiếm toàn bộ không gian */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh che phủ khung, cắt nếu cần */
+  cursor: pointer; /* Biểu thị có thể click để chọn lại */
+}
+
+/* --- STYLE MỚI CHO NÚT XÓA ẢNH --- */
+.meta-remove-image-button {
+  position: absolute;
+  top: 5px; /* Khoảng cách từ đỉnh */
+  right: 5px; /* Khoảng cách từ phải */
+  background-color: rgba(0, 0, 0, 0.6); /* Nền mờ */
+  color: #fff; /* Màu chữ X trắng */
+  border: none;
+  border-radius: 50%; /* Bo tròn thành hình tròn */
+  width: 24px; /* Kích thước nút */
+  height: 24px;
+  font-size: 16px; /* Kích thước dấu X */
+  line-height: 24px; /* Căn giữa dấu X theo chiều dọc */
+  text-align: center; /* Căn giữa dấu X theo chiều ngang */
+  cursor: pointer;
+  padding: 0; /* Xóa padding mặc định */
+  z-index: 10; /* Đảm bảo nút nằm trên ảnh */
+  transition: background-color 0.2s ease;
+}
+
+.meta-remove-image-button:hover {
+  background-color: rgba(255, 0, 0, 0.7); /* Đổi màu nền khi hover (ví dụ: đỏ mờ) */
+}
+
+.meta-input-icon {
     position: absolute;
     top: 50%;
-    right: 12px;
+    right: 10px;
     transform: translateY(-50%);
+    color: #aaa;
     pointer-events: none;
-    color: #aaa;
-  }
-  
-  /* Specifics for Input with Icon */
-  .meta-input-with-icon-wrapper { /* Wrapper này vẫn nằm trong <label> */
-      position: relative;
-      align-items: center;
-  }
-  /* Input giờ nằm trong wrapper, style padding-right áp dụng cho nó */
-  .meta-input-with-icon-wrapper .meta-form-input {
-      padding-right: 36px;
-  }
+}
 
-  .meta-image-upload-container {
-    width: 192px;
-    height: 192px;
-    background: linear-gradient(to bottom right, #8b5cf6, #ec4899, #f97316);
-    border-radius: 4px;
-    /* display: flex; flex-direction: column; align-items: center; justify-content: center; */ /* Có thể bỏ flex nếu không cần nữa */
-    position: relative; /* Vẫn cần cho absolute positioning */
-    flex-shrink: 0;
-    overflow: hidden; /* Giúp bo góc áp dụng cho cả ảnh con */
-  }
-  
-  .meta-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background-color: rgba(55, 65, 81, 0.5);
-    /* margin-bottom: 12px; */ /* Đã xóa */
-  }
-  
-  .meta-upload-button {
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    font-size: 0.875rem;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
-  }
-  
-  .meta-upload-button:hover {
-    background-color: rgba(0, 0, 0, 0.9);
-  }
-  
-  /* --- STYLE MỚI CHO ẢNH ĐÃ UPLOAD --- */
-  .meta-uploaded-image {
-    display: block; /* Để chiếm toàn bộ không gian */
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Đảm bảo ảnh che phủ khung, cắt nếu cần */
-    cursor: pointer; /* Biểu thị có thể click để chọn lại */
-  }
-  
-  /* --- STYLE MỚI CHO NÚT XÓA ẢNH --- */
-  .meta-remove-image-button {
-    position: absolute;
-    top: 5px; /* Khoảng cách từ đỉnh */
-    right: 5px; /* Khoảng cách từ phải */
-    background-color: rgba(0, 0, 0, 0.6); /* Nền mờ */
-    color: #fff; /* Màu chữ X trắng */
-    border: none;
-    border-radius: 50%; /* Bo tròn thành hình tròn */
-    width: 24px; /* Kích thước nút */
-    height: 24px;
-    font-size: 16px; /* Kích thước dấu X */
-    line-height: 24px; /* Căn giữa dấu X theo chiều dọc */
-    text-align: center; /* Căn giữa dấu X theo chiều ngang */
-    cursor: pointer;
-    padding: 0; /* Xóa padding mặc định */
-    z-index: 10; /* Đảm bảo nút nằm trên ảnh */
-    transition: background-color 0.2s ease;
-  }
-  
-  .meta-remove-image-button:hover {
-    background-color: rgba(255, 0, 0, 0.7); /* Đổi màu nền khi hover (ví dụ: đỏ mờ) */
-  }
+/* Specifics for Textarea */
+.meta-form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
 
-  .meta-input-icon {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      color: #aaa;
-      pointer-events: none;
-  }
-  
-  /* Specifics for Textarea */
-  .meta-form-textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-  
-  /* Form Grid */
-  .meta-form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    align-items: center;
-  }
-  
-  /* ----- Radio Buttons ----- */
-  /* Các style cho radio giữ nguyên vì cấu trúc HTML phần đó không đổi */
-  .meta-radio-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .meta-radio-option {
-    display: flex;
-    align-items: flex-start;
-  }
-  .meta-form-radio {
-    margin-top: 2px;
-    width: 16px;
-    height: 16px;
-    accent-color: #ea580c;
-    background-color: #2d2d2d;
-    border: 1px solid #555;
-    cursor: pointer;
-  }
-  .meta-radio-label-group {
-    margin-left: 12px;
-  }
-  .meta-radio-label-main {
-    font-weight: 500;
-    color: #fff;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-  .meta-radio-label-description {
-    color: #aaa;
-    font-size: 0.75rem;
-    margin-top: 2px;
-  }
-  
-  
-  /* ----- Footer ----- */
-  .meta-form-footer {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid #444;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .meta-required-note {
-    font-size: 0.75rem;
-    color: #aaa;
-  }
-  
-  .meta-footer-buttons {
-    display: flex;
-    gap: 8px;
-  }
-  
-  .meta-form-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  
-  .meta-form-button.meta-form-button-cancel {
-    background-color: transparent;
-    color: #ccc;
-  }
-  
-  .meta-form-button.meta-form-button-cancel:hover {
-    background-color: #333;
-  }
-  
-  .meta-form-button.meta-form-button-save {
-    background-color: #ea580c;
-    color: #fff;
-  }
-  
-  .meta-form-button.meta-form-button-save:hover {
-    background-color: #c2410c;
-  }
-  
-  /* ----- Responsive adjustments ----- */
-  @media (max-width: 768px) {
-      .meta-main-content-area {
-          flex-direction: column;
-          align-items: center;
-      }
-      .meta-image-upload-container {
-          margin-bottom: 24px;
-      }
-      .meta-form-grid {
-          grid-template-columns: 1fr;
-      }
-       .meta-form-footer {
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
-      }
-      .meta-footer-buttons {
-          width: 100%;
-          justify-content: flex-end;
-      }
-  }
-  fieldset.meta-form-group {
-    /* Quan trọng nhất: Xóa viền */
-    border: none;
-  
-    /* Xóa padding và margin mặc định có thể có của fieldset */
-    padding: 0;
-    margin: 0;
-  
-    /* Giữ lại các style flex cũ nếu cần cho layout bên trong fieldset */
-    /* display: flex; */
-    /* flex-direction: column; */
-    /* Bạn có thể bỏ comment 2 dòng trên nếu layout các nút radio bị xô lệch sau khi xóa border */
-  }
-  
-  /* Style cho thẻ <legend> (chữ "Privacy") bên trong fieldset */
-  /* Bạn có thể điều chỉnh nếu muốn */
-  fieldset.meta-form-group > legend.meta-form-label {
-     font-size: 0.875rem;
-     font-weight: 500;
-     color: #ccc;
-     padding: 0; /* Bỏ padding mặc định của legend */
-     margin-bottom: 8px; /* Tạo khoảng cách dưới chữ Privacy */
-     width: auto; /* Để legend không chiếm hết chiều rộng */
-  }
+/* Form Grid */
+.meta-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+/* ----- Radio Buttons ----- */
+/* Các style cho radio giữ nguyên vì cấu trúc HTML phần đó không đổi */
+.meta-radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.meta-radio-option {
+  display: flex;
+  align-items: flex-start;
+}
+.meta-form-radio {
+  margin-top: 2px;
+  width: 16px;
+  height: 16px;
+  accent-color: #ea580c;
+  background-color: #2d2d2d;
+  border: 1px solid #555;
+  cursor: pointer;
+}
+.meta-radio-label-group {
+  margin-left: 12px;
+}
+.meta-radio-label-main {
+  font-weight: 500;
+  color: #fff;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.meta-radio-label-description {
+  color: #aaa;
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+
+
+/* ----- Footer ----- */
+.meta-form-footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #444;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-required-note {
+  font-size: 0.75rem;
+  color: #aaa;
+}
+
+.meta-footer-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.meta-form-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.meta-form-button.meta-form-button-cancel {
+  background-color: transparent;
+  color: #ccc;
+}
+
+.meta-form-button.meta-form-button-cancel:hover {
+  background-color: #333;
+}
+
+.meta-form-button.meta-form-button-save {
+  background-color: #ea580c;
+  color: #fff;
+}
+
+.meta-form-button.meta-form-button-save:hover {
+  background-color: #c2410c;
+}
+
+/* ----- Responsive adjustments ----- */
+@media (max-width: 768px) {
+    .meta-main-content-area {
+        flex-direction: column;
+        align-items: center;
+    }
+    .meta-image-upload-container {
+        margin-bottom: 24px;
+    }
+    .meta-form-grid {
+        grid-template-columns: 1fr;
+    }
+     .meta-form-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    .meta-footer-buttons {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+fieldset.meta-form-group {
+  /* Quan trọng nhất: Xóa viền */
+  border: none;
+
+  /* Xóa padding và margin mặc định có thể có của fieldset */
+  padding: 0;
+  margin: 0;
+
+  /* Giữ lại các style flex cũ nếu cần cho layout bên trong fieldset */
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* Bạn có thể bỏ comment 2 dòng trên nếu layout các nút radio bị xô lệch sau khi xóa border */
+}
+
+/* Style cho thẻ <legend> (chữ "Privacy") bên trong fieldset */
+/* Bạn có thể điều chỉnh nếu muốn */
+fieldset.meta-form-group > legend.meta-form-label {
+   font-size: 0.875rem;
+   font-weight: 500;
+   color: #ccc;
+   padding: 0; /* Bỏ padding mặc định của legend */
+   margin-bottom: 8px; /* Tạo khoảng cách dưới chữ Privacy */
+   width: auto; /* Để legend không chiếm hết chiều rộng */
+}
+
+.meta-input-button-wrapper {
+  display: flex;         /* Sắp xếp input và button nằm ngang */
+  align-items: center;   /* Căn giữa các item theo chiều dọc */
+  gap: 8px;            /* Khoảng cách giữa input và button (có thể chỉnh lại) */
+}
+
+/* Cho phép input chiếm phần lớn không gian */
+.meta-input-button-wrapper .meta-form-input {
+  flex-grow: 1;         /* Cho phép input co giãn */
+  /* Quan trọng: Đảm bảo input và button có cùng chiều cao */
+  /* Ví dụ: height: 38px; hoặc padding phù hợp */
+}

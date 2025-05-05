@@ -1,76 +1,76 @@
-import React, { useState, useEffect, useRef } from 'react';
-import '../../styles/PlaylistEditModal.css'; // <-- Import file CSS mới
+// D:\web_html\gop\grapfity\frontend\src\components\Manager_Playlists\PlaylistEditModal.tsx
+import React, { useState, useEffect, useRef } from 'react'; // <-- Thêm lại useRef
+import '../../styles/PlaylistEditModal.css';
 
-// Định nghĩa kiểu dữ liệu cho playlist (có thể import từ nơi khác)
+// Định nghĩa kiểu dữ liệu cho playlist (giữ nguyên)
 interface PlaylistData {
     id: number;
     title: string;
-    cover: string | null;
-    // Thêm các trường khác nếu cần
+    cover: string | null; // Hoặc imageUrl tùy thuộc vào tên bạn thống nhất
 }
 
-// Định nghĩa kiểu Props cho component
+// Định nghĩa kiểu Props cho component (Sửa lại onSave)
 interface PlaylistEditModalProps {
-    playlist: PlaylistData | null; // Playlist cần sửa, hoặc null nếu không có
-    onClose: () => void; // Hàm để đóng modal
-    onSave: (playlistId: number, newTitle: string, newImageFile?: File) => void; // Hàm lưu thay đổi
+    playlist: PlaylistData | null;
+    onClose: () => void;
+    // Quay lại: onSave nhận newImageFile (File object)
+    onSave: (playlistId: number, newTitle: string, newImageFile?: File) => void;
+    isSaving?: boolean;
 }
 
-// SVG Path cho icon mặc định và icon edit (có thể import từ file khác)
+// SVG Paths (Thêm lại icon Edit)
 const svgIconMusicNote = "M6 3h15v15.167a3.5 3.5 0 1 1-3.5-3.5H19V5H8v13.167a3.5 3.5 0 1 1-3.5-3.5H6V3zm0 13.667H4.5a1.5 1.5 0 1 0 1.5 1.5v-1.5zm13 0h-1.5a1.5 1.5 0 1 0 1.5 1.5v-1.5z";
 const svgIconEdit = "M17.318 1.975a3.329 3.329 0 1 1 4.707 4.707L8.451 20.256c-.49.49-1.082.867-1.735 1.103L2.34 22.94a1 1 0 0 1-1.28-1.28l1.581-4.376a4.726 4.726 0 0 1 1.103-1.735L17.318 1.975zm3.293 1.414a1.329 1.329 0 0 0-1.88 0L5.159 16.963c-.283.283-.5.624-.636 1l-.857 2.372 2.371-.857a2.726 2.726 0 0 0 1.001-.636L20.611 5.268a1.329 1.329 0 0 0 0-1.879z";
 
-const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose, onSave }) => {
+
+const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose, onSave, isSaving }) => {
     // State cho các trường input
     const [title, setTitle] = useState('');
-    const [description, setDescription] = useState(''); // Thêm state cho mô tả
+    // const [description, setDescription] = useState(''); // Bỏ nếu không dùng
     const [imagePreview, setImagePreview] = useState<string | null>(null); // Xem trước ảnh mới
-    const [imageFile, setImageFile] = useState<File | null>(null); // File ảnh mới được chọn
-    const [isHoveringImage, setIsHoveringImage] = useState(false); // Trạng thái hover ảnh
+    const [imageFile, setImageFile] = useState<File | null>(null); // <-- Thêm lại state lưu File ảnh mới
+    const [isHoveringImage, setIsHoveringImage] = useState(false); // <-- Thêm lại state hover ảnh
 
     // Ref cho input file ẩn
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null); // <-- Thêm lại ref
 
     // useEffect để cập nhật state khi playlist prop thay đổi
     useEffect(() => {
         if (playlist) {
             setTitle(playlist.title);
-            setImagePreview(playlist.cover); // Hiển thị ảnh hiện tại ban đầu
-            // setDescription(playlist.description || ''); // Lấy mô tả nếu có
+            // Hiển thị ảnh hiện tại ban đầu
+            setImagePreview(playlist.cover); // Sử dụng cover hoặc imageUrl tùy state cha
+            // setDescription(playlist.description || '');
         } else {
-            // Reset state nếu không có playlist (ví dụ: khi modal đóng và mở lại)
+            // Reset state
             setTitle('');
-            setDescription('');
+            // setDescription('');
             setImagePreview(null);
-            setImageFile(null);
         }
-        setIsHoveringImage(false); // Reset hover
-    }, [playlist]); // Chạy lại khi playlist thay đổi
+        // Reset các state liên quan đến file khi modal mở/đóng hoặc playlist thay đổi
+        setImageFile(null);
+        setIsHoveringImage(false);
+    }, [playlist]);
 
-    // Xử lý thay đổi tiêu đề
+    // Xử lý thay đổi tiêu đề (giữ nguyên)
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(event.target.value);
     };
 
-    // Xử lý thay đổi mô tả
-    const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setDescription(event.target.value);
-    };
-
     // Xử lý khi nhấn vào vùng ảnh để chọn file
-    const handleImageClick = () => {
+    const handleImageClick = () => { // <-- Thêm lại hàm này
         fileInputRef.current?.click(); // Kích hoạt input file ẩn
     };
 
     // Xử lý khi chọn file ảnh mới
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => { // <-- Thêm lại hàm này
         const file = event.target.files?.[0];
         if (file) {
-            setImageFile(file); // Lưu file đã chọn
+            setImageFile(file); // Lưu file đã chọn vào state
             // Tạo URL tạm thời để xem trước ảnh
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result as string);
+                setImagePreview(reader.result as string); // Cập nhật ảnh xem trước
             };
             reader.readAsDataURL(file);
         }
@@ -79,30 +79,27 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
     // Xử lý khi nhấn nút Lưu
     const handleSaveChanges = () => {
         if (playlist) {
-            // Gọi hàm onSave từ props, truyền ID, title mới và file ảnh mới (nếu có)
-            onSave(playlist.id, title, imageFile || undefined);
+            // Gọi hàm onSave từ props, truyền ID, title mới và imageFile (hoặc undefined)
+            onSave(playlist.id, title, imageFile || undefined); // <-- Truyền imageFile
         }
     };
 
-    // Nếu không có playlist, không render gì cả (hoặc có thể render thông báo lỗi)
+    // Nếu không có playlist, không render gì cả (giữ nguyên)
     if (!playlist) {
         return null;
     }
 
     // Xác định xem nên hiển thị ảnh thật, ảnh preview hay icon mặc định
-    const displayImage = imagePreview || playlist.cover; // Ưu tiên ảnh preview, rồi đến ảnh gốc
-    const showDefaultIcon = !displayImage; // Chỉ hiện icon nếu không có ảnh nào
+    const displayImage = imagePreview; // Luôn ưu tiên ảnh preview (ảnh mới chọn) nếu có
+    const showDefaultIcon = !displayImage;
 
     return (
-        // Lớp overlay bao phủ toàn màn hình
         <div className="playlist-edit-modal__overlay" onClick={onClose}>
-            {/* Container của modal, ngăn chặn sự kiện click lan ra overlay */}
             <div className="playlist-edit-modal__container" onClick={(e) => e.stopPropagation()}>
-                {/* Header của modal */}
+                {/* Header (giữ nguyên) */}
                 <div className="playlist-edit-modal__header">
                     <h2>Sửa thông tin chi tiết</h2>
                     <button className="playlist-edit-modal__close-btn" onClick={onClose} aria-label="Đóng">
-                        {/* SVG cho nút đóng (X) */}
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="20" height="20">
                             <path d="M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z"></path>
                         </svg>
@@ -111,12 +108,12 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
 
                 {/* Body của modal */}
                 <div className="playlist-edit-modal__body">
-                    {/* Phần ảnh bìa */}
+                    {/* Phần ảnh bìa (Thêm lại onClick và hover) */}
                     <div
-                        className="playlist-edit-modal__image-section"
-                        onClick={handleImageClick}
-                        onMouseEnter={() => setIsHoveringImage(true)}
-                        onMouseLeave={() => setIsHoveringImage(false)}
+                        className="playlist-edit-modal__image-section" // <-- Thêm lại class nếu cần style hover
+                        onClick={handleImageClick} // <-- Thêm lại onClick
+                        onMouseEnter={() => setIsHoveringImage(true)} // <-- Thêm lại hover
+                        onMouseLeave={() => setIsHoveringImage(false)} // <-- Thêm lại hover
                     >
                         {/* Hiển thị ảnh hoặc icon mặc định */}
                         {showDefaultIcon ? (
@@ -132,10 +129,11 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
                                 src={displayImage ?? ''} // Sử dụng ảnh preview hoặc ảnh gốc
                                 alt="Playlist cover"
                                 className="playlist-edit-modal__cover-image"
+                                // Không cần onError ở đây nữa vì ảnh preview là từ file hoặc ảnh gốc đã được kiểm tra
                             />
                         )}
                         {/* Lớp phủ và icon edit khi hover ảnh thật */}
-                        {displayImage && isHoveringImage && (
+                        {displayImage && isHoveringImage && ( // <-- Thêm lại lớp phủ khi hover ảnh
                             <div className="playlist-edit-modal__image-overlay">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" width="60" height="60">
                                     <path d={svgIconEdit}></path>
@@ -144,11 +142,11 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
                             </div>
                         )}
                         {/* Input file ẩn */}
-                        <input
+                        <input // <-- Thêm lại input file
                             type="file"
                             ref={fileInputRef}
                             onChange={handleImageChange}
-                            accept="image/jpeg, image/png, image/gif" // Chỉ chấp nhận các định dạng ảnh phổ biến
+                            accept="image/jpeg, image/png, image/gif"
                             style={{ display: 'none' }}
                         />
                     </div>
@@ -161,30 +159,25 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
                             value={title}
                             onChange={handleTitleChange}
                             placeholder="Nhập tên playlist"
-                            maxLength={100} // Giới hạn độ dài tiêu đề
+                            maxLength={100}
                         />
-                        <textarea
-                            className="playlist-edit-modal__desc-input"
-                            value={description}
-                            onChange={handleDescriptionChange}
-                            placeholder="Thêm phần mô tả không bắt buộc"
-                            rows={4} // Số dòng hiển thị ban đầu
-                            maxLength={300} // Giới hạn độ dài mô tả
-                        />
+                        {/* Bỏ ô nhập URL ảnh */}
+                        {/* <input type="text" ... /> */}
+                        {/* Bỏ textarea mô tả nếu không dùng */}
+                        {/* <textarea ... /> */}
                     </div>
                 </div>
 
-                {/* Footer của modal */}
+                {/* Footer của modal (giữ nguyên) */}
                 <div className="playlist-edit-modal__footer">
-                    <button className="playlist-edit-modal__save-btn" onClick={handleSaveChanges}>
-                        Lưu
+                    <button className="playlist-edit-modal__save-btn" onClick={handleSaveChanges} disabled={isSaving}>
+                        {isSaving ? 'Đang lưu...' : 'Lưu'}
                     </button>
                 </div>
-
             </div>
-             {/* Khối <style> đã được xóa */}
         </div>
     );
 };
 
 export default PlaylistEditModal;
+

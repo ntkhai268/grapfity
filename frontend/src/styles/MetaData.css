@@ -2,133 +2,133 @@
 
 /* ----- Container chính ----- */
 .metadata-container {
-    background-color: #1a1a1a; /* Nền tối */
-    color: #e0e0e0;         /* Chữ sáng */
-    padding: 24px;
-    border-radius: 8px;
-    max-width: 700px;      /* Giới hạn chiều rộng (điều chỉnh nếu cần) */
-    margin: 20px auto;
-    font-family: sans-serif;
-  }
-  
-  /* Tiêu đề Section */
-  .metadata-section-title {
-      font-size: 1.5rem; /* Cỡ chữ tiêu đề */
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 24px; /* Khoảng cách dưới tiêu đề */
-      padding-bottom: 12px; /* Khoảng cách thêm */
-      border-bottom: 1px solid #444; /* Đường kẻ dưới */
-  }
-  
-  
-  /* ----- Form Container & Grid ----- */
-  .metadata-form-container.metadata-two-columns { /* Class mới cho layout 2 cột */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Tạo 2 cột đều nhau */
-    gap: 20px 24px; /* Khoảng cách dọc và ngang */
-  }
-  
-  /* Nhóm chứa label và input/select */
-  .metadata-field-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px; /* Khoảng cách giữa label và input */
-  }
-  
-  /* Style cho label */
-  .metadata-field-label {
-    font-size: 0.875rem; /* Cỡ chữ */
-    font-weight: 500;
-    color: #b3b3b3; /* Màu xám nhạt */
+  background-color: #1a1a1a; /* Nền tối */
+  color: #e0e0e0;         /* Chữ sáng */
+  padding: 24px;
+  border-radius: 8px;
+  max-width: 700px;      /* Giới hạn chiều rộng (điều chỉnh nếu cần) */
+  margin: 20px auto;
+  font-family: sans-serif;
+}
+
+/* Tiêu đề Section */
+.metadata-section-title {
+    font-size: 1.5rem; /* Cỡ chữ tiêu đề */
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 24px; /* Khoảng cách dưới tiêu đề */
+    padding-bottom: 12px; /* Khoảng cách thêm */
+    border-bottom: 1px solid #444; /* Đường kẻ dưới */
+}
+
+
+/* ----- Form Container & Grid ----- */
+.metadata-form-container.metadata-two-columns { /* Class mới cho layout 2 cột */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Tạo 2 cột đều nhau */
+  gap: 20px 24px; /* Khoảng cách dọc và ngang */
+}
+
+/* Nhóm chứa label và input/select */
+.metadata-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Khoảng cách giữa label và input */
+}
+
+/* Style cho label */
+.metadata-field-label {
+  font-size: 0.875rem; /* Cỡ chữ */
+  font-weight: 500;
+  color: #b3b3b3; /* Màu xám nhạt */
+  display: flex;
+  align-items: center;
+}
+
+/* Style cho nhóm checkbox + label "Explicit" */
+.metadata-checkbox-label-group {
     display: flex;
     align-items: center;
-  }
-  
-  /* Style cho nhóm checkbox + label "Explicit" */
-  .metadata-checkbox-label-group {
-      display: flex;
-      align-items: center;
-      gap: 8px; /* Khoảng cách giữa checkbox và chữ */
-      margin-bottom: 6px; /* Khoảng cách với input bên dưới nếu có */
-  }
-  
-  /* Style cho checkbox */
-  .metadata-form-checkbox {
-      width: 16px;
-      height: 16px;
-      accent-color: #1db954; /* Màu khi check */
-      background-color: #2d2d2d;
-      border: 1px solid #555;
-      cursor: pointer;
-      margin: 0; /* Reset margin */
-  }
-  /* Style cho label khi đi cùng checkbox */
-  .metadata-checkbox-label-group .metadata-field-label {
-      margin-bottom: 0; /* Bỏ margin bottom mặc định của label */
-      cursor: pointer; /* Cho phép click label để check */
-  }
-  
-  
-  /* ----- Input, Select cơ bản ----- */
-  .metadata-form-input,
-  .metadata-form-select {
-    width: 100%;
+    gap: 8px; /* Khoảng cách giữa checkbox và chữ */
+    margin-bottom: 6px; /* Khoảng cách với input bên dưới nếu có */
+}
+
+/* Style cho checkbox */
+.metadata-form-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: #1db954; /* Màu khi check */
     background-color: #2d2d2d;
     border: 1px solid #555;
-    border-radius: 4px;
-    padding: 8px 12px;
-    color: #fff;
-    font-size: 0.9rem;
-    box-sizing: border-box;
-  }
-  .metadata-form-input::placeholder { color: #888; }
-  .metadata-form-input:focus,
-  .metadata-form-select:focus {
-    outline: none;
-    border-color: #1db954; /* Màu focus */
-    box-shadow: 0 0 0 1px #1db954;
-  }
-  
-  /* Wrapper cho Select (để chứa mũi tên) */
-  .metadata-select-wrapper {
-    position: relative;
-  }
-  .metadata-form-select {
-    appearance: none; -webkit-appearance: none; -moz-appearance: none;
-    padding-right: 32px;
     cursor: pointer;
+    margin: 0; /* Reset margin */
+}
+/* Style cho label khi đi cùng checkbox */
+.metadata-checkbox-label-group .metadata-field-label {
+    margin-bottom: 0; /* Bỏ margin bottom mặc định của label */
+    cursor: pointer; /* Cho phép click label để check */
+}
+
+
+/* ----- Input, Select cơ bản ----- */
+.metadata-form-input,
+.metadata-form-select {
+  width: 100%;
+  background-color: #2d2d2d;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+}
+.metadata-form-input::placeholder { color: #888; }
+.metadata-form-input:focus,
+.metadata-form-select:focus {
+  outline: none;
+  border-color: #1db954; /* Màu focus */
+  box-shadow: 0 0 0 1px #1db954;
+}
+
+/* Wrapper cho Select (để chứa mũi tên) */
+.metadata-select-wrapper {
+  position: relative;
+}
+.metadata-form-select {
+  appearance: none; -webkit-appearance: none; -moz-appearance: none;
+  padding-right: 32px;
+  cursor: pointer;
+}
+.metadata-select-arrow {
+  position: absolute; top: 50%; right: 12px;
+  transform: translateY(-50%); pointer-events: none; color: #aaa;
+}
+
+
+/* ----- Footer ----- */
+.metadata-form-footer {
+  margin-top: 24px; padding-top: 16px; border-top: 1px solid #444;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.metadata-required-note { font-size: 0.75rem; color: #aaa; }
+.metadata-footer-buttons { display: flex; gap: 8px; }
+.metadata-form-button {
+  padding: 8px 16px; border: none; border-radius: 4px;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.metadata-form-button.metadata-form-button-cancel { background-color: transparent; color: #ccc; }
+.metadata-form-button.metadata-form-button-cancel:hover { background-color: #333; }
+.metadata-form-button.metadata-form-button-save { background-color: #555; color: #fff; }
+.metadata-form-button.metadata-form-button-save:hover { background-color: #666; }
+
+/* ----- Responsive adjustments (Ví dụ) ----- */
+@media (max-width: 576px) {
+  .metadata-form-container.metadata-two-columns {
+    grid-template-columns: 1fr; /* 1 cột trên màn hình nhỏ */
   }
-  .metadata-select-arrow {
-    position: absolute; top: 50%; right: 12px;
-    transform: translateY(-50%); pointer-events: none; color: #aaa;
+   .metadata-form-footer {
+      flex-direction: column; align-items: flex-start; gap: 12px;
   }
-  
-  
-  /* ----- Footer ----- */
-  .metadata-form-footer {
-    margin-top: 24px; padding-top: 16px; border-top: 1px solid #444;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .metadata-required-note { font-size: 0.75rem; color: #aaa; }
-  .metadata-footer-buttons { display: flex; gap: 8px; }
-  .metadata-form-button {
-    padding: 8px 16px; border: none; border-radius: 4px;
-    font-size: 0.875rem; font-weight: 600; cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  .metadata-form-button.metadata-form-button-cancel { background-color: transparent; color: #ccc; }
-  .metadata-form-button.metadata-form-button-cancel:hover { background-color: #333; }
-  .metadata-form-button.metadata-form-button-save { background-color: #555; color: #fff; }
-  .metadata-form-button.metadata-form-button-save:hover { background-color: #666; }
-  
-  /* ----- Responsive adjustments (Ví dụ) ----- */
-  @media (max-width: 576px) {
-    .metadata-form-container.metadata-two-columns {
-      grid-template-columns: 1fr; /* 1 cột trên màn hình nhỏ */
-    }
-     .metadata-form-footer {
-        flex-direction: column; align-items: flex-start; gap: 12px;
-    }
-    .metadata-footer-buttons { width: 100%; justify-content: flex-end; }
-  }
+  .metadata-footer-buttons { width: 100%; justify-content: flex-end; }
+}
