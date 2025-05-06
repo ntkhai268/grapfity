@@ -246,7 +246,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
             {showEditModal && (
                 <PlaylistEditModal
                     // Truyền dữ liệu playlist hiện tại, dùng URL tương đối để modal hiển thị đúng ảnh ban đầu
-                    playlist={playlist ? { ...playlist, cover: relativeCoverUrlToDisplay } : null}
+                    playlist={playlist ? { ...playlist, cover:  `${BACKEND_URL}${relativeCoverUrlToDisplay}?` } : null}
                     onClose={handleCloseEditModal}
                     onSave={handleSaveChanges}
                     isSaving={isSaving}

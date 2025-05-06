@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useCallback, useRef } from "react"; // Import thêm useRef
+import { useEffect, useState, useCallback, useRef } from "react"; // Import thêm useRef
+import * as React from 'react';
+
 import { useParams } from "react-router-dom";
 // 1. Import các hàm API cần thiết
 // import { getPlaylistByIdAPI } from "../../services/playlistService";

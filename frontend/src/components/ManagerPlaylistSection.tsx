@@ -59,7 +59,10 @@
 // export default ManagerPlaylistSection;
 
 
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from 'react';
+import Sidebar from "./Sidebar";
+
 import { useParams,useNavigate } from 'react-router-dom'; // Import thêm useNavigate nếu cần điều hướng sau khi xóa
 import ControlPlaylist from "./Manager_Playlists/ControlPlaylist"; // Component điều khiển
 import PlaylistHeader from "./Manager_Playlists/HeaderPlaylist";   // Component Header
@@ -86,13 +89,23 @@ const ManagerPlaylistSection: React.FC = () => {
       // Ví dụ: Điều hướng người dùng về trang danh sách playlist hoặc trang chủ
       // navigate('/your-playlists-page'); // Thay đổi đường dẫn này cho phù hợp
       
-      navigate("/profile");
+      navigate(
+        "/profile",
+        {
+            state: { initialTab: "playlist" } // <-- Gửi thông tin tab mong muốn
+        }
+    );
   };
 
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const handleSidebarExpandChange = (expanded: boolean) => {
+    setSidebarExpanded(expanded);
+  };
 
   return (
     <div className="container">
-      <div className="song_side_playlist"
+        <Sidebar onExpandChange={handleSidebarExpandChange} />
+      <div className={`song_side_playlist ${sidebarExpanded ? "shrink" : ""}`}
            style={{
              // Áp dụng gradient với màu nền được cập nhật từ Header
              background: `linear-gradient(to bottom, ${bgColor}, var(--spotify-black) 70%)`,
