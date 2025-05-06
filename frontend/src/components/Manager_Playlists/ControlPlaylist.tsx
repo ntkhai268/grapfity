@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import useSongManager from "../../hooks/Manager_Song_Play";
 import EditPlaylistForm from "../../components/Manager_Playlists/Edit_Playlist_Form";
+// import PlaylistEditModal from './PlaylistEditModal';
 // --- 1. Import hàm deletePlaylistAPI ---
 // !!! Đảm bảo đường dẫn này đúng với vị trí file service của bạn !!!
 import { deletePlaylistAPI } from "../../services/playlistService"; // Hoặc tên file service tương ứng
@@ -82,14 +83,14 @@ const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId, onDeleteS
           <button className="control-button" title="Add All to Queue" disabled={isDeleting}>
             <i className="fas fa-plus"></i>
           </button>
-          <button
+          {/* <button
             className="control-button"
             title="Edit Playlist"
             onClick={() => setIsEditing(true)}
             disabled={isDeleting} // Chỉ cần kiểm tra isDeleting vì playlistId luôn hợp lệ
           >
             <i className="fas fa-pen"></i>
-          </button>
+          </button> */}
           {/* --- 8. Gắn handler vào nút xóa --- */}
           <button
             className="control-button"

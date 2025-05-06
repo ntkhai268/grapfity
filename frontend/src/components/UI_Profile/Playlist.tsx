@@ -1,4 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from "react"; // Import useRef
+import { useEffect, useState, useRef, useCallback } from "react"; // Import useRef
+import * as React from 'react';
+
 import { useNavigate } from "react-router-dom";
 // Import hook xử lý waveform và play track
 import handlePlayTrack, { initFirstWaveforms } from "../../hooks/Manager_Playlist"; // Ensure this imports the refactored version
