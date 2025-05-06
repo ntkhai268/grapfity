@@ -1,6 +1,7 @@
 // import React from "react";
 // import Header from "./Header";
-// import Sidebar from "./Sidebar";
+import  { useState } from "react";
+import Sidebar from "./Sidebar";
 import Tab from "./UI_Profile/Tab";
 // import Footer from "./Footer";
 import SongRight from "./UI_Profile/Song_right";
@@ -23,12 +24,17 @@ import "../styles/ProfileLayout.css";
 
 
 const ProfileSection = () => {
+
+  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const handleSidebarExpandChange = (expanded: boolean) => {
+    setSidebarExpanded(expanded);
+  };
   return (
     <div>
       <div className="container">
-        {/* <Header />
-        <Sidebar /> */}
-        <div className="song_side_profile">
+        
+      <Sidebar onExpandChange={handleSidebarExpandChange} />
+        <div className={`song_side_profile ${sidebarExpanded ? "shrink" : ""}`}>
             {/* -------------------------UI profile------------------------------------------- */}
             <div className="profile_slide">
                 <ProfileSlide />
