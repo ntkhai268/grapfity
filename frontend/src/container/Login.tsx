@@ -23,36 +23,44 @@ const LoginForm: React.FC = () => {
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // Ngừng hành động mặc định của form
-
+    e.preventDefault();
     try {
-      // Gửi yêu cầu đăng nhập đến server
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }), // Gửi username để xác thực
-        credentials: "include"
+      const response = await fetch('http://localhost:8080/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password }),
       });
-
-      const data = await response.json(); // Nhận dữ liệu trả về từ server
-      if (!response.ok) {
-        // Nếu phản hồi từ server không thành công, hiển thị thông báo lỗi
-        setErrorMessage(data.error || "Tài khoản không tồn tại!");
-        return;
-      }
-
-      // Nếu đăng nhập thành công, kiểm tra roleId và điều hướng người dùng
-      const roleId = data.roleId;
-      if (roleId === 1) {
-        window.location.href = "http://localhost:5173/mainpage"; // Điều hướng đến trang chính cho roleId = 1
-      } else if (roleId === 2) {
-        window.location.href = "http://localhost:5173/otherpage"; // Điều hướng đến trang khác cho roleId = 2
+  
+      const data: {
+        message: string;
+        token: string;
+        roleId: number;
+      } = await response.json();
+  
+      if (response.ok && data.message === 'Login successful') {
+        // Lưu token và roleId nếu cần cho các request sau
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('roleId', data.roleId.toString());
+  
+        alert(data.message); // Thông báo đăng nhập thành công
+  
+        // Điều hướng theo roleId
+        if (data.roleId === 1) {
+          window.location.href = 'http://localhost:5173/mainpage';
+        } else if (data.roleId === 2) {
+          window.location.href = 'http://localhost:5173/adminpage';
+        } else {
+          // Trường hợp role khác
+          window.location.href = 'http://localhost:5173/';
+        }
       } else {
-        setErrorMessage("Không có quyền truy cập"); // Nếu roleId không hợp lệ
+        // Đăng nhập thất bại
+        alert(data.message);
       }
     } catch (err) {
-      console.error("Lỗi kết nối server:", err);
-      setErrorMessage("Không thể kết nối đến máy chủ."); // Xử lý lỗi kết nối
+      console.error('Lỗi kết nối server:', err);
+      alert('Không thể kết nối đến máy chủ.');
     }
   };
 

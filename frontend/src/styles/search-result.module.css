@@ -1,0 +1,230 @@
+/* styles/search-result.module.css */
+
+.search_result_section {
+    position: absolute;
+    top: 80px;
+    left: 80px;
+    right: 10px;
+    min-height: calc(100vh - 90px);
+    background-color: #000;
+    border-radius: 8px;
+    padding: 24px;
+    color: #fff;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    transition: left 0.3s ease, padding 0.3s ease;
+  }
+  
+  .search_result_section.shrink {
+    left: 290px;
+  }
+  
+  .search_result_section::-webkit-scrollbar {
+    width: 6px;
+  }
+  .search_result_section::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+  }
+  .search_result_section {
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
+  }
+  
+  .sectionTitle_result {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  
+  .top_row {
+    display: flex;
+    gap: 32px;
+  }
+  
+  .topResultSection_result {
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .songsSection_result {
+    flex: 2;
+  }
+  
+  .artistCard_result,
+  .songCard_result {
+    background-color: #181818;
+    border-radius: 8px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 300px;
+  }
+  .artistCard_result:hover,
+  .songCard_result:hover {
+    background-color: #282828;
+  }
+  
+  .artistImageContainer_result {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .artistImage_result {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  /* Khi Top result là bài hát */
+  .songInfoTop_result {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 16px; /* matching artistCard_result gap */
+    margin-bottom: 16px;
+  }
+  .songCoverTop_result {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 8px;
+    /* tạo khoảng cách dưới ảnh giống artist */
+    margin-bottom: 16px;
+  }
+  .songTitleTop_result {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .songArtistTop_result {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin-top: 10px;
+  }
+  
+  .songCardList_result {
+    width: 100%;
+    background-color: transparent;
+    padding: 0;
+  }
+  .songsList_result {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .songItem_result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+  .songItem_result:hover {
+    background-color: #282828;
+  }
+  
+  .songInfo_result {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .songCover_result {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  .songDetails_result {
+    display: flex;
+    flex-direction: column;
+  }
+  .songTitle_result {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+    color: #fff;
+  }
+  .songArtist_result {
+    font-size: 14px;
+    color: #b3b3b3;
+    margin-top: 4px;
+  }
+  .songDuration_result {
+    font-size: 14px;
+    color: #b3b3b3;
+  }
+  
+  .featuringSection_result,
+  .albumSection_result {
+    width: 100%;
+  }
+  .grid_list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+    gap: 24px;
+  }
+  .grid_item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .grid_item_img {
+    width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  .grid_item_title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+  }
+  .grid_item_sub {
+    font-size: 14px;
+    color: #b3b3b3;
+  }
+  
+  .artistsSection_result {
+    width: 100%;
+    margin-top: 32px;
+  }
+  .artist_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
+    gap: 24px;
+  }
+  .artist_card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .artist_avatar {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+  
+  @media (max-width: 768px) {
+    .search_result_section {
+      left: 10px;
+      right: 10px;
+      padding: 16px;
+    }
+    .top_row {
+      flex-direction: column;
+    }
+    .topResultSection_result {
+      max-width: 100%;
+    }
+  }
