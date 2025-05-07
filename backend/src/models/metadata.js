@@ -19,6 +19,10 @@ export default (sequelize, DataTypes) => {
       allowNull: false,
       primaryKey: true
     },
+    lyrics: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
     explicit: DataTypes.BOOLEAN,
     danceability: DataTypes.FLOAT,
     energy: DataTypes.FLOAT,

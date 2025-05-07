@@ -1,3 +1,4 @@
+// D:\web_html\gop\grapfity\backend\src\migrations\20250415153910-create-metadata.js
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {

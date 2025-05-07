@@ -13,6 +13,10 @@ import * as mm from 'music-metadata';
 const getAllTracksController = async (req, res) => {
     try {
         const tracks = await getAllTracks();
+        if (tracks && tracks.length > 0) {
+            // Log ra đối tượng track đầu tiên để xem cấu trúc đầy đủ của nó
+            console.log("Dữ liệu thô của track đầu tiên từ service:", JSON.stringify(tracks[0], null, 2));
+        }
         return res.status(200).json({
             message: 'Get all tracks succeed!',
             data: tracks
@@ -29,6 +33,7 @@ const getTrackByIdController = async (req, res) => {
         if (!track) {
             return res.status(404).json({ message: 'Track not found' });
         }
+        // console.log(`Controller - getTrackById - Data to be sent for track ${req.params.id}:`, JSON.stringify(track, null, 2));
         return res.status(200).json({
             message: 'Get track succeed!',
             data: track

@@ -36,10 +36,10 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
     cover: playlistFromApi.imageUrl || null,
     tracks: (playlistFromApi.Tracks || []).map((track: any): TrackItem => ({
         id: track.id,
-        title: track.title || "Unknown Title",
+        title: track.Metadatum?.trackname  || "Unknown Title",
         src: track.trackUrl || null,
         artist: track.User?.userName || "Unknown Artist",
-        cover: track.imageUrl || "/assets/default_track_cover.png"
+        cover: track.imageUrl || null
     }))
 });
 

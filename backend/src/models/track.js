@@ -1,3 +1,4 @@
+// D:\web_html\gop\grapfity\backend\src\models\track.js
 'use strict';
 import { Model } from 'sequelize';
 

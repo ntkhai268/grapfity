@@ -22,6 +22,7 @@ export interface TrackData {
     uploader?: TrackUploader; // Thông tin chi tiết người tải lên (nếu có)
     createdAt?: string | Date;
     updatedAt?: string | Date;
+    lyrics?: string | null;
     // Thêm các trường khác nếu cần (ví dụ: duration, genre,...)
 }
 
@@ -38,19 +39,22 @@ const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     // --- THAY ĐỔI LOGIC LẤY TITLE Ở ĐÂY ---
     // Ưu tiên lấy từ Metadata.trackname, nếu không có thì mặc định là "Unknown Title"
     // Giả định Metadata được lồng trong key 'Metadata' (hoặc tên association bạn đặt)
-    const title = trackFromApi.Metadata?.trackname || "Unknown Title"; // Sử dụng optional chaining (?.)
+    const title = trackFromApi.Metadatum?.trackname || "Unknown Title"; // Sử dụng optional chaining (?.)
+    const lyrics = trackFromApi.Metadatum?.lyrics || null; // Trả về null nếu không có lyrics
+
 
     return {
         id: trackFromApi.id,
         // Sử dụng biến title đã xử lý ở trên
         title: title,
         src: trackFromApi.trackUrl || "",
-        cover: trackFromApi.imageUrl || "/assets/default_track_cover.png",
+        cover: trackFromApi.imageUrl || null,
         artist: uploaderInfo?.username, // Giữ nguyên logic lấy artist
         uploaderId: trackFromApi.uploaderId,
         uploader: uploaderInfo,
         createdAt: trackFromApi.createdAt,
         updatedAt: trackFromApi.updatedAt,
+        lyrics: lyrics,
         // Bạn cũng có thể thêm các trường metadata khác vào TrackData nếu cần hiển thị
         // duration: trackFromApi.Metadata?.duration_ms,
         // explicit: trackFromApi.Metadata?.explicit,
