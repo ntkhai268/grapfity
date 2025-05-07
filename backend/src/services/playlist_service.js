@@ -13,8 +13,16 @@ const getAllPlaylistsByUserId = async (userId) => {
                         {
                             model: db.User,
                             attributes: ['userName']
+                        },
+                        {
+                            model: db.Metadata,
+                            as: 'Metadatum', // QUAN TRỌNG: Dùng alias 'Metadatum' (số ít, viết hoa M)
+                                             // nếu Track.hasOne(models.Metadata) không có 'as'
+                                             // Hoặc dùng alias bạn đã đặt trong Track.hasOne(models.Metadata, { as: '...' })
+                            attributes: ['trackname', 'duration_ms'] // Các trường cần từ Metadata
                         }
                     ],
+                    
                 },
                 {
                     model: db.User,

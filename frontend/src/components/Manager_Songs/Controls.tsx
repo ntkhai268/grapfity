@@ -1,64 +1,56 @@
-import React, { useState, useEffect, useCallback } from "react";
-import useSongManager from "../../hooks/Manager_Song_Play"; // Hook quản lý nhạc
+import React, { useState, useEffect, useCallback, RefObject } from "react";
 
 // Import API và kiểu dữ liệu Playlist từ service của bạn
-// *** Đảm bảo đường dẫn import đúng và PlaylistData đã được export ***
 import { getMyPlaylistsAPI } from "../../services/playlistService";
-import {addTrackToPlaylistAPI} from "../../services/trackPlaylistService"
-// Giả sử PlaylistData được export từ đây theo yêu cầu trước đó
+import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
-// Hoặc nếu nó thực sự ở ManagerDataPlaylist:
-// import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
 
-
-// Định nghĩa kiểu dữ liệu trả về của hook useSongManager
-interface ISongManagerOutput {
-  audioRef: React.RefObject<HTMLAudioElement | null>;
+// Định nghĩa kiểu dữ liệu cho props mà Controls sẽ nhận từ ManagerSongSection
+interface ControlsProps {
+  audioRef: RefObject<HTMLAudioElement | null>;
   songUrl: string | undefined;
   isPlaying: boolean;
   togglePlay: () => void;
-  // Quan trọng: Hook cần cung cấp thông tin bài hát hiện tại
   currentTrackId?: string | number | null;
+  // Thêm các props khác nếu ManagerSongSection truyền xuống (ví dụ: playNext, playPrevious, etc.)
 }
 
 // --- Component Controls ---
-const Controls: React.FC = () => {
+// Controls giờ đây nhận props từ ManagerSongSection
+const Controls: React.FC<ControlsProps> = ({
+  audioRef,
+  songUrl,
+  isPlaying,
+  togglePlay,
+  currentTrackId,
+  // ...destructure các props khác nếu có
+}) => {
   // --- Hooks & State ---
 
-  // Giả định có cách lấy trạng thái đăng nhập (ví dụ: từ Context, Redux,...)
+  // Giả định có cách lấy trạng thái đăng nhập
   const isLoggedIn = true; // <<< !!! THAY THẾ BẰNG LOGIC LẤY TRẠNG THÁI ĐĂNG NHẬP THỰC TẾ !!!
 
-  const {
-    audioRef,
-    songUrl,
-    isPlaying,
-    togglePlay,
-    currentTrackId, // Lấy ID bài hát hiện tại từ hook
-  }: ISongManagerOutput = useSongManager();
+
 
   const [isDropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [userPlaylists, setUserPlaylists] = useState<PlaylistData[]>([]);
   const [isLoadingPlaylists, setIsLoadingPlaylists] = useState<boolean>(false);
   const [playlistError, setPlaylistError] = useState<string | null>(null);
-  // (Optional) State for API call in progress (prevents double clicks)
   const [isAddingTrack, setIsAddingTrack] = useState<boolean>(false);
 
   // --- Handlers (Memoized with useCallback) ---
 
-  // Đóng/Mở dropdown chính
   const toggleDropdown = useCallback(() => {
     setDropdownOpen(prev => !prev);
-  }, []); // Không cần fetch ở đây nữa nếu fetch trong useEffect
+  }, []);
 
-  // Đóng dropdown
   const closeDropdown = useCallback(() => {
     setDropdownOpen(false);
   }, []);
 
-  // Fetch danh sách playlist (chỉ khi đã đăng nhập)
   const fetchPlaylists = useCallback(async () => {
     if (!isLoggedIn) {
-      setUserPlaylists([]); // Reset playlist nếu không đăng nhập
+      setUserPlaylists([]);
       return;
     }
     setIsLoadingPlaylists(true);
@@ -72,136 +64,106 @@ const Controls: React.FC = () => {
     } finally {
       setIsLoadingPlaylists(false);
     }
-  }, [isLoggedIn]); // Phụ thuộc vào trạng thái đăng nhập
+  }, [isLoggedIn]);
 
-  // Xử lý tạo playlist mới
   const handleCreateNewPlaylist = useCallback(() => {
     console.log("Action: Create new playlist");
-    // TODO: Implement logic (mở modal, gọi API)
     closeDropdown();
   }, [closeDropdown]);
 
-  // Xử lý thêm vào playlist đã có
   const handleAddToExistingPlaylist = useCallback(async (playlistId: string | number) => {
-    // Ngăn chặn click nếu đang xử lý hoặc chưa có track ID
     if (isAddingTrack || !currentTrackId) {
-        if(!currentTrackId) console.error("Cannot add: Current Track ID missing.");
-        return;
+      if(!currentTrackId) console.error("Cannot add: Current Track ID missing (from props).");
+      return;
     }
-
     console.log(`Action: Add track ${currentTrackId} to playlist ${playlistId}`);
-    setIsAddingTrack(true); // Bắt đầu xử lý
-
+    setIsAddingTrack(true);
     try {
       const result = await addTrackToPlaylistAPI(playlistId, currentTrackId);
       if (result.success) {
-        alert(result.message || "Đã thêm bài hát vào playlist!"); // Placeholder feedback
-        // TODO: Dùng toast notification thay cho alert
+        alert(result.message || "Đã thêm bài hát vào playlist!");
       } else {
-        alert(result.message || "Thêm bài hát thất bại."); // Placeholder feedback
-        // TODO: Dùng toast notification
+        alert(result.message || "Thêm bài hát thất bại.");
       }
     } catch (error) {
       console.error("Unexpected error calling addTrackToPlaylistAPI:", error);
-      alert("Đã xảy ra lỗi không mong muốn."); // Placeholder feedback
-      // TODO: Dùng toast notification
+      alert("Đã xảy ra lỗi không mong muốn.");
     } finally {
-      setIsAddingTrack(false); // Kết thúc xử lý
-      closeDropdown(); // Đóng dropdown
+      setIsAddingTrack(false);
+      closeDropdown();
     }
-  }, [currentTrackId, closeDropdown, isAddingTrack]); // Phụ thuộc các giá trị này
+  }, [currentTrackId, closeDropdown, isAddingTrack]); // currentTrackId giờ là prop
 
   // --- Effects ---
-
-  // Fetch playlist khi component mount hoặc khi trạng thái đăng nhập thay đổi
   useEffect(() => {
     fetchPlaylists();
-  }, [fetchPlaylists]); // fetchPlaylists đã bao gồm isLoggedIn
-
-  // (Optional) Effect để đóng dropdown khi click ra ngoài (vẫn là TODO)
-  // ...
+  }, [fetchPlaylists]);
 
   // --- Render ---
   return (
     <div className="controls">
-      {/* Audio Player */}
+      {/* Audio Player sử dụng audioRef và songUrl từ props */}
       <audio ref={audioRef} src={songUrl} />
 
-      {/* Play/Pause Button */}
+      {/* Play/Pause Button sử dụng isPlaying và togglePlay từ props */}
       <div className="play-button" onClick={togglePlay}>
         <i className={isPlaying ? "fas fa-pause" : "fas fa-play"} style={{ color: "black" }}></i>
       </div>
 
       {/* Other Icons */}
       <div className="control-icon">
-        <i className="far fa-heart" style={{ color: "white" }}></i> {/* TODO: Like action */}
+        <i className="far fa-heart" style={{ color: "white" }}></i>
       </div>
       <div className="control-icon">
-        <i className="fas fa-arrow-down" style={{ color: "white" }}></i> {/* TODO: Download action */}
+        <i className="fas fa-arrow-down" style={{ color: "white" }}></i>
       </div>
 
       {/* Ellipsis Icon & Main Dropdown Trigger */}
       <div className="control-icon" style={{ position: 'relative' }} onClick={toggleDropdown}>
         <i className="fas fa-ellipsis-h" style={{ color: "white" }}></i>
-
-        {/* Main Dropdown Container */}
         <div className={`dropdown ${isDropdownOpen ? 'active' : ''}`}>
           <div className="dropdown-content">
-            {/* Like Action */}
-            <a href="#">Like</a> {/* TODO: Implement Like Action */}
-
-            {/* Add To Playlist Item (Conditional based on login) */}
+            <a href="#">Like</a>
             {isLoggedIn ? (
               <div className="dropdown-item has-submenu">
                 <span>Add To Playlist</span>
                 <i className="fas fa-chevron-right submenu-arrow"></i>
-
-                {/* Submenu */}
                 <div className="submenu">
-                  {/* Search */}
                   <div className="submenu-item search-item">
                     <i className="fas fa-search"></i>
-                    <input type="text" placeholder="Tìm một danh sách phát" disabled={isLoadingPlaylists || !!playlistError}/> {/* TODO: Implement Search */}
+                    <input type="text" placeholder="Tìm một danh sách phát" disabled={isLoadingPlaylists || !!playlistError}/>
                   </div>
-                  {/* Create New */}
                   <div className="submenu-item" onClick={handleCreateNewPlaylist}>
                     <i className="fas fa-plus"></i>
                     <span>Danh sách phát mới</span>
                   </div>
-
-                  {/* Dynamic Playlist List */}
                   {isLoadingPlaylists && <div className="submenu-item">Đang tải...</div>}
                   {playlistError && <div className="submenu-item" style={{ color: 'red' }}>{playlistError}</div>}
                   {!isLoadingPlaylists && !playlistError && userPlaylists.length > 0 && (
                     userPlaylists.map((playlist) => (
                       <div
                         key={playlist.id}
-                        className={`submenu-item existing-playlist ${isAddingTrack ? 'disabled' : ''}`} // Disable if adding
-                        onClick={() => !isAddingTrack && handleAddToExistingPlaylist(playlist.id)} // Prevent click if adding
+                        className={`submenu-item existing-playlist ${isAddingTrack ? 'disabled' : ''}`}
+                        onClick={() => !isAddingTrack && handleAddToExistingPlaylist(playlist.id)}
                       >
                         <span>{playlist.title}</span>
-                        {/* Có thể thêm spinner nhỏ ở đây nếu isAddingTrack và ID đang xử lý trùng khớp */}
                       </div>
                     ))
                   )}
                   {!isLoadingPlaylists && !playlistError && userPlaylists.length === 0 && (
                       <div className="submenu-item" style={{ fontStyle: 'italic', color: '#aaa' }}>Không có playlist.</div>
                   )}
-                  {/* End Dynamic Playlist List */}
-                </div> {/* End Submenu */}
-              </div> /* End has-submenu */
+                </div>
+              </div>
             ) : (
-              <a href="#" style={{ color: '#888', cursor: 'not-allowed' }} onClick={(e) => {e.preventDefault(); /* TODO: Show login prompt? */ }}>
+              <a href="#" style={{ color: '#888', cursor: 'not-allowed' }} onClick={(e) => {e.preventDefault(); }}>
                 Add To Playlist
               </a>
             )}
-            {/* End Add To Playlist Item */}
-
-            
           </div>
-        </div> {/* End Main Dropdown Container */}
-      </div> {/* End Ellipsis Icon & Main Dropdown Trigger */}
-    </div> /* End controls */
+        </div>
+      </div>
+    </div>
   );
 };
 

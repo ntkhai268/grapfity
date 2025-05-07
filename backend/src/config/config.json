@@ -1,11 +1,11 @@
 {
   "development": {
     "username": "sa",
-    "password": "MyS3cr3t!",
+    "password": "1234567",
     "database": "DB_Graptify",
     "host": "127.0.0.1",
     "dialect": "mssql",
-    "port": 1444
+    "port": 1433
   },
   "test": {
     "username": "root",

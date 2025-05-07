@@ -2,6 +2,7 @@ import express from 'express';
 import multer from 'multer';
 import {
     getAllTracksController,
+    getTrackByIdController,
     createTrackController,
     updateTrackController,
     deleteTrackController,
@@ -30,6 +31,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get('/tracks', getAllTracksController);
+router.get('/tracks/:id', getTrackByIdController);
 router.get('/trackswithuploader/:id', getTrackWithUploaderByIdController);
 router.post('/create-track', upload.fields([
     { name: 'audio', maxCount: 1 },
