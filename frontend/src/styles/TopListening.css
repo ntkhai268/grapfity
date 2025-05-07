@@ -7,7 +7,7 @@
   position: absolute; /* Đặt vị trí của container */
   bottom: 0; /* Đảm bảo container nằm ở dưới cùng của trang */
   width: 100%; /* Chiếm toàn bộ chiều rộng của trang */
-  top: 260px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
+  top: 300px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
 }
 
 .stats-section {
@@ -144,4 +144,19 @@
   .stats-section {
     margin-bottom: 30px; /* Khoảng cách dưới mỗi section khi xếp theo cột */
   }
+}
+/* Thu nhỏ ảnh trong các card Top Tracks */
+.top-tracks-grid .track-card img {
+  width: 100%;       /* vẫn đầy chiều ngang card */
+  height: 120px;     /* cố định cao 120px */
+  object-fit: cover; /* cắt gọn, giữ tỉ lệ */
+  border-radius: 4px;
+}
+
+/* Thu nhỏ thumbnail trong list Top Artists */
+.stats-list .item-thumb {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 4px;
 }

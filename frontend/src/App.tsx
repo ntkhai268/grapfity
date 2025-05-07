@@ -21,6 +21,7 @@ import ListeningLayouts from "./layouts/ListeningLayouts";
 
 import LoginForm from "./container/Login";  // Đảm bảo có nhập đúng đường dẫn
 import LoginLayout from "./layouts/LoginLayouts";  // Layout dành cho trang đăng nhập
+import SearchPage from "./container/SearchPage";
 
 const App = () => {
   return (
@@ -81,6 +82,7 @@ const App = () => {
 <Route path="/top-tracks" element={<SeeMoreLayouts><TopTracksLisPage /></SeeMoreLayouts>} />
 <Route path="/top-genres" element={<SeeMoreLayouts><TopGenresLisPage /></SeeMoreLayouts>} />
 <Route path="/top-tracks-page" element={<SeeMoreLayouts><TopTracksPage /></SeeMoreLayouts>} />
+<Route path="/search" element={<SearchPage />} />
     </Routes>
   );
 };
