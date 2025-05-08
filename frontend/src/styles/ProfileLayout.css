@@ -145,7 +145,7 @@ body.profile-page {
     position: absolute;
     right: 10px; /* Cách lề phải 20px */
     top: 80px; /* Đặt vị trí phía dưới header (nếu có) */
-    height: 80vh;
+    height: 77vh;
     border-radius: 8px;
     overflow: auto; /* Kích hoạt thanh cuộn */
     scrollbar-width: thin; /* Ẩn thanh cuộn trên Firefox */
@@ -245,7 +245,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
-
+.content {
+    display: none;
+}
 
 .content.active {
     display: block;

@@ -1,116 +1,117 @@
-import { useEffect, useState } from "react";
-import GlobalAudioManager, { Song } from "./GlobalAudioManager";
+import { useState, useEffect, useRef, RefObject, useCallback } from "react";
+// Import GlobalAudioManager và kiểu Song.
+// Đảm bảo đường dẫn này chính xác
+import GlobalAudioManager, { Song } from "./GlobalAudioManager"; 
 
-const useFooterAudioPlayer = () => {
-  const [song, setSong] = useState<Song | null>(GlobalAudioManager.getCurrentSong());
-  const [isPlaying, setIsPlaying] = useState<boolean>(GlobalAudioManager.getIsPlaying());
-  const [audio, setAudio] = useState<HTMLAudioElement | null>(GlobalAudioManager.getCurrentAudio());
-  const [duration, setDuration] = useState<number>(GlobalAudioManager.getDuration());
-  const [currentTime, setCurrentTime] = useState<number>(0);
+// Định nghĩa kiểu dữ liệu trả về của hook
+export interface UseFooterAudioPlayerReturn {
+  currentSong: Song | null;
+  isPlaying: boolean;
+  audioRef: RefObject<HTMLAudioElement | null>; 
+  songUrl: string | undefined;
+  currentTrackId: string | number | null | undefined;
+  currentTime: number;
+  duration: number;
+  progress: number;
+  togglePlay: () => void;
+  playNext: () => void;
+  playPrevious: () => void;
+  seekTo: (percent: number) => void;
+}
+
+/**
+ * Custom hook để theo dõi và điều khiển trạng thái từ GlobalAudioManager,
+ * dùng cho Footer Audio Player.
+ */
+const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
+  const [managerState, setManagerState] = useState({
+    currentSong: GlobalAudioManager.getCurrentSong(),
+    isPlaying: GlobalAudioManager.getIsPlaying(),
+    currentTime: GlobalAudioManager.getCurrentTime(),
+    duration: GlobalAudioManager.getDuration(),
+    progress: GlobalAudioManager.getProgress(),
+    _audioElement: GlobalAudioManager.getAudioElement(), 
+  });
+
+  const audioRef = useRef<HTMLAudioElement | null>(managerState._audioElement); 
 
   useEffect(() => {
-    const handleChange = () => {
-      const newAudio = GlobalAudioManager.getCurrentAudio();
-      setSong(GlobalAudioManager.getCurrentSong());
-      setIsPlaying(GlobalAudioManager.getIsPlaying());
-      setAudio(newAudio);
-      setDuration(GlobalAudioManager.getDuration());
-      setCurrentTime(GlobalAudioManager.getCurrentTime());
-    };
-  
-    const unsubscribe = GlobalAudioManager.subscribe(handleChange);
-  
-    // ✅ Bọc lại để return đúng kiểu `() => void`
-    return () => {
-      unsubscribe(); // gọi nhưng không return boolean
-    };
-  }, []);
-  useEffect(() => {
-    
-  }, [currentTime]);
-
-  // Cập nhật duration & currentTime khi audio thay đổi
-  useEffect(() => {
-    if (!audio) return;
-    console.log("⏱ audio time update effect", audio);
-
-    const handleLoadedMetadata = () => setDuration(audio.duration || 0);
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-
-    // Nếu metadata đã sẵn sàng (load nhanh), set luôn duration
-    if (audio.readyState >= 1) {
-      setDuration(audio.duration || 0);
-    }
-
-    return () => {
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-    };
-  }, [audio]);
-
-  const togglePlay = () => {
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play();
-    }
-
-    GlobalAudioManager.setIsPlaying(!isPlaying);
-  };
-
-  const seekTo = (time: number) => {
-    if (audio) {
-      audio.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-
-  const nextSong = () => {
-    const playlist = GlobalAudioManager.getPlaylist();
-    const currentIndex = GlobalAudioManager.getCurrentIndex();
-    const oldAudio = GlobalAudioManager.getCurrentAudio();
-    oldAudio?.pause();
-    if (oldAudio) oldAudio.currentTime = 0;
-  
-    if (currentIndex < playlist.length - 1) {
-      GlobalAudioManager.playNext(); // chuyển bài như bình thường
-    } else {
-      // Đang ở bài cuối → phát lại bài cuối
-      const lastSong = playlist[currentIndex];
-      if (lastSong) {
-        GlobalAudioManager.playSongAt(currentIndex); // phát lại bài cuối
+      if (audioRef.current !== managerState._audioElement) {
+          audioRef.current = managerState._audioElement;
       }
-    }
-  };
+  }, [managerState._audioElement]);
 
-  const prevSong = () => {
-    // const playlist = GlobalAudioManager.getPlaylist();
-    const currentIndex = GlobalAudioManager.getCurrentIndex();
-    const oldAudio = GlobalAudioManager.getCurrentAudio();
-    oldAudio?.pause();
-    if (oldAudio) oldAudio.currentTime = 0;
-  
-    if (currentIndex > 0) {
+
+  useEffect(() => {
+    // Hàm cập nhật state dựa trên GlobalAudioManager
+    const updateStateFromManager = () => {
+      // console.log("[useFooterAudioPlayer] Updating state from GlobalAudioManager");
+      setManagerState({
+        currentSong: GlobalAudioManager.getCurrentSong(),
+        isPlaying: GlobalAudioManager.getIsPlaying(),
+        currentTime: GlobalAudioManager.getCurrentTime(),
+        duration: GlobalAudioManager.getDuration(),
+        progress: GlobalAudioManager.getProgress(),
+        _audioElement: GlobalAudioManager.getAudioElement(),
+      });
+    };
+
+    // Đăng ký lắng nghe thay đổi
+    const unsubscribe = GlobalAudioManager.subscribe(updateStateFromManager);
+    
+    // --- QUAN TRỌNG: Cập nhật state lần đầu ngay sau khi subscribe ---
+    // Để lấy trạng thái mới nhất có thể đã được load từ localStorage
+    console.log("[useFooterAudioPlayer] Initial state sync after subscribe.");
+    updateStateFromManager(); 
+    // --------------------------------------------------------------
+
+    // Hủy đăng ký khi component unmount
+    return () => {
+      // console.log("[useFooterAudioPlayer] Unsubscribing.");
+      unsubscribe();
+    };
+  }, []); // Chỉ chạy một lần khi hook mount
+
+  // --- Các hàm điều khiển (gọi GlobalAudioManager) ---
+  const togglePlay = useCallback(() => { /* ... giữ nguyên ... */ 
+      if (GlobalAudioManager.getIsPlaying()) {
+        GlobalAudioManager.pausePlayback();
+      } else {
+        const audio = GlobalAudioManager.getCurrentAudio();
+        const song = GlobalAudioManager.getCurrentSong();
+        if (audio && song) {
+           GlobalAudioManager.playAudio(audio, song); 
+        } else {
+            console.warn("[useFooterAudioPlayer] Cannot toggle play: No current audio or song.");
+        }
+      }
+  }, []); 
+
+  const playNext = useCallback(() => { /* ... giữ nguyên ... */ 
+      GlobalAudioManager.playNext();
+  }, []);
+
+  const playPrevious = useCallback(() => { /* ... giữ nguyên ... */ 
       GlobalAudioManager.playPrevious();
-    } else {
-      // Nếu đang ở bài đầu, thì phát lại bài đầu
-      GlobalAudioManager.playSongAt(0);
-    }
-  };
+  }, []);
 
+  const seekTo = useCallback((percent: number) => { /* ... giữ nguyên ... */ 
+      GlobalAudioManager.seekTo(percent);
+  }, []);
+
+  // Trả về các giá trị state và hàm điều khiển
   return {
-    song,
-    isPlaying,
+    currentSong: managerState.currentSong,
+    isPlaying: managerState.isPlaying,
+    audioRef: audioRef, 
+    songUrl: managerState.currentSong?.src, 
+    currentTrackId: managerState.currentSong?.id, 
+    currentTime: managerState.currentTime,
+    duration: managerState.duration,
+    progress: managerState.progress,
     togglePlay,
-    nextSong,
-    prevSong,
-    duration,
-    currentTime,
+    playNext,
+    playPrevious,
     seekTo,
   };
 };

@@ -118,13 +118,14 @@ display: none;
   position: absolute;
   right: 10px; /* Cách lề phải 20px */
   top: 80px; /* Đặt vị trí phía dưới header (nếu có) */
-  height: 80vh;
+  height: 77vh ;
   border-radius: 8px;
-  overflow: auto; /* Kích hoạt thanh cuộn */
+  overflow-x: hidden; /* Ẩn cuộn ngang */
+  overflow-y: auto;   /* Cuộn dọc nếu cần */
   scrollbar-width: thin; /* Ẩn thanh cuộn trên Firefox */
   scrollbar-color: #888 transparent; /* Màu thanh cuộn */
   background-color: white;
-  
+
  
   left: 80px; 
 
@@ -212,7 +213,8 @@ height: calc(100vh - 90px);
   font-weight: bold;
 }
 .song-list-manager {
-  padding-left: 16px;
+  width: 100%;
+  padding-left: 20px;
   /* background-color: var(--spotify-dark-grey) ; */
  
 

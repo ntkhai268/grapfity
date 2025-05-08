@@ -154,104 +154,79 @@ const removeTrackFromPlaylist = async (playlistId, trackId, userId) => {
 const getPlaylistDetailsById = async (playlistId) => {
     const numericPlaylistId = Number(playlistId);
     if (isNaN(numericPlaylistId)) {
+        console.error(`[PlaylistService] Invalid playlist ID: ${playlistId}`);
         const error = new Error("Playlist ID không hợp lệ.");
         error.statusCode = 400;
         throw error;
     }
 
+    console.log(`[PlaylistService] Fetching details for playlist ID: ${numericPlaylistId}`);
+
     try {
-        // --- BƯỚC 1: Lấy thông tin cơ bản của Playlist VÀ User tạo Playlist ---
-        console.log(`[Service] Finding playlist with ID: ${numericPlaylistId}`); // Thêm log
-        const playlistInfo = await db.Playlist.findByPk(numericPlaylistId, {
-            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId'],
-            include: [ { model: db.User, attributes: ['id', 'userName'] } ]
-        });
-
-        // Log kết quả tìm kiếm playlist
-        if (playlistInfo) {
-            console.log(`[Service] Found playlist: ${JSON.stringify(playlistInfo.get({ plain: true }))}`);
-        } else {
-            console.warn(`[Service] Playlist with ID ${numericPlaylistId} not found by findByPk.`);
-            const error = new Error('Playlist not found');
-            error.statusCode = 404;
-            throw error; // Ném lỗi 404 nếu không tìm thấy
-        }
-
-        // --- BƯỚC 2: Lấy danh sách Tracks trong Playlist ---
-        const playlistTracksRaw = await db.PlaylistTrack.findAll({
-            where: { playlistId: numericPlaylistId },
+        const playlist = await db.Playlist.findByPk(numericPlaylistId, {
+            // Chọn các trường cần thiết từ bảng Playlist
+            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId'], 
             include: [
                 {
+                    model: db.User, // User tạo Playlist
+                    attributes: ['id', 'userName'] 
+                },
+                {
                     model: db.Track,
-                    attributes: ['id', 'trackUrl', 'imageUrl'], // Lấy trackUrl, imageUrl gốc từ DB
-                    include: [ { model: db.User, attributes: ['id', 'userName'] } ],
-                    required: true
+                    // Chọn các trường cần thiết từ bảng Track
+                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+                    through: { attributes: [] }, // Quan trọng: Không lấy các trường từ bảng PlaylistTrack
+                    // Sắp xếp các track trong playlist nếu cần (ví dụ: theo thứ tự thêm vào)
+                    // order: [[ db.PlaylistTrack, 'createdAt', 'ASC' ]], // Cần include PlaylistTrack để order theo nó
+                    include: [ // <<< LỒNG INCLUDE CHO TRACK
+                        {
+                            model: db.User, // User upload Track
+                            attributes: ['id', 'userName'],
+                            // Nếu có alias trong model Track.belongsTo(User), dùng as: '...'
+                        },
+                        {
+                            model: db.Metadata,
+                            as: 'Metadatum', // <<< Đảm bảo alias khớp với Track.hasOne(Metadata, { as: '...' })
+                            attributes: [    // <<< Lấy các trường cần từ Metadata
+                                'trackname', 
+                                'duration_ms', 
+                                'lyrics',
+                                // Thêm các trường khác nếu cần (explicit, tempo, key, ...)
+                            ],
+                            required: false // Dùng false để nếu track không có metadata thì vẫn trả về track
+                        }
+                    ] // Kết thúc include của Track
                 }
             ],
+            // Có thể thêm order cho Playlist nếu cần (ví dụ: order tracks)
+             // order: [[{ model: db.Track, as: 'Tracks' }, db.PlaylistTrack, 'createdAt', 'ASC']] // Cần cấu hình đúng
         });
 
-        const tracks = playlistTracksRaw.map(pt => pt.Track.get({ plain: true }));
-        const trackIds = new Set(tracks.map(track => track.id).filter(id => id != null));
-
-        // --- BƯỚC 3: Lấy Metadata (trackname) cho các Tracks ---
-        let metadataMap = new Map();
-        if (trackIds.size > 0) {
-            const metadataResults = await db.Metadata.findAll({
-                where: { track_id: { [Op.in]: Array.from(trackIds) } },
-                attributes: ['track_id', 'trackname'],
-                raw: true
-            });
-            metadataResults.forEach(meta => { metadataMap.set(meta.track_id, meta.trackname); });
+        if (!playlist) {
+            console.warn(`[PlaylistService] Playlist with ID ${numericPlaylistId} not found.`);
+            const error = new Error('Playlist not found');
+            error.statusCode = 404;
+            throw error; 
         }
 
-        // --- BƯỚC 4: Gán title và định dạng lại mảng Tracks (trả về đường dẫn tương đối) ---
-        const formattedTracks = tracks.map(track => {
-            const trackArtist = track.User ? track.User.userName : "Unknown Artist";
-
-            // Lấy đường dẫn gốc từ DB hoặc null
-            const trackUrlValue = track.trackUrl || null; // <-- Lấy giá trị trackUrl
-            const trackCover = track.imageUrl || "/assets/default_track_cover.png"; // Giữ fallback cho cover
-
-            return {
-                id: track.id,
-                title: metadataMap.get(track.id) || "Unknown Title",
-                // --- SỬA Ở ĐÂY ---
-                trackUrl: trackUrlValue, // <-- Trả về dưới tên key là trackUrl
-                // ---------------
-                // Giả định User của track là artist
-                artist: trackArtist,
-                // Giả định imageUrl của track là cover
-                imageUrl: trackCover // <-- Trả về dưới tên key là imageUrl
-            };
-        });
-
-        // --- BƯỚC 5: Gộp tất cả thông tin thành object cuối cùng ---
-        // Trả về đường dẫn tương đối cho ảnh playlist
-        const playlistImageUrl = playlistInfo.imageUrl || null;
-
-        const fullPlaylistData = {
-            id: playlistInfo.id,
-            title: playlistInfo.title || "Untitled Playlist",
-            User: playlistInfo.User ? { userName: playlistInfo.User.userName } : { userName: "Unknown Artist" },
-            createDate: playlistInfo.createDate,
-            imageUrl: playlistImageUrl, // <-- Giữ nguyên imageUrl cho playlist
-            // Đổi tên key chứa mảng track thành Tracks (viết hoa) để khớp frontend map ban đầu
-            Tracks: formattedTracks // <-- Mảng track giờ có key là trackUrl và imageUrl
-        };
-
-        console.log("[Service] Successfully fetched and formatted playlist details."); // Log thành công
-        return fullPlaylistData; // Trả về object đầy đủ
+        console.log(`[PlaylistService] Successfully fetched details for playlist ID: ${numericPlaylistId}`);
+        
+        // Sequelize tự động trả về cấu trúc lồng nhau đúng như mong đợi
+        // Hàm mapApiDataToPlaylistData ở frontend sẽ xử lý cấu trúc này
+        // Có thể trả về plain object nếu muốn chắc chắn
+        // return playlist.get({ plain: true }); 
+        return playlist;
 
     } catch (error) {
-        // Log lỗi chi tiết hơn
-        console.error(`[Service] Error fetching details for playlist ${playlistId}:`, error.message, error.stack);
+        console.error(`[PlaylistService] Error fetching details for playlist ${playlistId}:`, error);
+        // Ném lỗi để controller bắt và xử lý
+        // Nếu lỗi không có statusCode, gán mặc định 500
         if (!error.statusCode) {
-            error.statusCode = 500; // Lỗi không xác định
+             error.statusCode = 500; 
         }
-        throw error; // Ném lỗi để controller bắt
+        throw error; 
     }
 };
-
 
 
 // --- Export các hàm ---

@@ -6,8 +6,11 @@ import {
     createTrackController,
     updateTrackController,
     deleteTrackController,
-    getTrackWithUploaderByIdController
+    getTrackWithUploaderByIdController,
+    getMyUploadedTracksController
 } from '../controllers/trackController.js';
+import { authenticateUser } from '../middleware/authMiddleware.js';
+console.log('--->[ track_router.js] is being loaded by the application ---');
 
 const router = express.Router();
 
@@ -31,8 +34,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get('/tracks', getAllTracksController);
+router.get('/tracks/getmytracks', authenticateUser, getMyUploadedTracksController);
 router.get('/tracks/:id', getTrackByIdController);
 router.get('/trackswithuploader/:id', getTrackWithUploaderByIdController);
+
 router.post('/create-track', upload.fields([
     { name: 'audio', maxCount: 1 },
     { name: 'image', maxCount: 1 },

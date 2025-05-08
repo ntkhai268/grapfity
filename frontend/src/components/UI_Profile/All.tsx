@@ -1,92 +1,106 @@
-import React, { useEffect } from "react";
-import { initWaveSurfer } from "../../hooks/WaveForm";
+import React, { useState, useEffect } from "react";
+// Import hàm khởi tạo WaveSurfer và các kiểu dữ liệu/API cần thiết
+import { initWaveSurfer } from "../../hooks/WaveForm"; // Đảm bảo đường dẫn đúng
+import { Song } from "../../hooks/GlobalAudioManager"; // Import kiểu Song
+// --- THAY ĐỔI API IMPORT ---
+// Import API để lấy bài hát của user và kiểu TrackData
+// Giả sử bạn có hàm getMyUploadedTracksAPI trong trackServiceAPI.ts
+import { getMyUploadedTracksAPI, TrackData } from "../../services/trackServiceAPI"; 
+// --------------------------
 
-interface Song {
-  id: number;
-  src: string;
-  cover: string;
-  title: string;
-  artist: string;
-}
-
-const songs: Song[] = [
-  {
-    id: 1,
-    src: "assets/CoDangDeYeuThuong-DucAnhDuUyen-35764062.mp3",
-    cover: "assets/anhmau.png",
-    title: "Có Đáng Để Yêu Thương",
-    artist: "Đức Anh, Du Uyên",
-  },
-  {
-    id: 2,
-    src: "assets/Bánh Mì Không.mp3",
-    cover: "assets/anhmau.png",
-    title: "Bánh Mì Không",
-    artist: "Đạt G, Du Uyên",
-  },
-  {
-    id: 3,
-    src: "assets/BacPhanRapVersion-TuiHat-6184759.mp3",
-    cover: "assets/anhmau.png",
-    title: "Bạc Phận",
-    artist: "K-ICM, Jack",
-  },
-  {
-    id: 4,
-    src: "assets/MotDemSay.mp3",
-    cover: "assets/anhmau.png",
-    title: "Một Đêm Say",
-    artist: "Thịnh Suy",
-  },
-  {
-    id: 5,
-    src: "assets/CaoOc20.mp3",
-    cover: "assets/anhmau.png",
-    title: "Cao Ốc 20",
-    artist: "Bray, Đạt G",
-  },
-  {
-    id: 6,
-    src: "assets/PhiaSauMotCoGai.mp3",
-    cover: "assets/anhmau.png",
-    title: "Phía Sau Một Cô Gái",
-    artist: "SOOBIN",
-  },
-];
+// Hàm map từ TrackData sang Song (giữ nguyên)
+const mapTrackDataToSong = (track: TrackData): Song => ({
+    id: track.id, 
+    src: track.src || '', 
+    title: track.title === null ? undefined : track.title, 
+    artist: track.artist === null ? undefined : track.artist, 
+    cover: track.cover || "assets/anhmau.png", 
+});
 
 const SongList: React.FC = () => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      initWaveSurfer();
-    }, 500);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-    return () => clearTimeout(timer);
-  }, []);
+  // Fetch dữ liệu bài hát của user khi component mount
+  useEffect(() => {
+    const fetchMyTracks = async () => { // Đổi tên hàm fetch
+      setIsLoading(true);
+      setError(null);
+      try {
+        // --- THAY ĐỔI API CALL ---
+        // Gọi API để lấy các bài hát user đã upload
+        const fetchedTracksData: TrackData[] = await getMyUploadedTracksAPI(); 
+        // --------------------------
+        
+        const fetchedSongs: Song[] = fetchedTracksData.map(mapTrackDataToSong);
+        setSongs(fetchedSongs); 
+        console.log("[SongList] Fetched and mapped user's uploaded songs:", fetchedSongs);
+      } catch (err: any) {
+        console.error("[SongList] Failed to fetch user's uploaded tracks:", err);
+        // Có thể hiển thị lỗi cụ thể hơn nếu API trả về (ví dụ: lỗi xác thực)
+        if (err.message && err.message.includes('Unauthorized')) {
+             setError("Bạn cần đăng nhập để xem bài hát đã tải lên.");
+        } else {
+             setError(err.message || "Không thể tải danh sách bài hát của bạn.");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchMyTracks(); // Gọi hàm fetch mới
+  }, []); 
+
+  // useEffect để khởi tạo WaveSurfer (giữ nguyên)
+  useEffect(() => {
+    if (!isLoading && !error && songs.length > 0) {
+      console.log("[SongList] Data loaded, initializing WaveSurfer for user's songs...");
+      const timer = setTimeout(() => {
+        initWaveSurfer(); 
+      }, 100); 
+      return () => clearTimeout(timer);
+    } else if (!isLoading && !error && songs.length === 0) {
+        console.log("[SongList] No user uploaded songs to initialize WaveSurfer for.");
+    }
+  }, [isLoading, error, songs]); 
 
   return (
-    <div className="content all active">
-      {songs.map((song) => (
-        <div
-          key={song.id}
-          className="song"
-          data-src={song.src}
-          data-title={song.title}
-          data-artist={song.artist}
-          data-cover={song.cover}
-        >
-          <div className="song_left">
-            <img src={song.cover} alt="Album Cover" className="album_cover" />
-            <button className="play_button">
-              <img src="assets/play.png" alt="Play" />
-            </button>
+    // Đảm bảo class "content all active" được áp dụng đúng cách
+    <div className="content all active"> 
+      {isLoading && <p>Đang tải danh sách bài hát của bạn...</p>}
+      {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
+      
+      {!isLoading && !error && songs.length === 0 && (
+          <p>Bạn chưa tải lên bài hát nào.</p> // Thông báo phù hợp hơn
+      )}
+
+      {/* Render danh sách bài hát từ state 'songs' (giữ nguyên) */}
+      {!isLoading && !error && songs.length > 0 && (
+        songs.map((song) => (
+          <div
+            key={song.id} 
+            className="song"
+            data-id={song.id} 
+            data-src={song.src}
+            data-title={song.title || ''} 
+            data-artist={song.artist || ''} 
+            data-cover={song.cover || ''} 
+          >
+            <div className="song_left">
+              <img src={song.cover || 'assets/anhmau.png'} alt="Album Cover" className="album_cover" />
+              <button className="play_button">
+                <img src="assets/play.png" alt="Play" /> 
+              </button>
+            </div>
+            <div className="song_info">
+              <p className="song_title">{song.title || 'Unknown Title'}</p>
+              <p className="artist">{song.artist || 'Unknown Artist'}</p>
+              <div className="audio"></div> 
+            </div>
           </div>
-          <div className="song_info">
-            <p className="song_title">{song.title}</p>
-            <p className="artist">{song.artist}</p>
-            <div className="audio"></div>
-          </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 };
