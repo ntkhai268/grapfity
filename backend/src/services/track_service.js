@@ -85,6 +85,54 @@ const getTrackWithUploaderById = async (id) => {
     });
 };
 
+const getTracksByUploaderId = async (userId) => {
+    const numericUserId = Number(userId);
+    if (isNaN(numericUserId)) {
+        console.error(`TrackService: Invalid user ID received in getTracksByUploaderId: ${userId}`);
+        // Có thể ném lỗi hoặc trả về mảng rỗng tùy logic xử lý lỗi của bạn
+        throw new Error("User ID không hợp lệ."); 
+        // Hoặc: return [];
+    }
+
+    try {
+        const tracks = await db.Track.findAll({
+            where: {
+                uploaderId: numericUserId // Lọc theo uploaderId
+            },
+            // Include các thông tin cần thiết giống như khi lấy chi tiết một track
+            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+            include: [
+                {
+                    model: db.User, // Thông tin người upload (chính là user đang truy vấn)
+                    as: 'User',     // Đảm bảo alias khớp với model Track
+                    attributes: ['id', 'userName']
+                },
+                {
+                    model: db.Metadata,
+                    as: 'Metadatum', // Đảm bảo alias khớp với model Track
+                    attributes: [ // Liệt kê các trường metadata cần thiết
+                        'trackname',
+                        'duration_ms',
+                        'lyrics' // Lấy cả lyrics
+                        // Thêm các trường khác nếu cần
+                    ]
+                }
+            ],
+            order: [
+                ['createdAt', 'DESC'] // Sắp xếp theo ngày tạo mới nhất (tùy chọn)
+            ]
+        });
+
+        console.log(`TrackService: Found ${tracks.length} tracks for uploader ID ${numericUserId}`);
+        // Dữ liệu trả về đã bao gồm các include
+        return tracks; 
+
+    } catch (error) {
+        console.error(`TrackService: Error fetching tracks for uploader ID ${numericUserId}:`, error);
+        throw error; // Ném lỗi để controller xử lý
+    }
+};
+
 const createTrack = async (trackUrl, imageUrl, uploaderId, metadata) => {
     const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId });
     metadata.track_id = newTrack.id
@@ -120,6 +168,7 @@ export {
     getAllTracks,
     getTrackById,
     getTrackWithUploaderById,
+    getTracksByUploaderId,
     createTrack,
     updateTrack,
     deleteTrack

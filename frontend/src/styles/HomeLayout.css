@@ -10,18 +10,14 @@ body.home-body{
 .main-layout {
   display: flex;
   flex-direction: column;
-  height: 180vh;
+  height: 77vh;
   overflow: hidden;
 }
 
-.main-content {
-  display: flex;
-  flex: 1;
-  margin-top: 80px; /* Header height */
-  margin-bottom: 80px; /* Footer height */
+
+.page-content{
   overflow: hidden;
 }
-
 .sidebar {
   flex-shrink: 0;
 }

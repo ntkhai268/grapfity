@@ -23,6 +23,8 @@ export interface TrackData {
     createdAt?: string | Date;
     updatedAt?: string | Date;
     lyrics?: string | null;
+    duration_ms?: number;
+    explicit?: boolean;
     // Thêm các trường khác nếu cần (ví dụ: duration, genre,...)
 }
 
@@ -41,6 +43,9 @@ const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     // Giả định Metadata được lồng trong key 'Metadata' (hoặc tên association bạn đặt)
     const title = trackFromApi.Metadatum?.trackname || "Unknown Title"; // Sử dụng optional chaining (?.)
     const lyrics = trackFromApi.Metadatum?.lyrics || null; // Trả về null nếu không có lyrics
+    const durationMs = trackFromApi.Metadatum?.duration_ms;
+    const explicitContent = trackFromApi.Metadatum?.explicit;
+    const artist = uploaderInfo?.username || trackFromApi.Metadatum?.artistName || trackFromApi.artist || null;
 
 
     return {
@@ -49,12 +54,14 @@ const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
         title: title,
         src: trackFromApi.trackUrl || "",
         cover: trackFromApi.imageUrl || null,
-        artist: uploaderInfo?.username, // Giữ nguyên logic lấy artist
+        artist: artist === "Unknown Artist" ? null : artist, // Trả về null nếu artist là mặc định không rõ
         uploaderId: trackFromApi.uploaderId,
         uploader: uploaderInfo,
         createdAt: trackFromApi.createdAt,
         updatedAt: trackFromApi.updatedAt,
         lyrics: lyrics,
+        duration_ms: durationMs,
+        explicit: explicitContent,
         // Bạn cũng có thể thêm các trường metadata khác vào TrackData nếu cần hiển thị
         // duration: trackFromApi.Metadata?.duration_ms,
         // explicit: trackFromApi.Metadata?.explicit,
@@ -182,6 +189,44 @@ export const getTrackWithUploaderByIdAPI = async (id: string | number): Promise<
              console.error('Unknown error occurred:', error);
         }
         throw error;
+    }
+};
+
+
+/**
+ * Lấy tất cả các bài hát do người dùng hiện tại tải lên.
+ * Yêu cầu backend có endpoint /api/tracks/my-uploads và xác thực người dùng.
+ */
+export const getMyUploadedTracksAPI = async (): Promise<TrackData[]> => {
+    console.log("[trackServiceAPI] Fetching tracks uploaded by current user...");
+    try {
+        // Gọi đến endpoint backend /api/tracks/my-uploads
+        const response = await axios.get<{ message: string; data: any[] }>(
+            (`${API_BASE_URL}/getmytracks`), // Endpoint đã định nghĩa trong router backend
+            {
+                withCredentials: true // Gửi cookie xác thực
+            }
+        );
+        console.log("[trackServiceAPI] Raw data received for user's tracks:", response.data);
+        
+        const rawTracks = response.data?.data || [];
+        // Map dữ liệu thô sang TrackData[]
+        const formattedTracks = rawTracks.map(mapApiDataToTrackData);
+        console.log("[trackServiceAPI] Formatted user's tracks data:", formattedTracks);
+        return formattedTracks;
+
+    } catch (error: any) { 
+        console.error("[trackServiceAPI] Error fetching user's uploaded tracks:", error);
+        if (error.response) {
+            console.error('[trackServiceAPI] Server response status:', error.response.status);
+            console.error('[trackServiceAPI] Server response data:', error.response.data);
+            if (error.response.status === 401 || error.response.status === 403) {
+                 throw new Error('Unauthorized: Bạn cần đăng nhập để xem danh sách này.'); 
+            }
+        }
+        // Ném lại lỗi chung hoặc trả về mảng rỗng
+        throw new Error("Không thể tải danh sách bài hát đã tải lên."); 
+        // Hoặc: return []; 
     }
 };
 

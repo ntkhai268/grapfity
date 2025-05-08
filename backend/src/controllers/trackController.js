@@ -5,7 +5,8 @@ import {
     createTrack,
     updateTrack,
     deleteTrack,
-    getTrackWithUploaderById
+    getTrackWithUploaderById,
+    getTracksByUploaderId
 } from '../services/track_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 import * as mm from 'music-metadata';
@@ -15,7 +16,7 @@ const getAllTracksController = async (req, res) => {
         const tracks = await getAllTracks();
         if (tracks && tracks.length > 0) {
             // Log ra đối tượng track đầu tiên để xem cấu trúc đầy đủ của nó
-            console.log("Dữ liệu thô của track đầu tiên từ service:", JSON.stringify(tracks[0], null, 2));
+            // console.log("Dữ liệu thô của track đầu tiên từ service:", JSON.stringify(tracks[0], null, 2));
         }
         return res.status(200).json({
             message: 'Get all tracks succeed!',
@@ -60,6 +61,39 @@ const getTrackWithUploaderByIdController = async (req, res) => {
     }
 };
 
+const getMyUploadedTracksController = async (req, res) => {
+    // --- THÊM LOG ĐỂ KIỂM TRA ---
+    console.log('>>> getMyUploadedTracksController CALLED'); 
+    // ---------------------------
+    try {
+        // 1. Lấy userId từ request (do middleware xác thực gắn vào)
+        const userId = req.userId; // Hoặc req.user?.id
+
+        // 2. Kiểm tra xem userId có tồn tại không
+        if (!userId) {
+            console.error('getMyUploadedTracksController Error: userId không tìm thấy trên req.');
+            return res.status(401).json({ message: 'Unauthorized: Yêu cầu xác thực.' });
+        }
+
+        console.log(`Controller: Đang lấy các bài hát đã upload cho user ID: ${userId}`);
+
+        // 3. Gọi hàm service để lấy tracks theo uploaderId
+        const tracks = await getTracksByUploaderId(userId);
+
+        // 4. Trả về kết quả
+        return res.status(200).json({
+            message: 'Lấy danh sách bài hát đã tải lên thành công!',
+            data: tracks 
+        });
+
+    } catch (error) { 
+        console.error(`Lỗi trong getMyUploadedTracksController cho user ${req.userId || 'UNKNOWN'}:`, error);
+        if (error && error.message === "User ID không hợp lệ.") {
+             return res.status(400).json({ message: error.message });
+        }
+        return res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài hát đã tải lên.' });
+    }
+};
 const createTrackController = async (req, res) => {
     const JWT = req.cookies;
     const data = verityJWT(JWT.jwt);
@@ -127,5 +161,7 @@ export {
     getTrackWithUploaderByIdController,
     createTrackController,
     updateTrackController,
-    deleteTrackController
+    deleteTrackController,
+    getMyUploadedTracksController,
+
 };

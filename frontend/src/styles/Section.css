@@ -123,6 +123,7 @@
     font-size: 30px;
     font-weight: bold;
     color: white;
+    margin-left: 20px;
 }
 
 /* Danh sách bài hát */
@@ -131,6 +132,7 @@
     gap: 15px;
     overflow-x: auto;
     padding: 10px;
+    margin-left: 30px;
 }
 
 /* Mỗi bài hát */
