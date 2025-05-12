@@ -127,12 +127,16 @@ const createTrackController = async (req, res) => {
 };
 
 const updateTrackController = async (req, res) => {
-    const { id, trackUrl, imageUrl, uploaderId } = req.body;
-    if (!id || !trackUrl || !imageUrl || !uploaderId) {
+    const { id, trackUrl, imageUrl } = req.body;
+    const userId = req.user?.id;
+    if (!id || !trackUrl || !imageUrl) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized: No user ID found' });
+    }
     try {
-        const updatedTrack = await updateTrack(id, { trackUrl, imageUrl, uploaderId });
+        const updatedTrack = await updateTrack(id, { trackUrl, imageUrl, userId });
         return res.status(200).json({
             message: 'Update track succeed!',
             data: updatedTrack
@@ -143,9 +147,17 @@ const updateTrackController = async (req, res) => {
     }
 };
 
-const deleteTrackController = async (req, res) => {
+const deleteTrackController = async (req, res) => { 
+    const userId = req.userId;
+    const trackId = req.params.id;
+    console.log('🎵 trackId from URL', trackId);
+    console.log('👤 req.user.id =', userId);
+    
+    if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized: user not logged in' });
+    }
     try{
-        await deleteTrack(req.params.id)
+        await deleteTrack(trackId, userId);
         return res.status(200).json({
             message: 'Delete track succeed!',
         });

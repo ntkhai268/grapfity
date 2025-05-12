@@ -42,7 +42,7 @@ router.post('/create-track', upload.fields([
     { name: 'audio', maxCount: 1 },
     { name: 'image', maxCount: 1 },
 ]), createTrackController);
-router.put('/update-track', updateTrackController);
-router.delete('/delete-track/:id', deleteTrackController);
+router.put('/update-track/:id', authenticateUser,updateTrackController);
+router.delete('/tracks/:id',authenticateUser, deleteTrackController);
 
 export default router;

@@ -3,11 +3,24 @@ import db from '../models/index.js';
 
 const getAllTracks = async () => {
     return await db.Track.findAll({
+        where: {
+            status: 'approved'
+        },
         include:{
             model: db.Metadata
         }
     }); // Lấy tất cả dữ liệu trong bảng Track
 };
+
+const getAllTracksForAdmin = async () => {
+    return await db.Track.findAll({
+        include: {
+            model: db.Metadata
+        },
+        order: [['createdAt', 'DESC']]
+    });
+};
+
 
 const getTrackById = async (trackId) => {
     const numericTrackId = Number(trackId);
@@ -17,7 +30,11 @@ const getTrackById = async (trackId) => {
     }
 
     try {
-        const track = await db.Track.findByPk(numericTrackId, {
+        const track = await db.Track.findOne( {
+            where: {
+                id: numericTrackId,
+                status: 'approved' 
+            },
             // Bạn có thể chọn các attributes cụ thể từ bảng Track nếu muốn
             attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
             include: [
@@ -77,7 +94,11 @@ const getTrackById = async (trackId) => {
 };
 
 const getTrackWithUploaderById = async (id) => {
-    return await db.Track.findByPk(id, {
+    return await db.Track.findOne({
+        where: {
+            id,
+            status: 'approved' 
+        },
         include: {
             model: db.User,
             attributes: ['username'],
@@ -97,7 +118,8 @@ const getTracksByUploaderId = async (userId) => {
     try {
         const tracks = await db.Track.findAll({
             where: {
-                uploaderId: numericUserId // Lọc theo uploaderId
+                uploaderId: numericUserId, // Lọc theo uploaderId
+                status : 'approved'
             },
             // Include các thông tin cần thiết giống như khi lấy chi tiết một track
             attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
@@ -134,7 +156,7 @@ const getTracksByUploaderId = async (userId) => {
 };
 
 const createTrack = async (trackUrl, imageUrl, uploaderId, metadata) => {
-    const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId });
+    const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId, status: 'pending'  });
     metadata.track_id = newTrack.id
     const {
         trackname, track_id, explicit, danceability,
@@ -151,21 +173,35 @@ const createTrack = async (trackUrl, imageUrl, uploaderId, metadata) => {
     return newTrack;
 };
 
-const updateTrack = async (id, updateData) => {
+// chỉ cho phép user cập nhật bài hát mà họ quản lí, không cập nhật status được
+const updateTrack = async (id, updateData, userId) => {
     const track = await db.Track.findByPk(id);
     if (!track) throw new Error('Track not found');
+    if (track.uploaderId !== userId) {
+        throw new Error('Unauthorized: You can only edit your own tracks.');
+    }
+    if ('status' in updateData) {
+        delete updateData.status;
+      }
     await track.update(updateData);
     return track;
 };
 
-const deleteTrack = async (id) => {
-    return await Sequelize.Transaction(async (t) => {
+const deleteTrack = async (id, userId) => {
+    const track = await db.Track.findByPk(id);
+    console.log("track.uploaderId: ", track.uploaderId )
+    if (!track|| track.uploaderId !== userId) {
+        throw new Error("Unauthorized: You can only delete your own tracks.");
+    }
+    return await db.sequelize.transaction(async (t) => {
+        await db.PlaylistTrack.destroy({ where: { trackId: id }, transaction: t });
         await db.Track.destroy({ where: { id }, individualHooks: true, transaction: t });
     })
 };
 
 export {
     getAllTracks,
+    getAllTracksForAdmin,
     getTrackById,
     getTrackWithUploaderById,
     getTracksByUploaderId,

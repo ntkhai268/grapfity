@@ -5,7 +5,8 @@ import { Song } from "../../hooks/GlobalAudioManager"; // Import kiểu Song
 // --- THAY ĐỔI API IMPORT ---
 // Import API để lấy bài hát của user và kiểu TrackData
 // Giả sử bạn có hàm getMyUploadedTracksAPI trong trackServiceAPI.ts
-import { getMyUploadedTracksAPI, TrackData } from "../../services/trackServiceAPI"; 
+import { getMyUploadedTracksAPI, TrackData,deleteTrackAPI } from "../../services/trackServiceAPI"; 
+import SongOptionOfUser from "./SongOptionOfUser";
 // --------------------------
 
 // Hàm map từ TrackData sang Song (giữ nguyên)
@@ -65,6 +66,22 @@ const SongList: React.FC = () => {
     }
   }, [isLoading, error, songs]); 
 
+  const handleDeleteTrack = async (songId: number) => {
+    const confirmDelete = window.confirm("Bạn có chắc muốn xoá bài nhạc này không?");
+    if (!confirmDelete) return;
+  
+    const result = await deleteTrackAPI(songId);
+    if (!result.success) {
+      alert(`❌ Xóa thất bại: ${result.message}`);
+      return;
+    }
+  
+    // ✅ Xoá thành công, cập nhật UI
+    setSongs(prevSongs => prevSongs.filter(song => song.id !== songId));
+    alert("✅ Bài hát đã được xoá thành công!");
+  };
+  
+  
   return (
     // Đảm bảo class "content all active" được áp dụng đúng cách
     <div className="content all active"> 
@@ -97,6 +114,10 @@ const SongList: React.FC = () => {
               <p className="song_title">{song.title || 'Unknown Title'}</p>
               <p className="artist">{song.artist || 'Unknown Artist'}</p>
               <div className="audio"></div> 
+              <SongOptionOfUser
+                onEdit={() => console.log("Edit", song.id)}
+                onDelete={() => handleDeleteTrack(Number(song.id))}
+              />
             </div>
           </div>
         ))
