@@ -348,6 +348,7 @@ body.profile-page {
 }
 
 .song_info {
+    position: relative;
     flex-grow: 1;
     display: flex;
     flex-direction: column;
@@ -357,6 +358,15 @@ body.profile-page {
     margin-top: -5px;
     flex-wrap: wrap; /* Cho phép artist tự động xuống dòng */    
 }
+/* .more_options {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  color: white;
+  z-index: 10;
+} */
 .song img{
     width: 100px;
     height: 100px;
@@ -895,3 +905,44 @@ body.profile-page {
 
 
 
+/* ---------------SongOptionOfUser.css */
+.more_options_container {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 20;
+}
+
+.more_options_icon {
+  cursor: pointer;
+  font-size: 20px;
+  color: white;
+  user-select: none;
+}
+
+.dropdown_menu {
+  position: absolute;
+  top: 28px;
+  right: 0;
+  background-color: #1e1e1e;
+  border: 1px solid #555;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  overflow: hidden;
+  z-index: 30;
+  min-width: 160px;
+}
+
+.dropdown_item {
+  white-space: nowrap;
+  padding: 10px 16px;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown_item:hover {
+  background-color: #333;
+}
+/* ------------------------------------------------------ */

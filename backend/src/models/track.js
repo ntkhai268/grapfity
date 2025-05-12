@@ -36,7 +36,15 @@ export default (sequelize, DataTypes) => {
   Track.init({
     trackUrl: DataTypes.STRING,
     imageUrl: DataTypes.STRING,
-    uploaderId: DataTypes.INTEGER
+    uploaderId: DataTypes.INTEGER,
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'pending',
+      validate: {
+        isIn: [['pending', 'approved', 'rejected']]
+      }
+    }
   }, {
     sequelize,
     modelName: 'Track'
@@ -44,7 +52,7 @@ export default (sequelize, DataTypes) => {
 
   Track.addHook('afterDestroy', async (track, options) => {
     const {Track} = sequelize.models;
-    await Track.destroy({ where: { trackId: track.id }, transaction: options.transaction});
+    await Track.destroy({ where: { id: track.id }, transaction: options.transaction});
   })
 
   return Track;
