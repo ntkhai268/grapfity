@@ -28,35 +28,48 @@ function calculateTimeAgo(createDate: string | Date | undefined): string {
  * @param playlistFromApi Dữ liệu playlist thô từ backend.
  * @returns Đối tượng PlaylistData đã được định dạng.
  */
-export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => {
-    // Log dữ liệu thô nhận được từ API để kiểm tra cấu trúc
-    // console.log("[mapApiDataToPlaylistData] Raw playlistFromApi:", JSON.stringify(playlistFromApi, null, 2));
+const BACKEND_URL = 'http://localhost:8080'; // có thể import từ config
 
-    return {
-        id: playlistFromApi.id,
-        title: playlistFromApi.title || "Untitled Playlist", // Title của Playlist
-        artist: playlistFromApi.User?.userName || "Unknown Artist", // Người tạo Playlist
-        timeAgo: calculateTimeAgo(playlistFromApi.createDate),
-        cover: playlistFromApi.imageUrl || null, // Ảnh bìa Playlist
-        tracks: (playlistFromApi.Tracks || []).map((track: any): TrackItem => {
-            // Log từng track thô nhận được
-            // console.log("[mapApiDataToPlaylistData] Raw track:", JSON.stringify(track, null, 2));
-            
-            // Lấy artist từ User lồng trong Track
-            const trackArtist = track.User?.userName || "Unknown Artist";
-            
-            return {
-                id: track.id,
-                // --- SỬA LẠI: Đọc title từ track.Metadatum.trackname ---
-                title: track.Metadatum?.trackname || "Unknown Title", // Backend trả về Metadatum lồng vào Track
-                // ------------------------------------------------------
-                src: track.trackUrl || null, // Lấy src từ trackUrl
-                artist: trackArtist, // Sử dụng artist đã lấy từ User của Track
-                cover: track.imageUrl || "/assets/default_track_cover.png" // Lấy cover từ imageUrl của Track
-            };
-        })
-    };
+export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => {
+  // Chuẩn hóa ảnh cover playlist
+  const relativeCover = playlistFromApi.imageUrl || null;
+  const cover = relativeCover
+    ? `${BACKEND_URL}/${relativeCover.replace(/^\/?/, '')}`
+    : `${BACKEND_URL}/assets/default_playlist_cover.png`;
+
+  return {
+    id: playlistFromApi.id,
+    title: playlistFromApi.title || 'Untitled Playlist',
+    artist: playlistFromApi.User?.userName || 'Unknown Artist',
+    timeAgo: calculateTimeAgo(playlistFromApi.createDate),
+    cover: cover,
+
+    tracks: (playlistFromApi.Tracks || []).map((track: any): TrackItem => {
+      const trackArtist = track.User?.userName || 'Unknown Artist';
+
+      const trackTitle = track.Metadatum?.trackname || 'Unknown Title';
+
+      const relativeAudioUrl = track.trackUrl || '';
+      const fullAudioUrl = relativeAudioUrl
+        ? `${BACKEND_URL}/${relativeAudioUrl.replace(/^\/?/, '')}`
+        : '';
+
+      const relativeTrackImage = track.imageUrl || null;
+      const fullTrackImage = relativeTrackImage
+        ? `${BACKEND_URL}/${relativeTrackImage.replace(/^\/?/, '')}`
+        : `${BACKEND_URL}/assets/default_track_cover.png`;
+
+      return {
+        id: track.id,
+        title: trackTitle,
+        src: fullAudioUrl,
+        artist: trackArtist,
+        cover: fullTrackImage
+      };
+    })
+  };
 };
+
 
 
 // --- Các hàm gọi API ---

@@ -28,7 +28,7 @@ interface PlaylistData {
 }
 
 // --- THÊM BASE URL CỦA BACKEND ---
-const BACKEND_URL = 'http://localhost:8080';
+
 // ---------------------------------
 
 
@@ -133,8 +133,7 @@ const Playlist: React.FC = () => {
                 playlists.map((playlist, playlistIndex) => {
                     const hasImageError = imageErrorMap[playlist.id] || false;
                     const isHoveringIcon = hoveringIconMap[playlist.id] || false;
-                    const relativeCoverUrl = playlist.imageUrl ?? playlist.cover ?? null;
-                    const coverUrlToDisplay = relativeCoverUrl ? `${BACKEND_URL}${relativeCoverUrl}` : null;
+                    const coverUrlToDisplay = playlist.cover || null;
 
                     return (
                         <div
