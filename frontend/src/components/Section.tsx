@@ -9,6 +9,7 @@ import GlobalAudioManager, { Song, PlaylistContext } from "../hooks/GlobalAudioM
 // Đảm bảo đường dẫn này chính xác
 import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
 
+
 import "../styles/Section.css"; // Đảm bảo đường dẫn CSS đúng
 
 // Hàm map tạm thời từ TrackData sang Song (bạn có thể đặt ở nơi khác)
@@ -62,7 +63,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
     const recommendedTracks: Song[] = allTracks.slice(0, 3); 
     const recentTracks: Song[] = allTracks.slice(3, 7);     
-    const popularTracks: Song[] = allTracks.slice(7, 10);   
+    const popularTracks: Song[] = allTracks.slice(7, 11);   
 
     const handleSidebarExpandChange = (expanded: boolean) => {
         setSidebarExpanded(expanded);

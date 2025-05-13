@@ -16,7 +16,7 @@ export interface TrackData {
     id: number | string;
     title: string; // Giả định có trường title dựa trên playlistService
     src: string;   // Ánh xạ từ trackUrl
-    cover: string; // Ánh xạ từ imageUrl
+    cover: string | null; // Ánh xạ từ imageUrl
     artist?: string; // Tên nghệ sĩ (lấy từ uploader)
     uploaderId?: number | string; // ID người tải lên
     uploader?: TrackUploader; // Thông tin chi tiết người tải lên (nếu có)
@@ -34,39 +34,51 @@ export interface TrackData {
  * @param trackFromApi Dữ liệu track thô từ backend.
  * @returns Đối tượng TrackData đã được định dạng.
  */
-const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
-    // Kiểm tra xem thông tin User (uploader) có được include không
-    const uploaderInfo = trackFromApi.User ? { username: trackFromApi.User.username || "Unknown Artist" } : undefined;
+const BACKEND_URL = 'http://localhost:8080'; // hoặc import từ config
 
-    // --- THAY ĐỔI LOGIC LẤY TITLE Ở ĐÂY ---
-    // Ưu tiên lấy từ Metadata.trackname, nếu không có thì mặc định là "Unknown Title"
-    // Giả định Metadata được lồng trong key 'Metadata' (hoặc tên association bạn đặt)
-    const title = trackFromApi.Metadatum?.trackname || "Unknown Title"; // Sử dụng optional chaining (?.)
-    const lyrics = trackFromApi.Metadatum?.lyrics || null; // Trả về null nếu không có lyrics
-    const durationMs = trackFromApi.Metadatum?.duration_ms;
-    const explicitContent = trackFromApi.Metadatum?.explicit;
-    const artist = uploaderInfo?.username || trackFromApi.Metadatum?.artistName || trackFromApi.artist || null;
+export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
+  const uploaderInfo = trackFromApi.User
+    ? { username: trackFromApi.User.username || 'Unknown Artist' }
+    : undefined;
 
+  const title = trackFromApi.Metadatum?.trackname || 'Unknown Title';
+  const lyrics = trackFromApi.Metadatum?.lyrics || null;
+  const durationMs = trackFromApi.Metadatum?.duration_ms;
+  const explicitContent = trackFromApi.Metadatum?.explicit;
+  const artist =
+    uploaderInfo?.username ||
+    trackFromApi.Metadatum?.artistName ||
+    trackFromApi.artist ||
+    null;
 
-    return {
-        id: trackFromApi.id,
-        // Sử dụng biến title đã xử lý ở trên
-        title: title,
-        src: trackFromApi.trackUrl || "",
-        cover: trackFromApi.imageUrl || null,
-        artist: artist === "Unknown Artist" ? null : artist, // Trả về null nếu artist là mặc định không rõ
-        uploaderId: trackFromApi.uploaderId,
-        uploader: uploaderInfo,
-        createdAt: trackFromApi.createdAt,
-        updatedAt: trackFromApi.updatedAt,
-        lyrics: lyrics,
-        duration_ms: durationMs,
-        explicit: explicitContent,
-        // Bạn cũng có thể thêm các trường metadata khác vào TrackData nếu cần hiển thị
-        // duration: trackFromApi.Metadata?.duration_ms,
-        // explicit: trackFromApi.Metadata?.explicit,
-    };
+  // ✅ Chuẩn hóa đường dẫn ảnh và nhạc
+  const relativeImageUrl = trackFromApi.imageUrl || null;
+  const relativeAudioUrl = trackFromApi.trackUrl || null;
+
+  const fullImageUrl = relativeImageUrl
+    ? `${BACKEND_URL}/${relativeImageUrl.replace(/^\/?/, '')}`
+    : null;
+
+  const fullAudioUrl = relativeAudioUrl
+    ? `${BACKEND_URL}/${relativeAudioUrl.replace(/^\/?/, '')}`
+    : '';
+
+  return {
+    id: trackFromApi.id,
+    title,
+    src: fullAudioUrl,
+    cover: fullImageUrl,
+    artist: artist === 'Unknown Artist' ? null : artist,
+    uploaderId: trackFromApi.uploaderId,
+    uploader: uploaderInfo,
+    createdAt: trackFromApi.createdAt,
+    updatedAt: trackFromApi.updatedAt,
+    lyrics,
+    duration_ms: durationMs,
+    explicit: explicitContent,
+  };
 };
+
 
 // --- Các hàm gọi API ---
 
@@ -240,54 +252,41 @@ export const getMyUploadedTracksAPI = async (): Promise<TrackData[]> => {
  * @param title Tiêu đề bài hát (nếu có)
  */
 export const createTrackAPI = async (
-    trackUrl: string,
-    imageUrl: string,
-    uploaderId: string | number,
-    title?: string // Thêm title nếu model Track có
+  fileAudio: File,
+  fileImage: File,
+  title: string,
+  audioFeatures?: any // Đã bao gồm lyrics trong object này
 ): Promise<TrackData> => {
-    console.log(`Attempting to create track: ${title || trackUrl}`);
-    try {
-        const payload: any = { trackUrl, imageUrl, uploaderId };
-        if (title) {
-            payload.title = title; // Thêm title vào payload nếu được cung cấp
-        }
+  try {
+    const formData = new FormData();
+    formData.append('audio', fileAudio);
+    formData.append('image', fileImage);
+    formData.append('title', title);
 
-        // Backend trả về { message, data: newTrack }
-        const response = await axios.post<{ message: string; data: any }>(
-            `${API_BASE_URL}/`,
-            payload,
-            { withCredentials: true } // Gửi thông tin xác thực
-        );
-        console.log("Track created successfully (raw data):", response.data);
-        const newTrack = mapApiDataToTrackData(response.data.data);
-        console.log("Formatted new track data:", newTrack);
-        return newTrack;
+    // 🎯 Chỉ gửi audioFeatures (đã bao gồm lyrics bên trong)
+    formData.append('audioFeatures', JSON.stringify(audioFeatures));
 
-    } catch (error) { // error là 'unknown'
-        console.error("Error creating track via API:", error);
-        // Xử lý lỗi chi tiết (400 Bad Request, 401 Unauthorized, etc.)
-        if (error && typeof error === 'object' && 'response' in error) {
-            const axiosError = error as any;
-            console.error('Server response status:', axiosError.response?.status);
-            console.error('Server response data:', axiosError.response?.data);
-            const status = axiosError.response?.status;
-            const errorMessage = axiosError.response?.data?.message || "Could not create track.";
-            if (status === 400) {
-                 throw new Error(`Dữ liệu không hợp lệ: ${errorMessage}`);
-            } else if (status === 401 || status === 403) {
-                 throw new Error('Bạn không có quyền tạo track. Vui lòng đăng nhập.');
-            } else {
-                 throw new Error(`Lỗi không xác định từ server: ${errorMessage}`);
-            }
-        } else if (error && typeof error === 'object' && 'request' in error) {
-            throw new Error("Không nhận được phản hồi từ server.");
-        } else if (error instanceof Error) {
-            throw new Error(`Lỗi khi tạo track: ${error.message}`);
-        } else {
-            throw new Error("Lỗi không xác định khi tạo track.");
-        }
+    // ✅ Gửi lên server
+    const response = await fetch('http://localhost:8080/api/tracks/create-track', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.message || 'Tạo track thất bại.');
     }
+
+    const result = await response.json();
+    return result.data;
+
+  } catch (error: any) {
+    console.error('[createTrackAPI] Lỗi tạo track:', error);
+    throw new Error(error.message || 'Lỗi không xác định khi tạo track.');
+  }
 };
+
 
 
 /**
