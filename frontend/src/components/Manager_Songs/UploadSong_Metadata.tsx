@@ -5,13 +5,8 @@ import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'rea
 import Metadata from '../Manager_Songs/MetaData'; // <<< Đảm bảo đúng đường dẫn
 // Import/Định nghĩa interface AudioFeaturesData (quan trọng)
 import { AudioFeaturesData } from '../Manager_Songs/MetaData';
-/* // Hoặc định nghĩa lại:
-interface AudioFeaturesData {
-  isExplicit: boolean; key: string; danceability: number | null; energy: number | null;
-  loudness: number | null; tempo: number | null; timeSignature: string | null;
-  acousticness: number | null; instrumentalness: number | null; liveness: number | null;
-  speechiness: number | null; valence: number | null;
-} */
+import { createTrackAPI } from '../../services/trackServiceAPI';
+
 import '../../styles/UploadSongMeta.css'; // Đường dẫn tới file CSS của bạn
 
 // Định nghĩa kiểu cho các tab
@@ -132,25 +127,21 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
 
     // Gửi request
     try {
-      console.log("FormData to send:", Object.fromEntries(formData.entries()));
-      const apiUrl = "/api/v1/tracks/upload"; // <<< THAY THẾ API
-      const response = await fetch(apiUrl, { method: 'POST', body: formData });
+    console.log("Gửi tới createTrackAPI:", { title, audioFeatures, lyrics: audioFeatures.lyrics });
+    const result = await createTrackAPI(
+      selectedAudioFile,
+      selectedImageFile,
+      title,
+      audioFeatures // hoặc bạn filter các field cần thiết
+    );
 
-      if (!response.ok) {
-          let errorData = { message: `Server responded with status ${response.status}` };
-          try { errorData = await response.json(); } catch (jsonError) {}
-          console.error("❌ Lỗi từ server:", response.status, errorData);
-          alert(`Lỗi khi lưu dữ liệu: ${errorData.message || response.statusText}`);
-          return;
-      }
-      const result = await response.json();
-      console.log("✅ Lưu thành công:", result);
-      alert("Lưu thông tin và file thành công!");
-      onCancel();
-    } catch (error) {
-        console.error("❌ Lỗi khi gửi request:", error);
-        alert("Đã xảy ra lỗi mạng hoặc lỗi không xác định. Vui lòng thử lại.");
-    }
+    console.log("✅ Lưu thành công:", result);
+    alert("Lưu thông tin và file thành công!");
+    onCancel();
+  } catch (error: any) {
+    console.error("❌ Lỗi khi tạo track:", error);
+    alert(error.message || "Đã xảy ra lỗi khi tạo track.");
+  }
   };
 
   // --- Render Functions ---

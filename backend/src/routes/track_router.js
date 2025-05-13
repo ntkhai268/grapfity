@@ -10,6 +10,7 @@ import {
     getMyUploadedTracksController
 } from '../controllers/trackController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
+// import { uploadTrackImage} from "../middleware/uploadMiddleware.js";
 console.log('--->[ track_router.js] is being loaded by the application ---');
 
 const router = express.Router();
@@ -17,7 +18,7 @@ const router = express.Router();
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         if (file.fieldname === 'audio') {
-            cb(null, 'src/public/assets/track_mp3');
+            cb(null, 'src/public/assets/track_audio');
         } else if (file.fieldname === 'image') {
             cb(null, 'src/public/assets/track_image');
         } else {
@@ -38,7 +39,7 @@ router.get('/tracks/getmytracks', authenticateUser, getMyUploadedTracksControlle
 router.get('/tracks/:id', getTrackByIdController);
 router.get('/trackswithuploader/:id', getTrackWithUploaderByIdController);
 
-router.post('/create-track', upload.fields([
+router.post('/tracks/create-track', upload.fields([
     { name: 'audio', maxCount: 1 },
     { name: 'image', maxCount: 1 },
 ]), createTrackController);

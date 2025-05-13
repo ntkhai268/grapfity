@@ -94,26 +94,92 @@ const getMyUploadedTracksController = async (req, res) => {
         return res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài hát đã tải lên.' });
     }
 };
+// 
+// controller để tải ảnh cover cho tracks
+const uploadTrackCoverController = async (req, res) => {
+    try {
+        const userId = req.userId;
+        const { trackId } = req.params;
+        const uploadedFile = req.file;
+
+        // --- VALIDATION ---
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
+        }
+        if (!trackId || isNaN(Number(trackId))) {
+            return res.status(400).json({ error: 'Bad Request: Track ID không hợp lệ.' });
+        }
+        if (!uploadedFile) {
+            const uploadError = req.multerError?.message || 'Không có file ảnh được tải lên hoặc file không hợp lệ.';
+            return res.status(400).json({ error: `Bad Request: ${uploadError}` });
+        }
+
+        // --- TẠO URL TƯƠNG ĐỐI ---
+        const relativePath = `assets/track_image/${uploadedFile.filename}`;
+        const imageUrl = `/${relativePath.replace(/\\/g, '/')}`; // hỗ trợ Windows path
+
+        console.log(`User ${userId} uploaded cover for track ${trackId}: ${imageUrl}`);
+
+        // --- TRẢ VỀ URL ẢNH ---
+        return res.status(200).json({
+            message: 'Tải ảnh track thành công!',
+            imageUrl: imageUrl
+        });
+
+    } catch (error) {
+        console.error(`Lỗi trong uploadTrackCoverController:`, error);
+
+        // Nếu có lỗi và đã upload file, thì xóa file tránh rác
+        if (req.file?.path) {
+            try {
+                fs.unlinkSync(req.file.path);
+                console.log(`Đã xoá file lỗi: ${req.file.path}`);
+            } catch (cleanupError) {
+                console.error("Lỗi khi xoá file:", cleanupError);
+            }
+        }
+
+        return res.status(500).json({ error: 'Lỗi server khi upload ảnh track.' });
+    }
+};
+
 const createTrackController = async (req, res) => {
     const JWT = req.cookies;
     const data = verityJWT(JWT.jwt);
     const uploaderId = data.userId;
-    const trackUrl = req.files.audio[0].destination + '/' + req.files.audio[0].filename
-    const imageUrl = req.files.image[0].destination + '/' + req.files.image[0].filename
+    const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
+    const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
     console.log(req.body.audioFeatures)
-    const metadata = eval('('+ req.body.audioFeatures + ')')
-    console.log(metadata)
+    const metadata = JSON.parse(req.body.audioFeatures);
+    console.log('>>> Metadata sau parse:', metadata); 
+    
+
+    const metadataAudio = await mm.parseFile(req.files.audio[0].path);
     //thêm các metadata có thể lấy tự động
     metadata.trackname = req.body.title
-    metadata.release_date = req.body.releaseDate || new Date().toISOString().split('T')[0];
-    metadata.year = eval(req.body.releaseDate.slice(0, 4))
-    const metadataAudio = await mm.parseFile(trackUrl);
-    metadata.duration_ms = Math.floor((metadataAudio.format.duration || 0) * 1000);
+    metadata.track_id = null; // Hệ thống tự tạo (identity/autoincrement), KHÔNG nên gán
 
-    console.log(trackUrl, imageUrl, uploaderId, metadata.trackname, metadata.release_date)
-    if (!trackUrl || !imageUrl || !uploaderId || !metadata.trackname || !metadata.release_date) {
-        return res.status(400).json({ message: 'Missing required fields' });
-    }
+    metadata.explicit = req.body.explicit === 'true' || false;
+    metadata.danceability = parseFloat(req.body.danceability) || 0;
+    metadata.energy = parseFloat(req.body.energy) || 0;
+    metadata.key = parseInt(req.body.key) || 0;
+    metadata.loudness = parseFloat(req.body.loudness) || 0;
+    metadata.mode = parseInt(req.body.mode) || 0;
+    metadata.speechiness = parseFloat(req.body.speechiness) || 0;
+    metadata.acousticness = parseFloat(req.body.acousticness) || 0;
+    metadata.instrumentalness = parseFloat(req.body.instrumentalness) || 0;
+    metadata.liveness = parseFloat(req.body.liveness) || 0;
+    metadata.valence = parseFloat(req.body.valence) || 0;
+    metadata.tempo = parseFloat(req.body.tempo) || 0;
+    metadata.duration_ms = Math.floor((metadataAudio.format.duration || 0) * 1000); // giữ nguyên như trước
+    metadata.time_signature = parseInt(req.body.time_signature) || 4;
+    metadata.year = parseInt(req.body.releaseDate?.slice(0, 4)) || new Date().getFullYear();
+    metadata.release_date = req.body.releaseDate || new Date().toISOString().split('T')[0];
+    metadata.createdAt = new Date();
+    metadata.updatedAt = new Date();
+    metadata.lyrics =metadata.lyrics || '';
+
+   
     try {
         const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, metadata);
         return res.status(200).json({
@@ -171,6 +237,7 @@ export {
     getAllTracksController,
     getTrackByIdController,
     getTrackWithUploaderByIdController,
+    uploadTrackCoverController,
     createTrackController,
     updateTrackController,
     deleteTrackController,

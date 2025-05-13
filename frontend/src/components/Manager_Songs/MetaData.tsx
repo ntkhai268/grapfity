@@ -4,10 +4,11 @@ import '../../styles/MetaData.css'; // CSS riêng của Metadata
 
 // Kiểu dữ liệu trả về
 export interface AudioFeaturesData {
-  isExplicit: boolean; key: string; danceability: number | null; energy: number | null;
-  loudness: number | null; tempo: number | null; timeSignature: string | null;
+  explicit: boolean; key: number; danceability: number | null; energy: number | null;
+  loudness: number | null;mode: number |null; tempo: number | null; timeSignature: number | null;
   acousticness: number | null; instrumentalness: number | null; liveness: number | null;
   speechiness: number | null; valence: number | null;
+  lyrics: string | null;
 }
 
 // Props interface
@@ -24,6 +25,7 @@ const Metadata: React.FC<MetadataProps> = ({ onCancel, onOk }) => {
   const [danceability, setDanceability] = useState<string>('');
   const [energy, setEnergy] = useState<string>('');
   const [loudness, setLoudness] = useState<string>('');
+  const [mode, setMode] = useState<number>(1); // 1 = Major mặc định
   const [tempo, setTempo] = useState<string>('');
   const [timeSignature, setTimeSignature] = useState<string>('4/4');
   const [acousticness, setAcousticness] = useState<string>('');
@@ -31,6 +33,7 @@ const Metadata: React.FC<MetadataProps> = ({ onCancel, onOk }) => {
   const [liveness, setLiveness] = useState<string>('');
   const [speechiness, setSpeechiness] = useState<string>('');
   const [valence, setValence] = useState<string>('');
+  const [lyrics, setLyrics] = useState<string>('');
 
   const parseNumericInput = (value: string): number | null => {
       const trimmed = value.trim();
@@ -40,16 +43,31 @@ const Metadata: React.FC<MetadataProps> = ({ onCancel, onOk }) => {
   };
 
   const handleOkClick = () => {
-    const metadataPayload: AudioFeaturesData = {
-      isExplicit, key: keyValue,
-      danceability: parseNumericInput(danceability), energy: parseNumericInput(energy),
-      loudness: parseNumericInput(loudness), tempo: parseNumericInput(tempo),
-      timeSignature: timeSignature.trim() || null, acousticness: parseNumericInput(acousticness),
-      instrumentalness: parseNumericInput(instrumentalness), liveness: parseNumericInput(liveness),
-      speechiness: parseNumericInput(speechiness), valence: parseNumericInput(valence),
-    };
-    onOk(metadataPayload); // Gọi prop onOk để gửi dữ liệu về cha
+  const keyToIntMap: Record<string, number> = {
+    C: 0, "C#": 1, D: 2, "D#": 3, E: 4, F: 5,
+    "F#": 6, G: 7, "G#": 8, A: 9, "A#": 10, B: 11
   };
+
+  const metadataPayload: AudioFeaturesData = {
+    explicit: isExplicit, // đổi tên field cho đúng với DB (bit)
+    key: keyToIntMap[keyValue], // map từ "C" → 0
+    mode: mode, // nên có state mode: number (0 | 1), nếu chưa có thì thêm
+    danceability: parseNumericInput(danceability),
+    energy: parseNumericInput(energy),
+    loudness: parseNumericInput(loudness),
+    tempo: parseNumericInput(tempo),
+    timeSignature: parseInt(timeSignature.split('/')[0]) || 4, // "4/4" → 4
+    acousticness: parseNumericInput(acousticness),
+    instrumentalness: parseNumericInput(instrumentalness),
+    liveness: parseNumericInput(liveness),
+    speechiness: parseNumericInput(speechiness),
+    valence: parseNumericInput(valence),
+    lyrics: lyrics.trim() || null
+  };
+
+  onOk(metadataPayload); // Gửi dữ liệu lên component cha
+};
+
 
   const renderMetadataForm = () => (
     <div className="metadata-form-container metadata-two-columns">
@@ -74,6 +92,13 @@ const Metadata: React.FC<MetadataProps> = ({ onCancel, onOk }) => {
        {/* Các trường còn lại */}
        <div className="metadata-field-group"><label htmlFor="danceability" className="metadata-field-label">Danceability</label><input type="number" min="0" max="1" step="0.01" id="danceability" value={danceability} onChange={(e) => setDanceability(e.target.value)} className="metadata-form-input" placeholder="0-1" /></div>
        <div className="metadata-field-group"><label htmlFor="loudness" className="metadata-field-label">Loudness (dB)</label><input type="number" step="0.1" id="loudness" value={loudness} onChange={(e) => setLoudness(e.target.value)} className="metadata-form-input" placeholder="—" /></div>
+       <label className="metadata-field-group">
+          <span className="metadata-field-label">Mode</span>
+          <select value={mode} onChange={(e) => setMode(Number(e.target.value))} className="metadata-form-select">
+            <option value={1}>Major</option>
+            <option value={0}>Minor</option>
+          </select>
+        </label>
        <div className="metadata-field-group"><label htmlFor="energy" className="metadata-field-label">Energy</label><input type="number" min="0" max="1" step="0.01" id="energy" value={energy} onChange={(e) => setEnergy(e.target.value)} className="metadata-form-input" placeholder="0-1" /></div>
        <div className="metadata-field-group"><label htmlFor="tempo" className="metadata-field-label">Tempo</label><input type="number" step="0.1" id="tempo" value={tempo} onChange={(e) => setTempo(e.target.value)} className="metadata-form-input" placeholder="(BPM)" /></div>
        <div className="metadata-field-group"><label htmlFor="timeSignature" className="metadata-field-label">Time Signature</label><input type="text" id="timeSignature" value={timeSignature} onChange={(e) => setTimeSignature(e.target.value)} className="metadata-form-input" placeholder='e.g. 4/4'/></div>
@@ -82,7 +107,20 @@ const Metadata: React.FC<MetadataProps> = ({ onCancel, onOk }) => {
        <div className="metadata-field-group"><label htmlFor="liveness" className="metadata-field-label">Liveness</label><input type="number" min="0" max="1" step="0.01" id="liveness" value={liveness} onChange={(e) => setLiveness(e.target.value)} className="metadata-form-input" placeholder="0-1" /></div>
        <div className="metadata-field-group"><label htmlFor="speechiness" className="metadata-field-label">Speechiness</label><input type="number" min="0" max="1" step="0.01" id="speechiness" value={speechiness} onChange={(e) => setSpeechiness(e.target.value)} className="metadata-form-input" placeholder="0-1" /></div>
        <div className="metadata-field-group"><label htmlFor="valence" className="metadata-field-label">Valence</label><input type="number" min="0" max="1" step="0.01" id="valence" value={valence} onChange={(e) => setValence(e.target.value)} className="metadata-form-input" placeholder="0-1" /></div>
+       
+       <div className="metadata-field-group full-width">
+          <label htmlFor="lyrics" className="metadata-field-label">Lyrics</label>
+          <textarea
+            id="lyrics"
+            value={lyrics}
+            onChange={(e) => setLyrics(e.target.value)}
+            className="metadata-form-textarea"
+            placeholder="Enter lyrics here..."
+            rows={4}
+          />
+        </div>
     </div>
+    
   );
 
   const renderFooter = () => (

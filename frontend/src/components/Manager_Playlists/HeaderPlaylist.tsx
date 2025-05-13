@@ -29,8 +29,6 @@ interface PlaylistData {
     tracks: TrackItem[];
 }
 
-// Base URL của backend server
-const BACKEND_URL = 'http://localhost:8080';
 
 interface PlaylistHeaderProps {
     onColorExtract?: (color: string) => void;
@@ -57,7 +55,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
     const relativeCoverUrlForColor = playlist?.cover ?? playlist?.imageUrl ?? null;
     // Tạo URL đầy đủ, thêm version để hook lấy màu cũng cập nhật khi ảnh đổi
     const fullCoverUrlForColor = relativeCoverUrlForColor
-        ? `${BACKEND_URL}${relativeCoverUrlForColor}?v=${imageVersion}`
+        ? `${relativeCoverUrlForColor}?v=${imageVersion}`
         : null;
 
     // Hook lấy màu nền từ ảnh bìa
@@ -193,7 +191,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
     const relativeCoverUrlToDisplay = pendingImageUrl ?? playlist.cover ?? playlist.imageUrl ?? null;
     // Tạo URL đầy đủ từ URL tương đối đã xác định, THÊM THAM SỐ VERSION
     const coverUrlToDisplay = relativeCoverUrlToDisplay
-        ? `${BACKEND_URL}${relativeCoverUrlToDisplay}?v=${imageVersion}` // <-- Thêm ?v=...
+        ? `${relativeCoverUrlForColor}?v=${imageVersion}` // <-- Thêm ?v=...
         : null;
 
     return (
@@ -246,7 +244,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
             {showEditModal && (
                 <PlaylistEditModal
                     // Truyền dữ liệu playlist hiện tại, dùng URL tương đối để modal hiển thị đúng ảnh ban đầu
-                    playlist={playlist ? { ...playlist, cover:  `${BACKEND_URL}${relativeCoverUrlToDisplay}?` } : null}
+                    playlist={playlist ? { ...playlist, cover:  `${relativeCoverUrlToDisplay}?` } : null}
                     onClose={handleCloseEditModal}
                     onSave={handleSaveChanges}
                     isSaving={isSaving}

@@ -162,13 +162,13 @@ const createTrack = async (trackUrl, imageUrl, uploaderId, metadata) => {
         trackname, track_id, explicit, danceability,
         energy, key, loudness, mode, speechiness,
         acousticness, instrumentalness, liveness,
-        valence, tempo, duration_ms, time_signature, year, release_date
+        valence, tempo, duration_ms, time_signature, year, release_date, lyrics
     } = metadata
     await db.Metadata.create({
         trackname, track_id, explicit, danceability,
         energy, key, loudness, mode, speechiness,
         acousticness, instrumentalness, liveness,
-        valence, tempo, duration_ms, time_signature, year, release_date
+        valence, tempo, duration_ms, time_signature, year, release_date, lyrics
     });
     return newTrack;
 };
