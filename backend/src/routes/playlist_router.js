@@ -15,7 +15,8 @@ import {
 
 // Import middleware xác thực
 import { authenticateUser } from '../middleware/authMiddleware.js';
-import uploadPlaylistImage from "../middleware/uploadMiddleware.js";
+import {uploadPlaylistImage} from "../middleware/uploadMiddleware.js";
+
 
 const router = express.Router();
 
