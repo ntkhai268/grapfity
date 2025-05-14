@@ -182,7 +182,15 @@ const updateTrack = async (id, updateData, userId) => {
     }
     if ('status' in updateData) {
         delete updateData.status;
-      }
+    }
+    // Chỉ cập nhật các trường cho phép
+    const allowedFields = ['title', 'trackUrl', 'imageUrl', 'lyrics'];
+    const safeUpdateData = {};
+    for (const field of allowedFields) {
+        if (field in updateData) {
+        safeUpdateData[field] = updateData[field];
+        }
+    }
     await track.update(updateData);
     return track;
 };

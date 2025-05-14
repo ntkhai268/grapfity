@@ -193,25 +193,53 @@ const createTrackController = async (req, res) => {
 };
 
 const updateTrackController = async (req, res) => {
-    const { id, trackUrl, imageUrl } = req.body;
-    const userId = req.user?.id;
-    if (!id || !trackUrl || !imageUrl) {
-        return res.status(400).json({ message: 'Missing required fields' });
+  const id = req.params.id; // ID nằm trong URL
+  const { title, lyrics } = req.body;
+   const userId = req.userId;
+ 
+
+  if (!id || !userId) {
+    return res.status(400).json({ message: 'Thiếu ID hoặc chưa đăng nhập.' });
+  }
+
+  try {
+    const updateData = {};
+
+    if (title) updateData.title = title;
+    if (lyrics !== undefined) updateData.lyrics = lyrics;
+
+    // ✅ Nhận file nếu có
+    if (req.files?.image?.[0]) {
+      updateData.imageUrl = '/assets/track_image/' + req.files.image[0].filename;
     }
-    if (!userId) {
-        return res.status(401).json({ message: 'Unauthorized: No user ID found' });
+    if (req.files?.audio?.[0]) {
+      updateData.trackUrl = '/assets/track_audio/' + req.files.audio[0].filename;
     }
-    try {
-        const updatedTrack = await updateTrack(id, { trackUrl, imageUrl, userId });
-        return res.status(200).json({
-            message: 'Update track succeed!',
-            data: updatedTrack
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+   
+    const updatedTrack = await updateTrack(id, updateData, userId);
+
+    if (title || lyrics !== undefined) {
+      const metadataUpdate = {};
+      if (title) metadataUpdate.trackname = title;
+      if (lyrics !== undefined) metadataUpdate.lyrics = lyrics;
+
+      await db.Metadata.update(
+        metadataUpdate,
+        { where: { track_id: id } }
+      );
     }
+    
+
+    return res.status(200).json({
+      message: 'Update track succeed!',
+      data: updatedTrack
+    });
+  } catch (err) {
+    console.error('❌ Failed to update track:', err);
+    res.status(500).json({ message: err.message || 'Internal Server Error' });
+  }
 };
+
 
 const deleteTrackController = async (req, res) => { 
     const userId = req.userId;

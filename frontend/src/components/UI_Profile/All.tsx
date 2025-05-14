@@ -7,6 +7,7 @@ import { Song } from "../../hooks/GlobalAudioManager"; // Import kiểu Song
 // Giả sử bạn có hàm getMyUploadedTracksAPI trong trackServiceAPI.ts
 import { getMyUploadedTracksAPI, TrackData,deleteTrackAPI } from "../../services/trackServiceAPI"; 
 import SongOptionOfUser from "./SongOptionOfUser";
+import UpdateSongBasicInfo from "../Manager_Songs/updateSongBasicInfo";
 // --------------------------
 
 // Hàm map từ TrackData sang Song (giữ nguyên)
@@ -22,6 +23,7 @@ const SongList: React.FC = () => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [editingSongId, setEditingSongId] = useState<number | null>(null);
 
   // Fetch dữ liệu bài hát của user khi component mount
   useEffect(() => {
@@ -115,10 +117,21 @@ const SongList: React.FC = () => {
               <p className="artist">{song.artist || 'Unknown Artist'}</p>
               <div className="audio"></div> 
               <SongOptionOfUser
-                onEdit={() => console.log("Edit", song.id)}
+                 onEdit={() => setEditingSongId(Number(song.id))} // nút chỉnh sửa nhạc ở đây
                 onDelete={() => handleDeleteTrack(Number(song.id))}
               />
             </div>
+             {editingSongId === Number(song.id) && (
+              <UpdateSongBasicInfo
+                trackId={song.id}
+                onCancel={() => setEditingSongId(null)}
+                onSaveSuccess={() => {
+                  // ví dụ reload danh sách track, hoặc đóng modal
+                  console.log("Đã cập nhật thành công");
+                  setEditingSongId(null);
+                }}            
+               />
+            )}
           </div>
         ))
       )}

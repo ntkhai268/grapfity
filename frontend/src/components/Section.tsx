@@ -63,7 +63,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
     const recommendedTracks: Song[] = allTracks.slice(0, 3); 
     const recentTracks: Song[] = allTracks.slice(3, 7);     
-    const popularTracks: Song[] = allTracks.slice(7, 11);   
+    const popularTracks: Song[] = allTracks.slice(7, 15);   
 
     const handleSidebarExpandChange = (expanded: boolean) => {
         setSidebarExpanded(expanded);
