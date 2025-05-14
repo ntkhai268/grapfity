@@ -367,7 +367,7 @@ body.profile-page {
   color: white;
   z-index: 10;
 } */
-.song img{
+.song .album_cover{
     width: 100px;
     height: 100px;
 }
