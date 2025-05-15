@@ -24,6 +24,7 @@ import "../styles/ProfileLayout.css";
 
 
 const ProfileSection = () => {
+  const [profileBgColor, setProfileBgColor] = useState<string>("#f2f2f2");
 
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const handleSidebarExpandChange = (expanded: boolean) => {
@@ -36,8 +37,8 @@ const ProfileSection = () => {
       <Sidebar onExpandChange={handleSidebarExpandChange} />
         <div className={`song_side_profile ${sidebarExpanded ? "shrink" : ""}`}>
             {/* -------------------------UI profile------------------------------------------- */}
-            <div className="profile_slide">
-                <ProfileSlide />
+            <div className="profile_slide" style={{ background: `linear-gradient(to bottom, ${profileBgColor}, #454545  50%)`,}}>
+               <ProfileSlide onColorExtract={setProfileBgColor} />
 
                 <div className="mid_section_profile">
                     <Tab />

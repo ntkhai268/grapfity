@@ -179,7 +179,7 @@ body.profile-page {
 
 .top_section {
     height: 50%; /* Chiều cao phần trên */
-    background-color: #454545;
+    background-color:transparent;
     display: flex;
     align-items: center; /* Căn giữa theo chiều dọc */
     justify-content: flex-start; /* Canh trái */
@@ -199,9 +199,16 @@ body.profile-page {
 .avatar:hover{
     transform: scale(1.1);
 }
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ảnh phủ đều khung tròn */
+    border-radius: 50%;
+}
 .profile_info {
     margin-left: 20px;
     color: white;
+    position: relative;
 }
 
 .profile_info span {
@@ -213,11 +220,36 @@ body.profile-page {
     font-size: 50px;
     font-weight: bold;
 }
+.button_wrapper {
+  position: absolute;
+  top: 0px;
+  right: 280px; /* chỉnh gần chữ 'Hồ Sơ', bạn có thể tăng giảm */
+}
+
+
+.edit_button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #ccc;
+  transition: color 0.2s ease;
+}
+
+.edit_button:hover {
+  color: #fff;
+}
+
+.edit_icon {
+  width: 18px;
+  height: 18px;
+}
+
 .mid_section_profile {
     display: flex;
     align-items: center; /* Căn giữa theo chiều dọc */
     justify-content: space-between; /* Tabs bên trái, Stats bên phải */
-    background-color: #1F1F1F;
+    background-color: transparent;
     padding: 20px; /* Thêm padding cho dễ kiểm soát */
     position: relative;
     height: 80px; /* Đảm bảo có đủ không gian */
@@ -936,7 +968,8 @@ body.profile-page {
 .dropdown_item {
   white-space: nowrap;
   padding: 10px 16px;
-  color: white;
+   background-color: transparent;
+  color: #eee;
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.2s ease;
