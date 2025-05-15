@@ -37,7 +37,13 @@ export default (sequelize, DataTypes) => {
     userName: DataTypes.STRING,
     email: DataTypes.STRING,
     password: DataTypes.STRING,
-    roleId: DataTypes.INTEGER
+    roleId: DataTypes.INTEGER,
+
+    Name: DataTypes.STRING,
+    Birthday: DataTypes.DATEONLY,
+    Address: DataTypes.STRING,
+    PhoneNumber: DataTypes.STRING,
+    Avatar: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'User'
