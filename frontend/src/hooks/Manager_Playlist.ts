@@ -68,15 +68,11 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
         console.log(`[Manager_Playlist] New waveform created and mapped for ${audio.src}`);
 
         // Lắng nghe sự kiện 'seeking' từ WaveSurfer (khi người dùng tương tác)
-        waveSurfer.on("seeking", (time: number) => { 
-            if (!isNaN(time) && time >= 0) {
-                const duration = waveSurfer.getDuration(); 
-                if (duration > 0) {
-                    const percent = (time / duration) * 100;
-                    console.log(`[Waveform] Seeking event triggered by user: time = ${time}, percent = ${percent}`);
-                    // Yêu cầu GlobalAudioManager seek đến vị trí %
-                    GlobalAudioManager.seekTo(percent); 
-                }
+       waveSurfer.on("seeking", (progress: number) => {
+            if (!isNaN(progress) && progress >= 0 && progress <= 1) {
+                const percent = progress * 100;
+                console.log(`[Waveform] Seek event by user: progress = ${progress}, percent = ${percent}`);
+                GlobalAudioManager.seekTo(percent);
             }
         });
         

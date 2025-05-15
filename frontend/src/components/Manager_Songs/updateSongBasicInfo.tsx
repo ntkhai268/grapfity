@@ -91,6 +91,8 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
       }
 
       await updateTrackAPI(trackId, formData);
+      const updatedTrack = await getTrackByIdAPI(trackId);
+      setPreviewImage(updatedTrack?.cover || '');
       alert('Cập nhật thành công!');
       onSaveSuccess();
     } catch (err: any) {

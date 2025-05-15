@@ -58,6 +58,7 @@ const ProfileSlide: React.FC<ProfileSlideProps> = ({ onColorExtract }) =>{
         <img
           src={user?.Avatar || "assets/User_alt@3x.png"} // fallback nếu chưa có ảnh
           alt="avatar"
+           style={user?.Avatar ? {} : { width: 24, height: 24 }}
         />
       </div>
       <div className="profile_info">

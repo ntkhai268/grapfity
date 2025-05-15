@@ -125,10 +125,17 @@ const SongList: React.FC = () => {
               <UpdateSongBasicInfo
                 trackId={song.id}
                 onCancel={() => setEditingSongId(null)}
-                onSaveSuccess={() => {
+                onSaveSuccess={async () => {
                   // ví dụ reload danh sách track, hoặc đóng modal
                   console.log("Đã cập nhật thành công");
                   setEditingSongId(null);
+                  try {
+                    const updatedTracks = await getMyUploadedTracksAPI();
+                    const mappedSongs = updatedTracks.map(mapTrackDataToSong);
+                    setSongs(mappedSongs);
+                  } catch (err) {
+                    console.error("Lỗi khi reload danh sách bài hát:", err);
+                  }
                 }}            
                />
             )}

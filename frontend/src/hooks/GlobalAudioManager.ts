@@ -46,7 +46,12 @@ export interface Song {
     playAudio: (audio: HTMLAudioElement, song: Song, context?: PlaylistContext) => void;
     pausePlayback: () => void;
     loadInitialState: (fetchPlaylistCallback: (context: PlaylistContext) => Promise<Song[] | null>) => Promise<void>;
-  }
+    setShuffle: (state: boolean) => void;
+    toggleShuffle: () => void;
+    setRepeat: (mode: 'off' | 'one' | 'all') => void;
+    getRepeat: () => 'off' | 'one' | 'all';
+    getShuffle: () => boolean;
+    }
   
   // --- IIFE để tạo GlobalAudioManager ---
   const GlobalAudioManager = ((): IGlobalAudioManager => {
@@ -62,7 +67,11 @@ export interface Song {
     let playlistContainer: HTMLElement | null = null;
     let onPlaylistEnded: (() => void) | null = null;
     let isTransitioning = false; // Cờ khóa chuyển đổi
-  
+
+    let isShuffle = false; // chế độ phát ngẫu nhiên
+    type RepeatMode = 'off' | 'one' | 'all';
+    let repeatMode: RepeatMode = 'off';  
+
     let currentTime = 0;
     let duration = 0;
     let progress = 0;
@@ -397,14 +406,14 @@ export interface Song {
               const audio = new Audio(initialSong.src);
               audio.crossOrigin = "anonymous";
               audio.preload = "metadata";
-  
+
               currentSong = initialSong;
               currentIndex = effectiveInitialIndex;
               isPlaying = false;
               duration = 0; currentTime = 0; progress = 0;
               notifySongChanged();
               notify();
-  
+
               const handleInitialMetadataLoaded = () => {
                 if (audio.duration && savedTime > 0 && savedTime < audio.duration) {
                   audio.currentTime = savedTime;
@@ -441,25 +450,75 @@ export interface Song {
         updateCurrentState(null, -1, null, null);
       }
     }
-  
+    function setShuffle(state: boolean) {
+      isShuffle = state;
+      notify();
+    }
+
+    function toggleShuffle() {
+      isShuffle = !isShuffle;
+      notify();
+    }
+
+    function setRepeat(mode: RepeatMode) {
+      repeatMode = mode;
+      notify();
+    }
+
+    function getRepeat(): RepeatMode {
+      return repeatMode;
+    }
+
+    function getShuffle(): boolean {
+      return isShuffle;
+    }
     function playNext() {
-      if (!playlist.length) return;
-      let nextIndex = currentIndex + 1;
-      if (nextIndex >= playlist.length) {
-        if(currentAudio) {
-          currentAudio.pause();
-        }
-        isPlaying = false;
-        notify();
-        onPlaylistEnded?.();
-        return;
-      }
-      if (playCallback) {
-        playCallback(nextIndex);
-      } else {
-        playSongAt(nextIndex);
-      }
-    }
+      if (!playlist.length) return;
+
+      // 🔁 Lặp lại bài hiện tại
+      if (repeatMode === 'one' && currentIndex !== -1) {
+        playSongAt(currentIndex);
+        return;
+      }
+
+      let nextIndex: number;
+
+      // 🔀 Phát ngẫu nhiên
+      if (isShuffle) {
+        const availableIndexes = playlist
+          .map((_, i) => i)
+          .filter(i => i !== currentIndex); // tránh trùng bài hiện tại
+        nextIndex = availableIndexes[Math.floor(Math.random() * availableIndexes.length)];
+      } else {
+        nextIndex = currentIndex + 1;
+      }
+
+      // 🔁 Lặp toàn bộ
+      if (nextIndex >= playlist.length) {
+        if (repeatMode === 'all') {
+          nextIndex = 0;
+        } else {
+          // hết bài trong danh sách thì dừng
+          if (currentAudio) {
+            currentAudio.pause();
+          }
+          isPlaying = false;
+          notify();
+          onPlaylistEnded?.();
+          return;
+
+          // hết bài thì phát lại bài cuối
+          //  nextIndex = playlist.length - 1;
+        }
+      }
+
+      if (playCallback) {
+        playCallback(nextIndex);
+      } else {
+        playSongAt(nextIndex);
+      }
+    }
+
   
     function playPrevious() {
       if (!playlist.length) return;
@@ -595,6 +654,11 @@ export interface Song {
       playAudio,
       pausePlayback,
       loadInitialState,
+      setShuffle,
+      toggleShuffle,
+      setRepeat,
+      getRepeat,
+      getShuffle
     };
   })();
   
