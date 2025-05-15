@@ -35,7 +35,7 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
   const relativeCover = playlistFromApi.imageUrl || null;
   const cover = relativeCover
     ? `${BACKEND_URL}/${relativeCover.replace(/^\/?/, '')}`
-    : `${BACKEND_URL}/assets/default_playlist_cover.png`;
+    : "";
 
   return {
     id: playlistFromApi.id,
@@ -167,7 +167,7 @@ export const createPlaylistAPI = async (trackId?: string | number | null): Promi
                  title: track.title || "Unknown Title",
                  src: track.trackUrl || "",
                  artist: track.User?.userName || "Unknown Artist",
-                 cover: track.imageUrl || "/assets/default_track_cover.png"
+                 cover: track.imageUrl || ""
              })) || []
         };
         console.log("Formatted new playlist data:", formattedNewPlaylist);

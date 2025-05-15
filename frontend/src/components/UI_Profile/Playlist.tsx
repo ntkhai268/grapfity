@@ -27,9 +27,7 @@ interface PlaylistData {
     imageUrl?: string | null;
 }
 
-// --- THÊM BASE URL CỦA BACKEND ---
 
-// ---------------------------------
 
 
 // SVG Paths (Giữ nguyên)

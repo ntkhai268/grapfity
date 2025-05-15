@@ -4,6 +4,7 @@ import useFooterAudioPlayer, { UseFooterAudioPlayerReturn } from "../hooks/Foote
 // Import kiểu Song nếu cần (hoặc dùng Song từ GlobalAudioManager)
 import { Song } from "../hooks/GlobalAudioManager"; 
 import "../styles/Footer.css";
+import  { RepeatButton, ShuffleButton } from './modeControl';
 
 // Interface cho FooterLeft (có thể giữ nguyên hoặc điều chỉnh)
 interface FooterLeftProps {
@@ -53,6 +54,11 @@ interface MusicControlsProps {
   togglePlay: () => void;
   playNext: () => void;    // <<< Sửa tên thành playNext
   playPrevious: () => void; // <<< Sửa tên thành playPrevious
+
+  repeatMode: 'off' | 'one' | 'all';
+  isShuffle: boolean;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
 }
 
 const MusicControls: React.FC<MusicControlsProps> = ({
@@ -60,12 +66,14 @@ const MusicControls: React.FC<MusicControlsProps> = ({
   togglePlay,
   playNext,     // <<< Sửa tên thành playNext
   playPrevious, // <<< Sửa tên thành playPrevious
+  repeatMode,        // 👈 thêm dòng này
+  isShuffle,         // 👈 thêm dòng này
+  toggleRepeat,      // 👈 và dòng này
+  toggleShuffle, 
 }) => {
   return (
     <div className="music-controls">
-      <button className="shuffle">
-        <img src="/assets/shuffle.png" alt="Shuffle" />
-      </button>
+      <ShuffleButton isActive={isShuffle} onToggle={toggleShuffle} />
       {/* Gọi đúng hàm playPrevious */}
       <button className="prev" onClick={playPrevious}> 
         <img src="/assets/prev.png" alt="Previous" />
@@ -77,9 +85,8 @@ const MusicControls: React.FC<MusicControlsProps> = ({
       <button className="next" onClick={playNext}> 
         <img src="/assets/next.png" alt="Next" />
       </button>
-      <button className="repeat">
-        <img src="/assets/loop.png" alt="Repeat" />
-      </button>
+      <RepeatButton mode={repeatMode} onToggle={toggleRepeat} />
+
     </div>
   );
 };
@@ -141,6 +148,10 @@ const Footer: React.FC = () => {
     duration,
     progress,    // Lấy progress trực tiếp từ hook
     seekTo,      // Hàm seekTo từ hook nhận percent (0-100)
+    repeatMode,          // 👈 Thêm dòng này
+    isShuffle,           // 👈 Thêm dòng này
+    toggleRepeat,        // 👈 Thêm dòng này
+    toggleShuffle,       // 👈 Thêm dòng này
   }: UseFooterAudioPlayerReturn = useFooterAudioPlayer();
   // -----------------------------------------
 
@@ -169,6 +180,10 @@ const Footer: React.FC = () => {
           togglePlay={togglePlay}
           playNext={playNext}       // <<< Sửa tên
           playPrevious={playPrevious} // <<< Sửa tên
+          repeatMode={repeatMode}             // 👈 thêm
+          isShuffle={isShuffle}               // 👈 thêm
+          toggleRepeat={toggleRepeat}         // 👈 thêm
+          toggleShuffle={toggleShuffle}       // 👈 thêm
         />
         <ProgressBar
           currentTime={currentTime} // Truyền number
