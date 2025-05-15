@@ -8,7 +8,7 @@ interface EditSongProps {
   onSaveSuccess: () => void;
 }
 
-const UploadSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSaveSuccess }) => {
+const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSaveSuccess }) => {
   const [title, setTitle] = useState('');
   const [lyrics, setLyrics] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -166,4 +166,4 @@ const UploadSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
   );
 };
 
-export default UploadSongBasicInfo;
+export default UpdateSongBasicInfo;
