@@ -17,6 +17,11 @@ export interface UseFooterAudioPlayerReturn {
   playNext: () => void;
   playPrevious: () => void;
   seekTo: (percent: number) => void;
+  repeatMode: 'off' | 'one' | 'all';
+  isShuffle: boolean;
+  toggleRepeat: () => void;
+  toggleShuffle: () => void;
+
 }
 
 /**
@@ -34,6 +39,8 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(managerState._audioElement); 
+  const [repeatMode, setRepeatMode] = useState<'off' | 'one' | 'all'>(GlobalAudioManager.getRepeat());
+  const [isShuffle, setIsShuffle] = useState(GlobalAudioManager.getShuffle());
 
   useEffect(() => {
       if (audioRef.current !== managerState._audioElement) {
@@ -53,8 +60,12 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
         duration: GlobalAudioManager.getDuration(),
         progress: GlobalAudioManager.getProgress(),
         _audioElement: GlobalAudioManager.getAudioElement(),
+        
       });
+      setRepeatMode(GlobalAudioManager.getRepeat());
+      setIsShuffle(GlobalAudioManager.getShuffle());
     };
+    
 
     // Đăng ký lắng nghe thay đổi
     const unsubscribe = GlobalAudioManager.subscribe(updateStateFromManager);
@@ -86,6 +97,19 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
         }
       }
   }, []); 
+  
+  const toggleRepeat = useCallback(() => {
+    const current = GlobalAudioManager.getRepeat();
+    const next: 'off' | 'one' | 'all' = current === 'off' ? 'one' : current === 'one' ? 'all' : 'off';
+    GlobalAudioManager.setRepeat(next);
+    setRepeatMode(next);
+  }, []);
+
+  const toggleShuffle = useCallback(() => {
+    const next = !isShuffle;
+    GlobalAudioManager.setShuffle(next);
+    setIsShuffle(next);
+  }, [isShuffle]);
 
   const playNext = useCallback(() => { /* ... giữ nguyên ... */ 
       GlobalAudioManager.playNext();
@@ -113,6 +137,10 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
     playNext,
     playPrevious,
     seekTo,
+    repeatMode,
+    isShuffle,
+    toggleRepeat,
+    toggleShuffle,
   };
 };
 

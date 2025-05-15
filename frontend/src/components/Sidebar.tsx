@@ -1,12 +1,21 @@
 // components/Sidebar.tsx
-import React, { useState } from "react";
+import React, {  useEffect, useState  } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Section.css"; // đổi sang Sidebar.css
 import stackIcon from "../assets/images/stack.png";
 import musicNoteIcon from "../assets/images/notnhac.png";
 
-import { createPlaylistAPI } from "../services/playlistService";
-import { mockPlaylists, mockArtists } from "../services/mockSidebar";
+import { createPlaylistAPI,getMyPlaylistsAPI  } from "../services/playlistService";
+import {  mockArtists } from "../services/mockSidebar";
+
+interface PlaylistData {
+    id: number;
+    title: string;
+    artist: string;
+    timeAgo: string;
+    cover: string | null; // Cho phép cover là null
+    imageUrl?: string | null;
+}
 
 interface SidebarProps {
   onExpandChange?: (expanded: boolean) => void;
@@ -16,6 +25,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"playlists" | "artists">("playlists");
+  const [myPlaylists, setMyPlaylists] = useState<PlaylistData[]>([]);
+
+   useEffect(() => {
+    const fetchPlaylists = async () => {
+      try {
+        const playlists = await getMyPlaylistsAPI();
+        setMyPlaylists(playlists);
+      } catch (error) {
+        console.error("Không thể tải danh sách playlist:", error);
+      }
+    };
+    fetchPlaylists();
+  }, []);
 
   const handleToggle = () => {
     const next = !expanded;
@@ -101,21 +123,35 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
 
       {/* Danh sách luôn render */}
       <ul className="sidebar-list">
-        {activeTab === "playlists" &&
-          mockPlaylists.map((pl) => (
+         {activeTab === "playlists" &&
+          myPlaylists.map((pl) => (
             <li
               key={pl.id}
               className="sidebar-item"
-              onClick={() => navigate(`/playlist/${pl.id}`)}
+              onClick={() => navigate(`/ManagerPlaylistLayout/${pl.id}`)}
+              style={{ cursor: "pointer", color: "#1db954" }}
+              title={`Go to playlist: ${pl.title}`}
             >
-              <img
-                src={pl.coverUrl}
-                alt={pl.title}
-                className="playlist-cover"
-              />
+              {pl.cover?.trim() ? (
+                <img
+                  src={pl.cover}
+                  alt={pl.title}
+                  className="playlist-cover"
+                />
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  role="img"
+                  aria-hidden="true"
+                  className="playlist-cover"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M6 3h15v15.167a3.5 3.5 0 1 1-3.5-3.5H19V5H8v13.167a3.5 3.5 0 1 1-3.5-3.5H6V3zm0 13.667H4.5a1.5 1.5 0 1 0 1.5 1.5v-1.5zm13 0h-1.5a1.5 1.5 0 1 0 1.5 1.5v-1.5z" />
+                </svg>
+              )}
               <div className="item-texts">
                 <p className="item-title">{pl.title}</p>
-                <p className="item-sub">{pl.ownerName}</p>
+                <p className="item-sub">{pl.artist}</p>
               </div>
             </li>
           ))}
