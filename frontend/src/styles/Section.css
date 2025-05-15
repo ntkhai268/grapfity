@@ -240,7 +240,15 @@
     border-radius: 4px;
     object-fit: cover;
 }
-
+.sidebar .sidebar-list svg.playlist-cover {
+    width: 40px;
+    height: 40px;
+    display: block;
+    fill: white;
+    background-color: #333; /* tuỳ chọn */
+    border-radius: 4px;
+    padding: 6px; /* tuỳ chỉnh để icon gọn hơn */
+}
 /* Hình tròn cho artist */
 .sidebar .sidebar-list .artist-avatar {
     width: 40px;

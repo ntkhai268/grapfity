@@ -83,7 +83,7 @@ const DataPlaylist: React.FC = () => {
             artist: track.artist,
             cover: track.cover,
         }));
-        GlobalAudioManager.setPlaylist(songsForManager, index);
+        GlobalAudioManager.setPlaylist(songsForManager, index, {id: playlist.id,type: 'playlist'});
         GlobalAudioManager.playSongAt(index);
     }, [playlist]);
 
