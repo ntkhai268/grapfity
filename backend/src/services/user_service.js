@@ -7,7 +7,13 @@ const getAllUsers = async () => {
 };
 
 const getUserById = async (id) => {
-    return await db.User.findByPk(id); // Lấy dữ liệu của user theo id
+    try {
+        const user = await db.User.findByPk(id);
+        return user;
+    } catch (error) {
+        console.error(`Lỗi khi tìm user với id ${id}:`, error);
+        throw new Error('Không thể truy cập dữ liệu người dùng');
+    }
 };
 
 const createUser = async (userName, email, password, roleId) => {
@@ -69,13 +75,61 @@ const handleUserLogin = async (username, password) => {
     }
 };
 
-const updateUser = async (id, userName, email, password, roleId) => {
+
+
+const updateUser = async (id, {
+    userName,
+    email,
+    password,
+    Name,
+    Birthday,
+    Address,
+    PhoneNumber,
+    Avatar
+}) => {
     const user = await db.User.findByPk(id);
     if (!user) {
-        return { message: 'User not found' };
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
     }
 
-    const updatedUser = await user.update({ userName, email, password, roleId });
+    const updateFields = {};
+
+    if (typeof userName === 'string' && userName.trim() !== '') {
+        updateFields.userName = userName.trim();
+    }
+
+    if (typeof email === 'string' && email.trim() !== '') {
+        updateFields.email = email.trim();
+    }
+
+    if (typeof password === 'string' && password.trim() !== '') {
+        const saltRounds = 10;
+        updateFields.password = await bcrypt.hash(password, saltRounds);
+    }
+
+    if (typeof Name === 'string' && Name.trim() !== '') {
+        updateFields.Name = Name.trim();
+    }
+
+    if (Birthday) {
+        updateFields.Birthday = Birthday; // đảm bảo frontend gửi đúng định dạng yyyy-mm-dd
+    }
+
+    if (typeof Address === 'string' && Address.trim() !== '') {
+        updateFields.Address = Address.trim();
+    }
+
+    if (typeof PhoneNumber === 'string' && PhoneNumber.trim() !== '') {
+        updateFields.PhoneNumber = PhoneNumber.trim();
+    }
+
+    if (typeof Avatar === 'string' && Avatar.trim() !== '') {
+        updateFields.Avatar = Avatar.trim(); // hoặc URL ảnh được xử lý sẵn
+    }
+
+    const updatedUser = await user.update(updateFields);
     return updatedUser;
 };
 
