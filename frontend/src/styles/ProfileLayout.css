@@ -952,7 +952,7 @@ body.profile-page {
   user-select: none;
 }
 
-.dropdown_menu {
+.dropdown_menu_all {
   position: absolute;
   top: 28px;
   right: 0;
@@ -960,12 +960,17 @@ body.profile-page {
   border: 1px solid #555;
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-  overflow: hidden;
+  
   z-index: 30;
   min-width: 160px;
 }
+.dropdown_menu_all.drop-up {
+  top: auto;
+  bottom: 28px; 
+}
 
-.dropdown_item {
+
+.dropdown_item_all {
   white-space: nowrap;
   padding: 10px 16px;
    background-color: transparent;
@@ -975,7 +980,42 @@ body.profile-page {
   transition: background-color 0.2s ease;
 }
 
-.dropdown_item:hover {
+.dropdown_item_all:hover {
   background-color: #333;
+}
+
+
+
+.dropdown_item_all.has-submenu {
+  position: relative;
+}
+
+.submenu_all {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 100%;
+  background-color: #2a2a2a;
+  border: 1px solid #555;
+  border-radius: 6px;
+  min-width: 160px;
+  z-index: 999;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  max-height: 200px;
+}
+/* Style từng item trong submenu */
+.submenu_item_all {
+  padding: 10px 16px;
+  white-space: nowrap;
+  color: #eee;
+  font-size: 14px;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.submenu_item_all:hover {
+  background-color: #444;
 }
 /* ------------------------------------------------------ */

@@ -4,14 +4,17 @@ import React, { useState, useEffect, useCallback, RefObject } from "react";
 import { getMyPlaylistsAPI } from "../../services/playlistService";
 import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
+import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 
 // Định nghĩa kiểu dữ liệu cho props mà Controls sẽ nhận từ ManagerSongSection
 interface ControlsProps {
   audioRef: RefObject<HTMLAudioElement | null>;
   songUrl: string | undefined;
   isPlaying: boolean;
-  togglePlay: () => void;
+  
   currentTrackId?: string | number | null;
+  trackId?: string | number | null;
+  playlistIndex: number;
   // Thêm các props khác nếu ManagerSongSection truyền xuống (ví dụ: playNext, playPrevious, etc.)
 }
 
@@ -21,8 +24,9 @@ const Controls: React.FC<ControlsProps> = ({
   audioRef,
   songUrl,
   isPlaying,
-  togglePlay,
   currentTrackId,
+  trackId,
+  playlistIndex,
   // ...destructure các props khác nếu có
 }) => {
   // --- Hooks & State ---
@@ -94,11 +98,41 @@ const Controls: React.FC<ControlsProps> = ({
     }
   }, [currentTrackId, closeDropdown, isAddingTrack]); // currentTrackId giờ là prop
 
+
+const handlePlayButtonClick = () => {
+  const currentSong = GlobalAudioManager.getCurrentSong();
+  const currentIsPlaying = GlobalAudioManager.getIsPlaying();
+  const audio = GlobalAudioManager.getAudioElement();
+
+  if (!trackId || !songUrl) {
+    console.error("Missing trackId or songUrl");
+    return;
+  }
+
+  const isCurrentSong = currentSong && currentSong.id === trackId;
+
+  if (!isCurrentSong) {
+    // 🔥 Chỉ phát bài đầu tiên đã được set từ ManagerSongSection
+    console.log("📀 Bài khác đang phát. Phát bài đã được setup trong ManagerSongSection.");
+    GlobalAudioManager.playSongAt(playlistIndex); // chỉ phát bài đã được set
+  } else {
+    if (currentIsPlaying) {
+      GlobalAudioManager.pausePlayback();
+    } else if (audio && currentSong) {
+      GlobalAudioManager.playAudio(audio, currentSong);
+    }
+  }
+};
+
+
+
   // --- Effects ---
   useEffect(() => {
     fetchPlaylists();
   }, [fetchPlaylists]);
 
+  
+// console.log("Controls xxxxxxxxxx:", { trackId, currentTrackId, isPlaying,  }); 
   // --- Render ---
   return (
     <div className="controls">
@@ -106,8 +140,15 @@ const Controls: React.FC<ControlsProps> = ({
       <audio ref={audioRef} src={songUrl} />
 
       {/* Play/Pause Button sử dụng isPlaying và togglePlay từ props */}
-      <div className="play-button" onClick={togglePlay}>
-        <i className={isPlaying ? "fas fa-pause" : "fas fa-play"} style={{ color: "black" }}></i>
+      <div className="play-button" onClick={handlePlayButtonClick}>
+       <i
+        className={
+          isPlaying && currentTrackId === trackId
+            ? "fas fa-pause"
+            : "fas fa-play"
+        }
+        style={{ color: "black" }}
+      ></i>
       </div>
 
       {/* Other Icons */}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, RefObject } from "react";
+import { useLocation } from "react-router-dom";
 import Controls from "./Manager_Songs/Controls";
 import Lyrics from "./Manager_Songs/Lyrics";
 import PopularSongs from "./Manager_Songs/PopularSongs";
@@ -9,6 +10,7 @@ import Sidebar from "./Sidebar";
 // Import hook useSongManager và kiểu dữ liệu của nó
 // Đảm bảo đường dẫn này chính xác đến file hook của bạn
 import useSongManager from "../hooks/Manager_Song_Play"; 
+import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager";
 
 // Định nghĩa (hoặc import) kiểu dữ liệu trả về của hook useSongManager
 // Kiểu này cần khớp với những gì hook useSongManager thực sự trả về
@@ -16,7 +18,7 @@ interface ISongManagerOutput {
   audioRef: RefObject<HTMLAudioElement | null>;
   songUrl: string | undefined;
   isPlaying: boolean;
-  togglePlay: () => void;
+
   currentTrackId?: string | number | null;    // ID bài hát hiện tại từ hook
 }
 
@@ -24,14 +26,25 @@ interface ISongManagerOutput {
 const ManagerSongSection: React.FC = () => {
   const [bgColor, setBgColor] = useState<string>("#7D3218"); // màu mặc định
   const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(false);
+  
+  const location = useLocation();
+  const songFromState = location.state?.currentSong;
+  const [viewSong, setViewSong] = useState(songFromState || null);
+  const playlistFromState = location.state?.songs;
+  const indexFromState = location.state?.currentIndex;
+
+  const [playlist, setPlaylist] = useState<Song[]>(playlistFromState || []);
+  const [playlistIndex, setPlaylistIndex] = useState<number>(
+    indexFromState !== undefined ? indexFromState : 0
+  );
 
   // 1. Sử dụng hook useSongManager để lấy các giá trị cần thiết
   const { 
     currentTrackId, 
     audioRef,      // Lấy audioRef từ hook
     songUrl,       // Lấy songUrl từ hook
-    isPlaying,     // Lấy isPlaying từ hook
-    togglePlay     // Lấy togglePlay từ hook
+    isPlaying  // Lấy isPlaying từ hook
+  // Lấy togglePlay từ hook
   }: ISongManagerOutput = useSongManager();
 
   const handleSidebarExpandChange = (expanded: boolean) => {
@@ -40,9 +53,37 @@ const ManagerSongSection: React.FC = () => {
 
   useEffect(() => {
     // Log để kiểm tra giá trị currentTrackId mỗi khi nó thay đổi
-    console.log("ManagerSongSection - currentTrackId from hook:", currentTrackId);
-    console.log("ManagerSongSection - isPlaying from hook:", isPlaying);
+    // console.log("ManagerSongSection - currentTrackId from hook:", currentTrackId);
+    // console.log("ManagerSongSection - isPlaying from hook:", isPlaying);
   }, [currentTrackId, isPlaying]);
+
+  useEffect(() => {
+    if (!songFromState) {
+      const songStr = localStorage.getItem("viewedSong");
+      const listStr = localStorage.getItem("viewedPlaylist");
+      const indexStr = localStorage.getItem("viewedIndex");
+
+    try {
+      if (songStr) setViewSong(JSON.parse(songStr));
+      if (listStr) setPlaylist(JSON.parse(listStr));
+      if (indexStr) setPlaylistIndex(parseInt(indexStr));
+    } catch (e) {
+      console.error("Lỗi parse từ localStorage:", e);
+    }
+  }
+}, [songFromState]);
+
+useEffect(() => {
+  if (playlist.length > 0 && viewSong) {
+    console.log("🧪 Playlist được truyền vào ManagerSongSection:", playlist.map(s => s.id));
+    const context = {
+      id: `manager-${viewSong.id}`,
+      type: "queue"
+    };
+    GlobalAudioManager.setPlaylist(playlist, playlistIndex, context);
+  }
+}, [playlist, playlistIndex, viewSong]);
+
 
   return (
     <div>
@@ -58,7 +99,7 @@ const ManagerSongSection: React.FC = () => {
             {/* 2. Truyền các giá trị xuống component con nếu chúng cần */}
             <SongHeader 
               onColorExtract={setBgColor} 
-              currentTrackId={currentTrackId === undefined ? null : currentTrackId} 
+              currentTrackId={viewSong?.id ?? null}
               // currentSong={currentSong} // Ví dụ nếu SongHeader cần thông tin chi tiết bài hát
             />
             <Controls 
@@ -67,12 +108,12 @@ const ManagerSongSection: React.FC = () => {
               audioRef={audioRef}
               songUrl={songUrl}
               isPlaying={isPlaying}
-              togglePlay={togglePlay}
+              
+               trackId={viewSong?.id ?? null}
+               playlistIndex={playlistIndex}
               
             />
-            <Lyrics 
-              trackId={currentTrackId === undefined ? null : currentTrackId} 
-            />
+            <Lyrics trackId={viewSong?.id ?? null} />
             <Recommendations/>
             <PopularSongs/>
           </div>

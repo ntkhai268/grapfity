@@ -1,9 +1,11 @@
 // components/Sidebar.tsx
 import React, {  useEffect, useState  } from "react";
-import { useNavigate } from "react-router-dom";
+
 import "../styles/Section.css"; // đổi sang Sidebar.css
 import stackIcon from "../assets/images/stack.png";
 import musicNoteIcon from "../assets/images/notnhac.png";
+import { useNavigate, useLocation } from 'react-router-dom';
+import { getCurrentUser } from "../services/authService";
 
 import { createPlaylistAPI,getMyPlaylistsAPI  } from "../services/playlistService";
 import {  mockArtists } from "../services/mockSidebar";
@@ -23,9 +25,11 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [expanded, setExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"playlists" | "artists">("playlists");
   const [myPlaylists, setMyPlaylists] = useState<PlaylistData[]>([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
    useEffect(() => {
     const fetchPlaylists = async () => {
@@ -38,6 +42,25 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
     };
     fetchPlaylists();
   }, []);
+  useEffect(() => {
+      const checkLogin = async () => {
+        const user = await getCurrentUser();
+        setIsLoggedIn(!!user); // true nếu có user, false nếu null
+      };
+  
+      checkLogin();
+    }, []);
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.preventDefault();
+  
+      if (!isLoggedIn) {
+        // Hiển thị alert, sau khi nhấn OK thì chuyển đến login
+        alert('Vui lòng đăng nhập để thêm bài hát vào playlist!');
+        navigate('/login', { state: { from: location.pathname } });
+      }
+  
+      // nếu đã đăng nhập thì mở dropdown playlist ở đây
+    };
 
   const handleToggle = () => {
     const next = !expanded;
@@ -67,7 +90,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
         // Kiểm tra lỗi Unauthorized
         if (error.message === 'Unauthorized') {
              alert("Vui lòng đăng nhập để tạo playlist.");
-             // navigate('/login'); // Chuyển hướng nếu cần
         } else {
              alert(`Đã xảy ra lỗi khi tạo playlist: ${error.message || 'Vui lòng thử lại.'}`);
         }
@@ -93,16 +115,28 @@ const Sidebar: React.FC<SidebarProps> = ({ onExpandChange }) => {
         </div>
         {expanded && <span className="btn-label">Music</span>}
       </button>
-
-      <button className="btn-CrePlaylist" onClick={handleCreatePlaylist}>
-        <div className="btn-icon">
-          <svg viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
-            <path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"/>
-          </svg>
-        </div>
-        {expanded && <span className="btn-label">Create Playlist</span>}
-      </button>
-
+      { isLoggedIn ?(
+        <button className="btn-CrePlaylist" onClick={handleCreatePlaylist}>
+          <div className="btn-icon">
+            <svg viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
+              <path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"/>
+            </svg>
+          </div>
+          {expanded && <span className="btn-label">Create Playlist</span>}
+        </button>
+        ):(
+          
+           <button className="btn-CrePlaylist" style={{ color: '#888', cursor: 'not-allowed' }} onClick={handleClick}>
+              <div className="btn-icon">
+                <svg viewBox="0 0 17 17" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M15.25 8a.75.75 0 0 1-.75.75H8.75v5.75a.75.75 0 0 1-1.5 0V8.75H1.5a.75.75 0 0 1 0-1.5h5.75V1.5a.75.75 0 0 1 1.5 0v5.75h5.75a.75.75 0 0 1 .75.75z"/>
+                </svg>
+              </div>
+              {expanded && <span className="btn-label">Create Playlist</span>}
+            </button>
+          
+        )
+      }
       {/* Tabs chỉ hiển thị khi expanded */}
       {expanded && (
         <div className="sidebar-tabs">

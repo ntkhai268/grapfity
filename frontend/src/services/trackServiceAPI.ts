@@ -38,7 +38,7 @@ const BACKEND_URL = 'http://localhost:8080'; // hoặc import từ config
 
 export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
   const uploaderInfo = trackFromApi.User
-    ? { username: trackFromApi.User.username || 'Unknown Artist' }
+    ? { username: trackFromApi.User.Name || 'Unknown Artist' }
     : undefined;
 
   const title = trackFromApi.Metadatum?.trackname || 'Unknown Title';

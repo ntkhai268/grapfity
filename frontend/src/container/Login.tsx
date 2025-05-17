@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/LoginForm.css";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -7,6 +8,9 @@ const LoginForm: React.FC = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || "/mainpage"; // hoặc "/" nếu không có trang cũ
 
   useEffect(() => {
     const container = document.querySelector(".container");
@@ -38,21 +42,24 @@ const LoginForm: React.FC = () => {
         roleId: number;
       } = await response.json();
   
-      if (response.ok && data.message === 'Login successful') {
-        // Lưu token và roleId nếu cần cho các request sau
+     if (response.ok && data.message === 'Login successful') {
         localStorage.setItem('token', data.token);
         localStorage.setItem('roleId', data.roleId.toString());
-  
+
         alert(data.message); // Thông báo đăng nhập thành công
-  
-        // Điều hướng theo roleId
-        if (data.roleId === 1) {
-          window.location.href = 'http://localhost:5173/mainpage';
-        } else if (data.roleId === 2) {
-          window.location.href = 'http://localhost:5173/adminpage';
+
+        if (redirectTo && redirectTo !== "/login") {
+          // 🔁 Quay lại trang người dùng vừa đứng trước khi login
+          navigate(redirectTo, { replace: true });
         } else {
-          // Trường hợp role khác
-          window.location.href = 'http://localhost:5173/';
+          // 🎯 Không có trang cũ → điều hướng theo roleId
+          if (data.roleId === 1) {
+            navigate('/mainpage', { replace: true });
+          } else if (data.roleId === 2) {
+            navigate('/adminpage', { replace: true });
+          } else {
+            navigate('/', { replace: true }); // fallback
+          }
         }
       } else {
         // Đăng nhập thất bại

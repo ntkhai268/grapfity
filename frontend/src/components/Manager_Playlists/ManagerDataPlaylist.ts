@@ -138,12 +138,15 @@ export interface TrackItem {
   src: string;         // Sẽ map với trackUrl từ API
   artist: string;      // Sẽ map với track.User.userName từ API
   cover: string;       // Sẽ map với track.imageUrl từ API
+  uploaderId?: number | string;
+
 }
 
 export interface PlaylistData {
   id: number;          // ID từ database
   title: string;
   artist: string;      // Có thể lấy từ playlist.User.userName hoặc bỏ đi nếu không cần ở cấp playlist
+  uploaderId?: number;     // 👈 ID của người tạo playlist 
   timeAgo: string;     // Sẽ được tính toán ở frontend từ createDate của API
   cover: string;       // Sẽ map với playlist.imageUrl từ API
   imageUrl?: string | null;

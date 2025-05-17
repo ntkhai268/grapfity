@@ -545,7 +545,7 @@ export interface Song {
           return false;
         }
       } else if ((newContext && !currentPlaylistContext) || (!newContext && currentPlaylistContext)) {
-        // return false;
+         return false;
       }
   
       if (playlist.length !== newPlaylist.length) {

@@ -32,6 +32,8 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     const [allTracks, setAllTracks] = useState<Song[]>([]); 
     const [isLoading, setIsLoading] = useState<boolean>(true);   
     const [error, setError] = useState<string | null>(null);    
+    const [currentPlayingId, setCurrentPlayingId] = useState<string | number | null>(null);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
     // Fetch dữ liệu khi component mount
     useEffect(() => {
@@ -59,6 +61,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
         fetchTracks();
     }, []); // Mảng rỗng đảm bảo chỉ chạy 1 lần
 
+
     // --- Chia nhỏ dữ liệu (sử dụng mảng Song[] đã map) ---
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
     const recommendedTracks: Song[] = allTracks.slice(0, 3); 
@@ -68,6 +71,16 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     const handleSidebarExpandChange = (expanded: boolean) => {
         setSidebarExpanded(expanded);
     };
+
+    useEffect(() => {
+    const unsubscribe = GlobalAudioManager.subscribe(() => {
+        const song = GlobalAudioManager.getCurrentSong();
+        setCurrentPlayingId(song?.id || null);
+        setIsPlaying(GlobalAudioManager.getIsPlaying());
+    });
+
+    return () => unsubscribe();
+    }, []);
 
     // Hàm xử lý click, nhận danh sách Song[] và index
     // Thêm tham số 'type' và 'contextId' để xác định ngữ cảnh playlist
@@ -105,6 +118,63 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
 
     };
 
+
+    const handleClicktest = (
+        song: Song,
+        list: Song[],
+        index: number,
+        type: PlaylistContext['type'],
+        contextId: string | number = type
+        ) => {
+        // 👉 1. Lưu vào localStorage để chống mất khi reload
+        localStorage.setItem("viewedSong", JSON.stringify(song));
+        localStorage.setItem("viewedPlaylist", JSON.stringify(list));
+        localStorage.setItem("viewedIndex", index.toString());
+
+        // 👉 2. Điều hướng sang trang ManagerSong, truyền kèm state
+        navigate("/ManagerSong", {
+            state: {
+            songs: list,
+            currentIndex: index,
+            currentSong: song,
+            context: { id: contextId, type },
+            },
+        });
+    };
+
+
+
+    const handlePlayButtonClick = (
+        list: Song[],
+        index: number,
+        type: PlaylistContext['type'],
+        contextId: string | number = type
+        ) => {
+        const clickedSong = list[index];
+        const currentSong = GlobalAudioManager.getCurrentSong();
+        const isCurrentlyPlaying = GlobalAudioManager.getIsPlaying();
+
+        const context: PlaylistContext = {
+            id: contextId,
+            type: type
+        };
+
+        // Nếu chưa có bài hát nào, hoặc bài khác đang phát → chuyển playlist và phát
+        if (!currentSong || currentSong.id !== clickedSong.id) {
+            GlobalAudioManager.setPlaylist(list, index, context);
+            GlobalAudioManager.playSongAt(index);
+            return;
+        }
+
+        // Nếu là bài hiện tại → toggle play/pause
+        if (isCurrentlyPlaying) {
+            GlobalAudioManager.pausePlayback();
+        } else {
+            GlobalAudioManager.playAudio(GlobalAudioManager.getAudioElement()!, clickedSong, context);
+        }
+    };
+
+
     return (
         <>
             <Sidebar onExpandChange={handleSidebarExpandChange} />
@@ -123,11 +193,37 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                             {recommendedTracks.length > 0 ? (
                                 recommendedTracks.map((song, index) => (
                                     // Truyền context type là 'queue' và id là 'recommended' (ví dụ)
-                                    <button key={`rec-${song.id}-${index}`} className="song-item" onClick={() => handleClick(recommendedTracks, index, 'queue', 'recommended')}> 
-                                        <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
-                                        <p className="title">{song.title || 'Unknown Title'}</p>
-                                        <p className="artist">{song.artist || 'Unknown Artist'}</p>
-                                    </button>
+                                        <button
+                                            key={`rec-${song.id}-${index}`}
+                                            className="song-item"
+                                           onClick={() => handleClicktest(song, recommendedTracks, index, 'queue', 'recommended')}
+
+                                            >
+                                            <div className="song-image-wrapper">
+                                                <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
+                                                
+                                                <div
+                                                className="play-button-section"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Ngăn chuyển trang
+                                                    handlePlayButtonClick(recommendedTracks, index, 'queue', 'recommended');
+                                                }}
+                                                >
+                                                <i
+                                                    className={
+                                                     currentPlayingId === song.id && isPlaying
+                                                        ? "fas fa-pause"
+                                                        : "fas fa-play"
+                                                    }
+                                                    style={{ color: "black" }}
+                                                ></i>
+                                                </div>
+                                            </div>
+
+                                            <p className="title">{song.title || 'Unknown Title'}</p>
+                                            <p className="artist">{song.artist || 'Unknown Artist'}</p>
+                                        </button>
+
                                 ))
                             ) : (
                                 <p>Không có bài hát nào được đề xuất.</p>
@@ -135,7 +231,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                         </div>
 
                         {/* --- SECTION 2: RECENTLY RELEASED --- */}
-                        <h1>Recently released</h1>
+                         <h1>Recently released</h1>
                         <div className="song-list song-list-circle">
                             {recentTracks.length > 0 ? (
                                 recentTracks.map((song, index) => (
