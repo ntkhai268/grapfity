@@ -12,7 +12,7 @@ const getAllPlaylistsByUserId = async (userId) => {
                     include: [
                         {
                             model: db.User,
-                            attributes: ['userName']
+                            attributes: ['id','userName','Name']
                         },
                         {
                             model: db.Metadata,
@@ -24,10 +24,7 @@ const getAllPlaylistsByUserId = async (userId) => {
                     ],
                     
                 },
-                {
-                    model: db.User,
-                    attributes: ['userName']
-                }
+                
             ],
         });
         return playlists;

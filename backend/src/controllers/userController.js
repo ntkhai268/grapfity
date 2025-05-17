@@ -156,6 +156,12 @@ const deleteUserController = async(req, res) => {
     }
 }
 
+
+const logoutController = (req, res) => {
+  res.clearCookie('jwt'); // tên cookie bạn đang dùng
+  req.session?.destroy?.(); // nếu dùng session
+  res.status(200).json({ message: 'Đăng xuất thành công' });
+};
 export {
     getAllUsersController,
     getUserByIdController,
@@ -163,5 +169,6 @@ export {
     createUserController,
     handleUserLoginController,
     updateUserController,
-    deleteUserController
+    deleteUserController,
+    logoutController
 };

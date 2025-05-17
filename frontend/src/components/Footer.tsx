@@ -13,6 +13,7 @@ interface FooterLeftProps {
 }
 
 const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
+   
   // Xử lý trường hợp song là null
   if (!song) {
     return (
@@ -30,9 +31,12 @@ const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
       </div>
     );
   }
+  // test xem có id ko 
+  //  console.log(song.id);
 
   // Render khi có song
   return (
+  
     <div className="footer-left">
       <div className="playing-song">
         <img src={song.cover || "/assets/anhmau.png"} alt={song.title || 'Song cover'} />
@@ -45,6 +49,7 @@ const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
         <img src="/assets/plus.png" alt="Add" />
       </button>
     </div>
+    
   );
 };
 

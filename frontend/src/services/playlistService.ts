@@ -40,12 +40,14 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
   return {
     id: playlistFromApi.id,
     title: playlistFromApi.title || 'Untitled Playlist',
-    artist: playlistFromApi.User?.userName || 'Unknown Artist',
+    artist: playlistFromApi.User?.Name || 'Unknown Artist',
+    uploaderId: playlistFromApi.User?.id,
     timeAgo: calculateTimeAgo(playlistFromApi.createDate),
     cover: cover,
 
     tracks: (playlistFromApi.Tracks || []).map((track: any): TrackItem => {
-      const trackArtist = track.User?.userName || 'Unknown Artist';
+      const trackArtist = track.User?.Name || 'Unknown Artist';
+      const uploaderId= track.User?.id;
 
       const trackTitle = track.Metadatum?.trackname || 'Unknown Title';
 
@@ -64,7 +66,8 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
         title: trackTitle,
         src: fullAudioUrl,
         artist: trackArtist,
-        cover: fullTrackImage
+        cover: fullTrackImage,
+        uploaderId: uploaderId
       };
     })
   };

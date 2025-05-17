@@ -6,9 +6,15 @@ const getAllTracks = async () => {
         where: {
             status: 'approved'
         },
-        include:{
-            model: db.Metadata
-        }
+        include: [
+            {
+                model: db.Metadata
+            },
+            {
+                model: db.User, // ✅ KHÔNG dùng `as`
+                attributes: ['id', 'Name']
+            }
+        ]
     }); // Lấy tất cả dữ liệu trong bảng Track
 };
 
@@ -43,7 +49,7 @@ const getTrackById = async (trackId) => {
                     as: 'User',     // Đảm bảo alias 'User' khớp với định nghĩa trong model Track
                                     // Ví dụ: Track.belongsTo(models.User, { as: 'User', ...})
                                     // Bỏ 'as' nếu không đặt alias cụ thể trong association.
-                    attributes: ['id', 'userName']
+                    attributes: ['id', 'Name']
                 },
                 {
                     model: db.Metadata,
@@ -101,7 +107,7 @@ const getTrackWithUploaderById = async (id) => {
         },
         include: {
             model: db.User,
-            attributes: ['username'],
+            attributes: ['username', 'Name'],
         }
     });
 };
@@ -127,7 +133,7 @@ const getTracksByUploaderId = async (userId) => {
                 {
                     model: db.User, // Thông tin người upload (chính là user đang truy vấn)
                     as: 'User',     // Đảm bảo alias khớp với model Track
-                    attributes: ['id', 'userName']
+                    attributes: ['id', 'Name']
                 },
                 {
                     model: db.Metadata,

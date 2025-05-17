@@ -16,13 +16,16 @@ interface TrackItem {
     title: string;
     src: string;
     artist: string;
+    uploaderId?: number; 
     cover: string | null;
     imageUrl?: string | null;
+    
 }
 interface PlaylistData {
     id: number;
     title: string;
     artist: string;
+    uploaderId?: number; 
     timeAgo: string;
     cover: string | null;
     imageUrl?: string | null;

@@ -117,8 +117,9 @@ const SongList: React.FC = () => {
               <p className="artist">{song.artist || 'Unknown Artist'}</p>
               <div className="audio"></div> 
               <SongOptionOfUser
-                 onEdit={() => setEditingSongId(Number(song.id))} // nút chỉnh sửa nhạc ở đây
+                onEdit={() => setEditingSongId(Number(song.id))} // nút chỉnh sửa nhạc ở đây
                 onDelete={() => handleDeleteTrack(Number(song.id))}
+                trackId={Number(song.id)}
               />
             </div>
              {editingSongId === Number(song.id) && (
