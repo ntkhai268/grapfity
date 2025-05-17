@@ -53,11 +53,49 @@ const deleteTrack = async (id) => {
     })
 };
 
+//dangkhoi them
+const getTracksByUserId = async (userId) => {
+    return await db.Track.findAll({
+      where: { uploaderId: userId },
+      include: { model: db.Metadata }    // tương tự getAllTracks :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+    });
+  };
+
+  const updateTrackStatus = async (id, status) => {
+    const track = await db.Track.findByPk(id);
+    if (!track) throw new Error('Track not found');
+    return await track.update({ status });
+  };
+  const getJoinedTracks = async () => {
+    return await db.listeningHistory.findAll({
+      attributes: ['listenCount'],        // chỉ cần số lần nghe
+      include: [
+        {
+          association: 'metadata',        // tên bài
+          attributes: ['trackname']
+        },
+        {
+          association: 'track',           // url, ảnh, tác giả
+          attributes: ['trackUrl', 'imageUrl', 'uploaderId']
+        },
+        {
+          association: 'listener',        // người nghe
+          attributes: [
+            'id',
+            ['name', 'Name']              // alias → Name
+          ]
+        }
+      ]
+    });
+  };
 export {
     getAllTracks,
     getTrackById,
     getTrackWithUploaderById,
     createTrack,
     updateTrack,
-    deleteTrack
+    deleteTrack,
+    getTracksByUserId,
+    getJoinedTracks,
+    updateTrackStatus
 };

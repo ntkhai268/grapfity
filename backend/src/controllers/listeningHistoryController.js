@@ -1,5 +1,9 @@
-import { getListeningHistoryOfUser, trackingListeningHistory } from '../services/listeningHistory_service.js';
-import { verityJWT } from '../middleware/JWTActions.js';
+import {
+    getListeningHistoryOfUser,
+    trackingListeningHistory,
+    getAllListeningHistory    // import thêm
+  } from '../services/listeningHistory_service.js';
+  import { verityJWT } from '../middleware/JWTActions.js';
 
 const getListeningHistoryOfUserController = async (req, res) => {
     const JWT = req.cookies;
@@ -29,8 +33,23 @@ const trackingListeningHistoryController = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-export {
+// Controller mới:
+const getAllListeningHistoryController = async (req, res) => {
+    try {
+      const histories = await getAllListeningHistory();
+      return res.status(200).json({
+        message: 'Lấy tất cả lịch sử nghe thành công',
+        histories
+      });
+    } catch (err) {
+      console.error('Error fetching all histories:', err);
+      return res.status(500).json({ error: err.message || 'Unknown error' });
+    }
+  };
+  
+  
+  export {
     getListeningHistoryOfUserController,
-    trackingListeningHistoryController
-};
+    trackingListeningHistoryController,
+    getAllListeningHistoryController 
+  };

@@ -1,3 +1,4 @@
+// src/models/track.js
 'use strict';
 import { Model } from 'sequelize';
 
@@ -21,7 +22,8 @@ export default (sequelize, DataTypes) => {
       });
 
       Track.hasMany(models.listeningHistory, {
-        foreignKey: 'trackId'
+        foreignKey: 'trackId',
+        as: 'listeningHistories'
       });
 
       Track.hasOne(models.Metadata, {
@@ -33,18 +35,19 @@ export default (sequelize, DataTypes) => {
   }
 
   Track.init({
-    trackUrl: DataTypes.STRING,
-    imageUrl: DataTypes.STRING,
-    uploaderId: DataTypes.INTEGER
+    trackUrl:   DataTypes.STRING,
+    imageUrl:   DataTypes.STRING,
+    uploaderId: DataTypes.INTEGER,
+    status:     DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Track'
   });
 
   Track.addHook('afterDestroy', async (track, options) => {
-    const {Track} = sequelize.models;
-    await Track.destroy({ where: { trackId: track.id }, transaction: options.transaction});
-  })
+    const { listeningHistory } = sequelize.models;
+    await listeningHistory.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+  });
 
   return Track;
 };

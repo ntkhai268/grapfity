@@ -3,10 +3,17 @@ import "../styles/LoginForm.css";
 import { GoogleLogin } from "@react-oauth/google";
 
 const LoginForm: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  // --- Login form state ---
+  const [loginUsername, setLoginUsername] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
+
+  // --- Register form state ---
+  const [regUsername, setRegUsername] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regConfirmPassword, setRegConfirmPassword] = useState("");
+  const [regError, setRegError] = useState<string | null>(null);
 
   useEffect(() => {
     const container = document.querySelector(".container");
@@ -15,52 +22,55 @@ const LoginForm: React.FC = () => {
 
     registerBtn?.addEventListener("click", () => {
       container?.classList.add("active");
+      setLoginError(null);
+      setRegError(null);
     });
 
     loginBtn?.addEventListener("click", () => {
       container?.classList.remove("active");
+      setLoginError(null);
+      setRegError(null);
     });
   }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoginError(null);
     try {
-      const response = await fetch('http://localhost:8080/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ username, password }),
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          username: loginUsername,
+          password: loginPassword,
+        }),
       });
-  
+
       const data: {
         message: string;
-        token: string;
-        roleId: number;
+        token?: string;
+        roleId?: number;
       } = await response.json();
-  
-      if (response.ok && data.message === 'Login successful') {
-        // Lưu token và roleId nếu cần cho các request sau
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('roleId', data.roleId.toString());
-  
-        alert(data.message); // Thông báo đăng nhập thành công
-  
-        // Điều hướng theo roleId
+
+      if (response.ok && data.token && data.roleId != null) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("roleId", data.roleId.toString());
+        alert(data.message);
+
         if (data.roleId === 1) {
-          window.location.href = 'http://localhost:5173/mainpage';
+          window.location.href = "http://localhost:5173/mainpage";
         } else if (data.roleId === 2) {
-          window.location.href = 'http://localhost:5173/adminpage';
+          window.location.href = "http://localhost:5173/admin";
         } else {
-          // Trường hợp role khác
-          window.location.href = 'http://localhost:5173/';
+          window.location.href = "http://localhost:5173/";
         }
       } else {
-        // Đăng nhập thất bại
-        alert(data.message);
+        setLoginError(data.message || "Login failed");
       }
     } catch (err) {
-      console.error('Lỗi kết nối server:', err);
-      alert('Không thể kết nối đến máy chủ.');
+      console.error("Lỗi kết nối server:", err);
+      setLoginError("Không thể kết nối đến máy chủ.");
     }
   };
 
@@ -87,50 +97,63 @@ const LoginForm: React.FC = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    const roleid = 1; // Mặc định roleId là 1
+    setRegError(null);
+
+    if (regPassword !== regConfirmPassword) {
+      setRegError("Mật khẩu và xác nhận mật khẩu phải khớp");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:8080/api/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password, roleid }),
+        credentials: "include",
+        body: JSON.stringify({
+          userName: regUsername,
+          email: regEmail,
+          password: regPassword,
+          roleId: 1, // mặc định roleId 1 cho user thường
+        }),
       });
-      const data = await response.json();
+      const data: { message: string } = await response.json();
+
       if (response.ok) {
         alert("Đăng ký thành công!");
-        window.location.href = "http://localhost:5173/mainpage"; // Chuyển hướng sau khi đăng ký thành công
+        window.location.href = "http://localhost:5173/mainpage";
       } else {
-        alert(data.error || "Đăng ký thất bại!");
+        setRegError(data.message || "Đăng ký thất bại!");
       }
     } catch (err) {
       console.error("Lỗi kết nối server:", err);
-      alert("Không thể kết nối đến máy chủ.");
+      setRegError("Không thể kết nối đến máy chủ.");
     }
   };
 
   return (
     <div className="container">
+      {/* LOGIN */}
       <div className="form-box login">
         <form onSubmit={handleLogin}>
           <h1>Login</h1>
+          {loginError && <div className="error-text">{loginError}</div>}
           <div className="input-box">
             <input
               type="text"
               placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={loginUsername}
+              onChange={(e) => setLoginUsername(e.target.value)}
               required
             />
-            <i className="bx bxs-user"></i>
           </div>
           <div className="input-box">
             <input
               type="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
               required
             />
-            <i className="bx bxs-lock-alt"></i>
           </div>
           <div className="forgot-link">
             <a href="#">Forgot Password?</a>
@@ -148,38 +171,46 @@ const LoginForm: React.FC = () => {
         </form>
       </div>
 
+      {/* REGISTER */}
       <div className="form-box register">
         <form onSubmit={handleRegister}>
           <h1>Registration</h1>
+          {regError && <div className="error-text">{regError}</div>}
           <div className="input-box">
             <input
               type="text"
               placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={regUsername}
+              onChange={(e) => setRegUsername(e.target.value)}
               required
             />
-            <i className="bx bxs-user"></i>
           </div>
           <div className="input-box">
             <input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={regEmail}
+              onChange={(e) => setRegEmail(e.target.value)}
               required
             />
-            <i className="bx bxs-envelope"></i>
           </div>
           <div className="input-box">
             <input
               type="password"
               placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={regPassword}
+              onChange={(e) => setRegPassword(e.target.value)}
               required
             />
-            <i className="bx bxs-lock-alt"></i>
+          </div>
+          <div className="input-box">
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={regConfirmPassword}
+              onChange={(e) => setRegConfirmPassword(e.target.value)}
+              required
+            />
           </div>
           <button type="submit" className="btn">
             Register
@@ -194,6 +225,7 @@ const LoginForm: React.FC = () => {
         </form>
       </div>
 
+      {/* TOGGLE PANELS */}
       <div className="toggle-box">
         <div className="toggle-panel toggle-left">
           <h1>Graptify</h1>

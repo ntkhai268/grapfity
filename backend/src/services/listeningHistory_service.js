@@ -17,8 +17,21 @@ const trackingListeningHistory = async (userId, trackId) => {
     await history.save();
     return history;
 };
-
-export {
+const getAllListeningHistory = async () => {
+    return await db.listeningHistory.findAll({
+      attributes: [
+        'id',
+        'userId',
+        'trackId',
+        'listenCount',
+        'createdAt',
+        'updatedAt'
+      ]
+    });
+  };
+  
+  export {
     getListeningHistoryOfUser,
-    trackingListeningHistory
-};
+    trackingListeningHistory,
+    getAllListeningHistory    // xuất thêm
+  };

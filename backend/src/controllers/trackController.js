@@ -5,7 +5,10 @@ import {
     createTrack,
     updateTrack,
     deleteTrack,
-    getTrackWithUploaderById
+    getTrackWithUploaderById,
+    getTracksByUserId,
+    getJoinedTracks,
+    updateTrackStatus  
 } from '../services/track_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 import * as mm from 'music-metadata';
@@ -116,11 +119,71 @@ const deleteTrackController = async (req, res) => {
     }
 };
 
+//dangkhoii them
+const getTracksByUserController = async (req, res) => {
+    try {
+      const { jwt } = req.cookies;                  // userID được lưu trong JWT cookie
+      const { userId } = verityJWT(jwt);            // giải mã :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
+      const tracks = await getTracksByUserId(userId);
+      return res.status(200).json({
+        message: 'Get user tracks succeed!',
+        data: tracks
+      });
+    } catch (err) {
+      console.error('Error fetching user tracks:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+  };
+  const updateTrackStatusController = async (req, res) => {
+    // 1. Parse và validate id
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid track id' });
+    }
+  
+    // 2. Validate status
+    const { status } = req.body;
+    if (!status || typeof status !== 'string') {
+      return res.status(400).json({ message: 'Missing or invalid status' });
+    }
+  
+    try {
+      // 3. Cập nhật
+      const updatedTrack = await updateTrackStatus(id, status);
+  
+      // 4. Trả về kết quả
+      return res.status(200).json({
+        message: 'Update track status succeed!',
+        data: updatedTrack
+      });
+    } catch (err) {
+      console.error('Error updating track status:', err);
+      if (err.message === 'Track not found') {
+        return res.status(404).json({ message: 'Track not found' });
+      }
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+  const getJoinedTracksController = async (req, res) => {
+    try {
+      const data = await getJoinedTracks();
+      return res.status(200).json({
+        message: 'Get joined tracks succeed!',
+        data,
+      });
+    } catch (err) {
+      console.error('Error fetching joined tracks:', err);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
 export {
     getAllTracksController,
     getTrackByIdController,
     getTrackWithUploaderByIdController,
     createTrackController,
     updateTrackController,
-    deleteTrackController
+    deleteTrackController,
+    getTracksByUserController,
+    updateTrackStatusController,
+    getJoinedTracksController
 };
