@@ -32,7 +32,7 @@ const SongHeader: React.FC<SongHeaderProps> = ({ onColorExtract, currentTrackId 
   const [displayedSong, setDisplayedSong] = useState<Song | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
+  
   // useEffect để fetch thông tin bài hát khi currentTrackId thay đổi
   useEffect(() => {
     if (currentTrackId) {
