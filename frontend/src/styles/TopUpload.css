@@ -120,6 +120,8 @@
   
   .track-title {
     font-size: 14px;
+    color: #777;
+    font-size: 14px;
   }
   
   /* Phần Top Listeners */
@@ -216,5 +218,19 @@
     .tracks-list {
       gap: 10px; /* Giảm khoảng cách giữa các item */
     }
+  }
+  .track-item .track-icon {
+    width: 50px;    /* hoặc tuỳ bạn */
+    height: 50px; 
+    overflow: hidden;
+    border-radius: 8px;
+    background: #eee;
+    margin-bottom: 8px;
+  }
+  
+  .track-item .track-icon img.track-cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
   

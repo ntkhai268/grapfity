@@ -5,7 +5,10 @@ import {
     createTrackController,
     updateTrackController,
     deleteTrackController,
-    getTrackWithUploaderByIdController
+    getTrackWithUploaderByIdController,
+    getTracksByUserController,
+    getJoinedTracksController,
+    updateTrackStatusController
 } from '../controllers/trackController.js';
 
 const router = express.Router();
@@ -37,5 +40,7 @@ router.post('/create-track', upload.fields([
 ]), createTrackController);
 router.put('/update-track', updateTrackController);
 router.delete('/delete-track/:id', deleteTrackController);
-
+router.get('/tracks/user', getTracksByUserController);
+router.patch('/tracks/:id/status',updateTrackStatusController);
+router.get('/tracks/joined', getJoinedTracksController);
 export default router;

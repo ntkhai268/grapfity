@@ -10,41 +10,45 @@ const getUserById = async (id) => {
     return await db.User.findByPk(id); // Lấy dữ liệu của user theo id
 };
 
-const createUser = async (userName, email, password, roleId) => {
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        password = hashedPassword;
-    } catch (err) {
-        console.error('Error hashing password:', err);
-        throw new Error('Error hashing password');
+const createUserService = async (payload) => {
+  try {
+    // 1. Kiểm tra email đã tồn tại chưa
+    const existingEmail = await db.User.findOne({ where: { email: payload.email } });
+    if (existingEmail) {
+      return { message: 'Email already exists' };
     }
 
-    try {
-        const user = await db.User.findOne({ where: { email } });
-        if (user) {
-            return { message: 'Email already exists' };
-        }
-    } catch (err) {
-        console.error('Error checking email:', err);
-        throw new Error('Error checking email');
+    // 2. Kiểm tra userName đã tồn tại chưa
+    const existingUserName = await db.User.findOne({ where: { userName: payload.userName } });
+    if (existingUserName) {
+      return { message: 'Username already exists' };
     }
 
-    try {
-        const userNameExists = await db.User.findOne({ where: { userName } });
-        if (userNameExists) {
-            return { message: 'Username already exists' };
-        }
-    } catch (err) {
-        console.error('Error checking username:', err);
-        throw new Error('Error checking username');
-    }
+    // 3. Hash password
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
 
-    const newUser = await db.User.create({ email, password, userName, roleId });
-    const payload = { userId: newUser.id };
-    const token = createJWT(payload);
-    return { message: 'Register successful', token: token };
+    // 4. Tạo record mới
+    const newUser = await db.User.create({
+      userName: payload.userName,
+      email: payload.email,
+      password: hashedPassword,
+      roleId: payload.roleId,
+      Name: payload.Name || null,
+      Birthday: payload.Birthday ? new Date(payload.Birthday) : null,
+      Address: payload.Address || null,
+      PhoneNumber: payload.PhoneNumber || null
+    });
 
+    return {
+      message: 'Register successful',
+      user: newUser
+    };
+  } catch (err) {
+    console.error('Error in createUserService:', err);
+    throw new Error('Error creating user');
+  }
 };
+
 
 const handleUserLogin = async (username, password) => {
     try {
@@ -69,25 +73,51 @@ const handleUserLogin = async (username, password) => {
     }
 };
 
-const updateUser = async (id, userName, email, password, roleId) => {
+const updateUserService = async (
+    id,
+    userName,
+    email,
+    password,
+    roleId,
+    Name,
+    Birthday,
+    Address,
+    PhoneNumber
+  ) => {
+    // Tìm user theo khóa chính
     const user = await db.User.findByPk(id);
-    if (!user) {
-        return { message: 'User not found' };
+    if (!user) return null;
+  
+    // Xây dựng đối tượng cập nhật
+    const updateData = {
+      userName,
+      email,
+      roleId,
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    };
+  
+    // Nếu có password mới, hash rồi gán vào updateData
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
     }
-
-    const updatedUser = await user.update({ userName, email, password, roleId });
-    return updatedUser;
-};
-
-const deleteUser = async (userId) => {
-    return await db.User.destroy({ where: { id: userId }, individualHooks: true})
-}
+  
+    // Thực hiện cập nhật
+    await user.update(updateData);
+    return user;
+  };
+  
+const deleteUser = async (id) => {
+    return db.User.destroy({ where: { id } });
+  };
 
 export {
     getAllUsers,
     getUserById,
-    createUser,
+    createUserService,
     handleUserLogin,
-    updateUser,
+    updateUserService,
     deleteUser
 };
