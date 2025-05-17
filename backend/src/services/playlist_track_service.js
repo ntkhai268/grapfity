@@ -169,7 +169,7 @@ const getPlaylistDetailsById = async (playlistId) => {
             include: [
                 {
                     model: db.User, // User tạo Playlist
-                    attributes: ['id', 'userName'] 
+                    attributes: ['id', 'userName', 'Name'] 
                 },
                 {
                     model: db.Track,
@@ -181,7 +181,7 @@ const getPlaylistDetailsById = async (playlistId) => {
                     include: [ // <<< LỒNG INCLUDE CHO TRACK
                         {
                             model: db.User, // User upload Track
-                            attributes: ['id', 'userName'],
+                            attributes: ['id', 'userName', 'Name'],
                             // Nếu có alias trong model Track.belongsTo(User), dùng as: '...'
                         },
                         {
