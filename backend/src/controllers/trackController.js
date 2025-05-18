@@ -136,7 +136,6 @@ const getTracksByUserController = async (req, res) => {
         ...t,
         listeningHistories: (t.listeningHistories || []).map(hist => ({
         metadata: hist.metadata,
-        artis: hist.track.User,
           listenCount: hist.listenCount,
           listener: hist.listener
         }))

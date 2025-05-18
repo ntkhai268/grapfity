@@ -57,10 +57,15 @@ const deleteTrack = async (id) => {
 const getTracksByUserId = async (userId) => {
   return await db.Track.findAll({
     where: { uploaderId: userId },
+    
     include: [
       // 1) Lấy trackname từ Metadata, dùng alias 'Metadatum'
       // 2) Lấy lịch sử nghe, dùng alias 'listeningHistories'
-      
+      {
+        model: db.User,
+        attributes: [['name', 'UploaderName']],
+        required: false
+      },
       {
         model: db.listeningHistory,
         as: 'listeningHistories',
