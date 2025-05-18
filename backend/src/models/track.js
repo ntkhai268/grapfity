@@ -44,6 +44,14 @@ export default (sequelize, DataTypes) => {
       validate: {
         isIn: [['pending', 'approved', 'rejected']]
       }
+    },
+    privacy: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'public',
+      validate: {
+        isIn: [['public', 'private']]
+      }
     }
   }, {
     sequelize,
