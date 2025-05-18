@@ -1,30 +1,32 @@
-// src/services/trackService.ts
 import axios from "axios";
 
 // Interface representing a joined track item from the API
 export interface JoinedTrack {
-  listenCount: number;
+  id: number;
+  trackUrl: string;
+  imageUrl: string;
+  uploaderId: number;
+  status: "pending" | "approved" | "rejected";
   createdAt: string;
-  metadata: {
+  Metadatum: {
     trackname?: string;
     release_date?: string;
   } | null;
-  track: {
-    id: number;
-    trackUrl: string;
-    imageUrl: string;
-    uploaderId: number;
-    status: "pending" | "approved" | "rejected";
-  createdAt: string;
-    User: {
+  User: {
+    UploaderName: string;
+  };
+  listeningHistories: {
+    listenCount: number;
+    createdAt: string;
+    metadata: {
+      trackname?: string;
+      release_date?: string;
+    } | null;
+    listener: {
       id: number;
-      UploaderName: string;
+      Name: string;
     };
-  };
-  listener: {
-    id: number;
-    Name: string;
-  };
+  }[];
 }
 
 // API response shape for joined tracks
@@ -41,9 +43,6 @@ export const fetchJoinedTracks = async (): Promise<JoinedTrack[]> => {
   return res.data.data;
 };
 
-// (Optional) Keep or refactor original fetchTracks if still needed
-// export const fetchTracks = async (): Promise<TrackType[]> => { ... }
-
 // Update a track's status (pending / approved / rejected)
 export const updateTrackStatus = async (
   id: number,
@@ -55,4 +54,3 @@ export const updateTrackStatus = async (
   );
   return res.data.data;
 };
-

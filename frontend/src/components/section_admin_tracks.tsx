@@ -1,13 +1,11 @@
-// src/components/Section_admin_tracks.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   fetchJoinedTracks,
   JoinedTrack,
   updateTrackStatus,
-} from "../services/trackService"; // sử dụng service mới :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
+} from "../services/trackService";
 import "../styles/admin.css";
 
-// import tất cả hình ảnh trong assets/images
 const imageModules = import.meta.glob(
   "../assets/images/*.{png,jpg,jpeg,svg}",
   { eager: true, as: "url" }
@@ -26,15 +24,13 @@ const Section_admin_tracks: React.FC = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
-  // Load all pending tracks
   const loadPending = async () => {
     try {
       const data = await fetchJoinedTracks();
-      const pending = data.filter((t) => t.track.status === "pending");
+      const pending = data.filter((t) => t.status === "pending");
       setTracks(pending);
-      // reset checkbox
       const initChecks: Record<number, boolean> = {};
-      pending.forEach((t) => (initChecks[t.track.id] = false));
+      pending.forEach((t) => (initChecks[t.id] = false));
       setCheckedRows(initChecks);
       setAllChecked(false);
     } catch (err) {
@@ -46,7 +42,6 @@ const Section_admin_tracks: React.FC = () => {
     loadPending();
   }, []);
 
-  // click outside để đóng dropdown
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
@@ -57,45 +52,36 @@ const Section_admin_tracks: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // format ngày (ISO string)
-  const formatDate = (iso?: string) => {
-    if (!iso) return "N/A";
-    return new Date(iso).toLocaleDateString();
-  };
+  const formatDate = (iso?: string) =>
+    iso ? new Date(iso).toLocaleDateString() : "N/A";
 
-  // filter theo track name hoặc uploader name
   const displayedTracks = tracks.filter((t) => {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return true;
-    const name = (t.metadata?.trackname || `Track ${t.track.id}`)
-      .toLowerCase();
-    const artist = t.track.User.UploaderName.toLowerCase();
+    const name = (t.Metadatum?.trackname || `Track ${t.id}`).toLowerCase();
+    const artist = t.User?.UploaderName?.toLowerCase() || "";
     return name.includes(term) || artist.includes(term);
   });
 
-  // count đã chọn
-  const selectedCount = displayedTracks.filter((t) => checkedRows[t.track.id]).length;
+  const selectedCount = displayedTracks.filter((t) => checkedRows[t.id]).length;
 
-  // checkbox tất cả
   const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setAllChecked(checked);
     const updated: Record<number, boolean> = {};
     displayedTracks.forEach((t) => {
-      updated[t.track.id] = checked;
+      updated[t.id] = checked;
     });
     setCheckedRows((prev) => ({ ...prev, ...updated }));
   };
 
-  // checkbox từng dòng
   const handleCheckRow = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     const updated = { ...checkedRows, [id]: checked };
     setCheckedRows(updated);
-    setAllChecked(displayedTracks.every((t) => updated[t.track.id]));
+    setAllChecked(displayedTracks.every((t) => updated[t.id]));
   };
 
-  // approve/reject single
   const handleApproveClick = async (id: number) => {
     try {
       await updateTrackStatus(id, "approved");
@@ -104,6 +90,7 @@ const Section_admin_tracks: React.FC = () => {
       console.error("Lỗi khi cập nhật status:", err);
     }
   };
+
   const handleDeleteClick = async (id: number) => {
     try {
       await updateTrackStatus(id, "rejected");
@@ -113,25 +100,25 @@ const Section_admin_tracks: React.FC = () => {
     }
   };
 
-  // bulk actions
   const handleBulkApprove = async () => {
     try {
       await Promise.all(
         displayedTracks
-          .filter((t) => checkedRows[t.track.id])
-          .map((t) => updateTrackStatus(t.track.id, "approved"))
+          .filter((t) => checkedRows[t.id])
+          .map((t) => updateTrackStatus(t.id, "approved"))
       );
       await loadPending();
     } catch (err) {
       console.error("Lỗi khi bulk approve:", err);
     }
   };
+
   const handleBulkReject = async () => {
     try {
       await Promise.all(
         displayedTracks
-          .filter((t) => checkedRows[t.track.id])
-          .map((t) => updateTrackStatus(t.track.id, "rejected"))
+          .filter((t) => checkedRows[t.id])
+          .map((t) => updateTrackStatus(t.id, "rejected"))
       );
       await loadPending();
     } catch (err) {
@@ -139,36 +126,35 @@ const Section_admin_tracks: React.FC = () => {
     }
   };
 
-  // sort theo tên hoặc ngày phát hành
   const handleSort = (option: string) => {
     let sorted = [...tracks];
     switch (option) {
       case "name-asc":
         sorted.sort((a, b) =>
-          (a.metadata?.trackname || "").toLowerCase().localeCompare(
-            (b.metadata?.trackname || "").toLowerCase()
+          (a.Metadatum?.trackname || "").localeCompare(
+            b.Metadatum?.trackname || ""
           )
         );
         break;
       case "name-desc":
         sorted.sort((a, b) =>
-          (b.metadata?.trackname || "").toLowerCase().localeCompare(
-            (a.metadata?.trackname || "").toLowerCase()
+          (b.Metadatum?.trackname || "").localeCompare(
+            a.Metadatum?.trackname || ""
           )
         );
         break;
       case "date-asc":
         sorted.sort(
           (a, b) =>
-            new Date(a.metadata?.release_date || "").getTime() -
-            new Date(b.metadata?.release_date || "").getTime()
+            new Date(a.Metadatum?.release_date || "").getTime() -
+            new Date(b.Metadatum?.release_date || "").getTime()
         );
         break;
       case "date-desc":
         sorted.sort(
           (a, b) =>
-            new Date(b.metadata?.release_date || "").getTime() -
-            new Date(a.metadata?.release_date || "").getTime()
+            new Date(b.Metadatum?.release_date || "").getTime() -
+            new Date(a.Metadatum?.release_date || "").getTime()
         );
         break;
       default:
@@ -191,9 +177,7 @@ const Section_admin_tracks: React.FC = () => {
           />
         </div>
         <div className="user_actions_admin">
-          <span className="selected_count_admin">
-            {selectedCount} Selected
-          </span>
+          <span className="selected_count_admin">{selectedCount} Selected</span>
           <button
             className="delete_button_admin"
             disabled={selectedCount === 0}
@@ -257,25 +241,22 @@ const Section_admin_tracks: React.FC = () => {
         </div>
 
         {displayedTracks.map((t) => {
-          const hasRelease = t.track.status !== "pending";
-          const statusClass = hasRelease
-            ? "status_active_admin"
-            : "status_pending_admin";
-          const statusText = hasRelease ? "Active" : "Pending";
-          const title = t.metadata?.trackname || `Track ${t.track.id}`;
-          const fileName = t.track.imageUrl.split("/").pop()!;
+          const title = t.Metadatum?.trackname || `Track ${t.id}`;
+          const fileName = t.imageUrl.split("/").pop()!;
           const imgSrc = imageMap[fileName] || "";
-          const artist = t.track.User.UploaderName;
-          const day = formatDate(t.metadata?.release_date);
+          const artist = t.User?.UploaderName || "N/A";
+          const day = formatDate(t.createdAt);
+          const statusClass = "status_pending_admin";
+          const statusText = "Pending";
 
           return (
-            <div className="table_row_admin" key={t.track.id}>
+            <div className="table_row_admin" key={t.id}>
               <div className="table_cell_admin checkbox_cell_admin">
                 <input
                   type="checkbox"
                   className="checkbox_admin"
-                  checked={checkedRows[t.track.id] || false}
-                  onChange={handleCheckRow(t.track.id)}
+                  checked={checkedRows[t.id] || false}
+                  onChange={handleCheckRow(t.id)}
                 />
               </div>
               <div className="table_cell_admin name_cell_admin">
@@ -287,14 +268,14 @@ const Section_admin_tracks: React.FC = () => {
                   />
                   <div className="user_details_admin">
                     <div className="user_name_admin">{title}</div>
-                    <div className="user_email_admin">ID: {t.track.id}</div>
+                    <div className="user_email_admin">ID: {t.id}</div>
                   </div>
                 </div>
               </div>
               <div className="table_cell_admin position_cell_admin">
                 <div className="position_title_admin">{artist}</div>
               </div>
-              <div className="table_cell_admin country_cell_admin">{formatDate(t.track.createdAt)}</div>
+              <div className="table_cell_admin country_cell_admin">{day}</div>
               <div className="table_cell_admin status_cell_admin">
                 <span className={`status_badge_admin ${statusClass}`}>
                   <span className="status_dot_admin" /> {statusText}
@@ -303,15 +284,15 @@ const Section_admin_tracks: React.FC = () => {
               <div className="table_cell_admin action_cell_admin">
                 <button
                   className="edit_button_admin"
-                  disabled={!checkedRows[t.track.id]}
-                  onClick={() => handleApproveClick(t.track.id)}
+                  disabled={!checkedRows[t.id]}
+                  onClick={() => handleApproveClick(t.id)}
                 >
                   Approve
                 </button>
                 <button
                   className="delete_row_button_admin"
-                  disabled={!checkedRows[t.track.id]}
-                  onClick={() => handleDeleteClick(t.track.id)}
+                  disabled={!checkedRows[t.id]}
+                  onClick={() => handleDeleteClick(t.id)}
                 >
                   Rejected
                 </button>
