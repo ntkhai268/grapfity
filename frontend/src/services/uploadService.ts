@@ -15,7 +15,7 @@ export interface MinimalTrack {
 }
 
 export interface Artist {
-  id: number;
+  id?: number; // optional vì trong dữ liệu hiện tại không có id
   UploaderName: string;
 }
 
@@ -33,11 +33,6 @@ function toPublicPath(p: string): string {
     .replace(/^\/+/, '/');
 }
 
-
-/**
- * Lấy track của user, tính tổng listenCount từ listeningHistories, rồi sort giảm dần.
- * Component chỉ cần slice(0, N) nếu muốn lấy top N.
- */
 export async function getUserTracks(): Promise<TrackWithCount[]> {
   const res = await axios.get<{
     message: string;
@@ -49,9 +44,9 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       status: string;
       createdAt: string;
       updatedAt: string;
+      User: { UploaderName: string };
       listeningHistories: Array<{
         metadata: { trackname: string } | null;
-        artis: Artist | null;
         listenCount: number;
         listener: { id: number; Name: string };
       }>;
@@ -59,16 +54,13 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
   }>('/api/tracks/user');
 
   const tracks: TrackWithCount[] = res.data.data.map(item => {
-    // tính tổng listenCount
-    const totalCount = item.listeningHistories.reduce((sum, h) => sum + h.listenCount, 0);
+    const totalCount = item.listeningHistories.reduce(
+      (sum, h) => sum + h.listenCount,
+      0
+    );
 
-    // lấy trackName từ metadata đầu tiên có giá trị
     const metaEntry = item.listeningHistories.find(h => h.metadata?.trackname);
     const trackName = metaEntry?.metadata?.trackname ?? null;
-
-    // lấy artist từ listeningHistories
-    const artEntry = item.listeningHistories.find(h => h.artis != null)?.artis;
-    const artist = artEntry ? { id: artEntry.id, UploaderName: artEntry.UploaderName } : undefined;
 
     const base: MinimalTrack = {
       id: item.id,
@@ -84,11 +76,10 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       ...base,
       listenCount: totalCount,
       trackName,
-      artist,
+      artist: item.User ? { UploaderName: item.User.UploaderName } : undefined,
     };
   });
 
-  // sort giảm dần theo listenCount
   tracks.sort((a, b) => b.listenCount - a.listenCount);
   return tracks;
 }
