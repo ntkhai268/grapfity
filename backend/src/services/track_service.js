@@ -84,22 +84,31 @@ const getTracksByUserId = async (userId) => {
     return await track.update({ status });
   };
   const getJoinedTracks = async () => {
-    return await db.listeningHistory.findAll({
-      attributes: ['listenCount'],        // chỉ cần số lần nghe
+    return await db.Track.findAll({
+      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
       include: [
         {
-          association: 'metadata',        // tên bài
-          attributes: ['trackname']
+          model: db.Metadata,
+          attributes: ['trackname'],
+          required: false
         },
         {
-          association: 'track',           // url, ảnh, tác giả
-          attributes: ['trackUrl', 'imageUrl', 'uploaderId']
+          model: db.User,
+          attributes: [['name', 'UploaderName']],
+          required: false
         },
         {
-          association: 'listener',        // người nghe
-          attributes: [
-            'id',
-            ['name', 'Name']              // alias → Name
+          model: db.listeningHistory,
+          as: 'listeningHistories',
+          attributes: ['listenCount', 'createdAt'],
+          required: false,
+          include: [
+            {
+              model: db.User,
+              as: 'listener',
+              attributes: [['name', 'Name']],
+              required: false
+            }
           ]
         }
       ]
