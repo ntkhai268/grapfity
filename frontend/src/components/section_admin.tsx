@@ -171,7 +171,7 @@ const Section_admin: React.FC = () => {
                 {t.track.User.UploaderName}
               </div>
               <div className="table_cell_admin country_cell_admin">
-                {formatDate(t.metadata?.release_date)}
+              {formatDate(t.track.createdAt)}
               </div>
               <div className="table_cell_admin status_cell_admin">
                 <span className={`status_badge_admin ${statusClass}`}>

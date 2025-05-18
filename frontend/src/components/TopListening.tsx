@@ -4,126 +4,149 @@ import { Link } from "react-router-dom";
 import "../styles/TopListening.css";
 import {
   fetchListeningHistory,
-  fetchAllTracks,
-  HistoryRecord,
-  TrackRecord
-} from '../services/listeningService';
-
-type Category = "tracks" | "artists";
-
-interface StatsItem {
-  id: number;
-  name: string;
-  streams: number;
-  imageUrl: string;
-}
+  ListeningHistoryRecord,
+} from "../services/listeningService";
 
 // --- IMPORT ĐỘNG ẢNH TỪ /src/assets/images ---
 const imageModules = import.meta.glob(
-  '../assets/images/*.{jpg,jpeg,png,svg}',
-  { eager: true, as: 'url' }
+  "../assets/images/*.{jpg,jpeg,png,svg}",
+  { eager: true, as: "url" }
 ) as Record<string, string>;
 
 const imageMap: Record<string, string> = {};
 Object.entries(imageModules).forEach(([fullPath, url]) => {
-  const filename = fullPath.split('/').pop()!; 
+  const filename = fullPath.split("/").pop()!;
   imageMap[filename] = url;
 });
 
+type Category = "tracks" | "artists";
+
+interface StatsItem {
+  id: number | string;      // với artists dùng string key (tên artist)
+  name: string;
+  streams: number;
+  imageUrl?: string;        // optional cho track hoặc artist
+}
+
+// Lấy chữ cái đầu hoặc hai chữ cái đầu làm avatar
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map(part => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 const TopStats: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<{ tracks: string; artists: string }>({
-    tracks: "last-12-months",
-    artists: "last-12-months",
-  });
   const [tracksData, setTracksData] = useState<StatsItem[]>([]);
   const [artistsData, setArtistsData] = useState<StatsItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const dateRange = "Mar. 2024 - Mar. 2025";
 
-  const handleTabChange = (category: Category, tab: string) => {
-    setActiveTab(prev => ({ ...prev, [category]: tab }));
-  };
 
   useEffect(() => {
     (async () => {
       try {
-        const [histories, tracks] = (await Promise.all([
-          fetchListeningHistory(),
-          fetchAllTracks(),
-        ])) as [HistoryRecord[], TrackRecord[]];
+        const histories = await fetchListeningHistory();
 
-        // Đếm tổng streams
-        const countMap = new Map<number, number>();
+        // 1. Tính tổng streams theo track
+        const trackCounts = new Map<number, { record: ListeningHistoryRecord; count: number }>();
         histories.forEach(h => {
-          countMap.set(h.trackId, (countMap.get(h.trackId) || 0) + h.listenCount);
+          const tid = h.track.id;
+          const prev = trackCounts.get(tid);
+          if (prev) prev.count += h.listenCount;
+          else trackCounts.set(tid, { record: h, count: h.listenCount });
         });
 
-        // Ghép info + resolve ảnh
-        const merged: StatsItem[] = tracks.map(t => {
-          const fname = t.imageUrl.split('/').pop()!;
-          return {
-            id: t.id,
-            name: (t as any).name ?? `Track ${t.id}`,
-            streams: countMap.get(t.id) || 0,
-            imageUrl: imageMap[fname] || "", 
-          };
+        // 2. Tính tổng streams theo artist (UploaderName)
+        const artistCounts = new Map<string, { sample: ListeningHistoryRecord; count: number }>();
+        histories.forEach(h => {
+          const name = h.track.User.UploaderName;
+          const prev = artistCounts.get(name);
+          if (prev) prev.count += h.listenCount;
+          else artistCounts.set(name, { sample: h, count: h.listenCount });
         });
-        const topThree = merged
-          .sort((a, b) => b.streams - a.streams)
-          .slice(0, 3);
 
-        setTracksData(topThree);
-        setArtistsData(topThree); // tạm dùng tracks cho artists
+        // 3. Chuẩn bị mảng StatsItem cho tracks
+        const tracksList: StatsItem[] = Array.from(trackCounts.entries()).map(
+          ([id, { record, count }]) => {
+            const fname = record.track.imageUrl.split("/").pop()!;
+            return {
+              id,
+              name: record.metadata?.trackname ?? `Track ${id}`,
+              streams: count,
+              imageUrl: imageMap[fname] || record.track.imageUrl,
+            };
+          }
+        );
+
+        // 4. Chuẩn bị mảng StatsItem cho artists
+        const artistsList: StatsItem[] = Array.from(artistCounts.entries()).map(
+          ([name, { sample, count }]) => ({
+            id: name,
+            name,
+            streams: count,
+            imageUrl: undefined, // để tạo avatar chữ cái
+          })
+        );
+
+        // Lấy top 3
+        const topTracks = tracksList.sort((a, b) => b.streams - a.streams).slice(0, 3);
+        const topArtists = artistsList.sort((a, b) => b.streams - a.streams).slice(0, 3);
+
+        setTracksData(topTracks);
+        setArtistsData(topArtists);
       } catch (err) {
-        console.error(err);
+        console.error("Error loading listening history", err);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
 
-  const renderListSection = (title: string, category: Category, data: StatsItem[]) => (
+  const renderListSection = (
+    title: string,
+    category: Category,
+    data: StatsItem[]
+  ) => (
     <div className="stats-section">
       <div className="stats-header_listening">
         <h2>{title}</h2>
-        <Link to={`/top-${category}`} className="see-more">See more</Link>
+        <Link to={`/top-${category}`} className="see-more">
+          See more
+        </Link>
       </div>
 
-      <div className="tabs">
-        {["last-month","last-6-months","last-12-months"].map(tab => (
-          <button
-            key={tab}
-            className={activeTab[category] === tab ? "active" : ""}
-            onClick={() => handleTabChange(category, tab)}
-          >
-            {tab === "last-month" ? "Last month"
-             : tab === "last-6-months" ? "Last 6 months"
-             : "Last 12 months"}
-          </button>
-        ))}
-      </div>
-
-      <div className="date-range">{dateRange}</div>
-      <div className="streams-label">Streams</div>
+      <div className="date-range">{category === 'tracks' ? 'Tracks' : 'Artists'}</div>
+      <div className="streams-label">Played</div>
 
       <ul className="stats-list">
-        {loading
-          ? <li>Loading...</li>
-          : data.map(item => (
-              <li key={item.id} className="stats-item">
-                <div className="item-info">
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    className="item-thumb"
-                  />
-                  <span className="item-name">{item.name}</span>
-                </div>
-                <div className="item-streams">{item.streams}</div>
-              </li>
-            ))
-        }
+        {loading ? (
+          <li>Loading...</li>
+        ) : (
+          data.map(item => (
+            <li key={item.id} className="stats-item">
+              <div className="item-info">
+                {category === 'artists' ? (
+                  <div className="item-avatar">
+                    {getInitials(item.name)}
+                  </div>
+                ) : (
+                  item.imageUrl && (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      className="item-thumb"
+                    />
+                  )
+                )}
+                <span className="item-name">{item.name}</span>
+              </div>
+              <div className="item-streams">{item.streams}</div>
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );

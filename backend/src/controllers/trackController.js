@@ -121,19 +121,37 @@ const deleteTrackController = async (req, res) => {
 
 //dangkhoii them
 const getTracksByUserController = async (req, res) => {
-    try {
-      const { jwt } = req.cookies;                  // userID được lưu trong JWT cookie
-      const { userId } = verityJWT(jwt);            // giải mã :contentReference[oaicite:4]{index=4}:contentReference[oaicite:5]{index=5}
-      const tracks = await getTracksByUserId(userId);
-      return res.status(200).json({
-        message: 'Get user tracks succeed!',
-        data: tracks
-      });
-    } catch (err) {
-      console.error('Error fetching user tracks:', err);
-      return res.status(500).send('Internal Server Error');
-    }
-  };
+  try {
+    const { jwt } = req.cookies;
+    const { userId } = verityJWT(jwt);
+
+    // 1. Lấy toàn bộ tracks kèm listeningHistories
+    const tracks = await getTracksByUserId(userId);
+
+    // 2. Chuyển về plain object và chỉ giữ listenCount + listener
+    const filtered = tracks.map(track => {
+      // toJSON() để có object thuần
+      const t = track.toJSON();
+      return {
+        ...t,
+        listeningHistories: (t.listeningHistories || []).map(hist => ({
+        metadata: hist.metadata,
+        artis: hist.track.User,
+          listenCount: hist.listenCount,
+          listener: hist.listener
+        }))
+      };
+    });
+
+    return res.status(200).json({
+      message: 'Get user tracks succeed!',
+      data: filtered
+    });
+  } catch (err) {
+    console.error('Error fetching user tracks:', err);
+    return res.status(500).send('Internal Server Error');
+  }
+};
   const updateTrackStatusController = async (req, res) => {
     // 1. Parse và validate id
     const id = parseInt(req.params.id, 10);

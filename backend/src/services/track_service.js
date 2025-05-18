@@ -55,11 +55,28 @@ const deleteTrack = async (id) => {
 
 //dangkhoi them
 const getTracksByUserId = async (userId) => {
-    return await db.Track.findAll({
-      where: { uploaderId: userId },
-      include: { model: db.Metadata }    // tương tự getAllTracks :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}
-    });
-  };
+  return await db.Track.findAll({
+    where: { uploaderId: userId },
+    include: [
+      // 1) Lấy trackname từ Metadata, dùng alias 'Metadatum'
+      // 2) Lấy lịch sử nghe, dùng alias 'listeningHistories'
+      
+      {
+        model: db.listeningHistory,
+        as: 'listeningHistories',
+        attributes: ['listenCount', 'createdAt'],
+        include: [
+          // 3) Lấy thông tin listener, dùng alias 'listener'
+          {
+            model: db.User,
+            as: 'listener',
+            attributes: ['id', 'Name']
+          }
+        ]
+      }
+    ]
+  });
+};
 
   const updateTrackStatus = async (id, status) => {
     const track = await db.Track.findByPk(id);

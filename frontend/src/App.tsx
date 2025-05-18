@@ -26,7 +26,7 @@ import AdminLayout from "./layouts/adminlayouts"
 import Section_admin from "./components/section_admin"
 import Section_admin_tracks from "./components/section_admin_tracks"
 import Section_admin_users from "./components/section_admin_users"
-import Section_admin_profile from "./components/section_admin_profile"
+import Section_admin_profile from "./components/section_admin_statistical"
 
 const App = () => {
   return (

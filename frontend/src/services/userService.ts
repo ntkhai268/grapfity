@@ -77,3 +77,19 @@ export const updateUser = async (
 export const deleteUser = async (id: number): Promise<void> => {
   await axios.delete(`${USERS_API}/${id}`);
 };
+// 1. Đảm bảo đã có interface UsersResponse:
+interface UsersResponse {
+  message: string;
+  userId: number | null;
+  data: UserType[];
+}
+
+// 2. Thêm hàm mới:
+export const fetchUserId = async (): Promise<number | null> => {
+  // Gửi request kèm cookie để backend đọc JWT
+  const resp = await axios.get<UsersResponse>(USERS_API, {
+    withCredentials: true
+  });
+  // Trả về đúng userId
+  return resp.data.userId;
+};

@@ -1,4 +1,3 @@
-// src/components/Section_admin_users.tsx
 import React, { useState, useEffect, useRef } from "react";
 import {
   fetchUsers,
@@ -8,11 +7,12 @@ import {
   UserType,
   CreateUserPayload,
   UpdateUserPayload,
+  fetchUserId,
 } from "../services/userService";
 import "../styles/admin.css";
 
 const Section_admin_users: React.FC = () => {
-  // dữ liệu gốc và đã lọc
+  // Dữ liệu gốc và đã lọc
   const [users, setUsers] = useState<UserType[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserType[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -51,6 +51,7 @@ const Section_admin_users: React.FC = () => {
     Address: "",
     PhoneNumber: "",
   });
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   // 1) Lần đầu fetch users
   useEffect(() => {
@@ -70,7 +71,7 @@ const Section_admin_users: React.FC = () => {
     })();
   }, []);
 
-  // 2) Khi searchTerm hoặc users thay đổi → áp dụng filter (tìm cả userName, email và Name)
+  // 2) Khi searchTerm hoặc users thay đổi → áp dụng filter
   useEffect(() => {
     const term = searchTerm.trim().toLowerCase();
     const result = term
@@ -103,7 +104,24 @@ const Section_admin_users: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filterOpen]);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const loadUserId = async () => {
+      try {
+        const id = await fetchUserId();
+        setUserId(id);
+      } catch (err: any) {
+        console.error(err);
+        setError("Không thể lấy userId");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUserId();
+  }, []);
   // Checkbox handlers
   const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
@@ -114,7 +132,9 @@ const Section_admin_users: React.FC = () => {
       ) as Record<number, boolean>
     );
   };
-  const handleCheckRow = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCheckRow = (id: number) => (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const checked = e.target.checked;
     const updated = { ...checkedRows, [id]: checked };
     setCheckedRows(updated);
@@ -134,14 +154,12 @@ const Section_admin_users: React.FC = () => {
         break;
       case "Newest first":
         updated.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         break;
       case "Oldest first":
         updated.sort(
-          (a, b) =>
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
         break;
       case "A → Z":
@@ -164,13 +182,7 @@ const Section_admin_users: React.FC = () => {
     setFilterOpen(false);
   };
 
-  // Role cho modal Add/Edit
-  const handleRoleSelect = (role: number) =>
-    setNewUser((prev) => ({ ...prev, roleId: role }));
-  const handleRoleEditSelect = (role: number) =>
-    setEditUser((prev) => ({ ...prev, roleId: role }));
-
-  // Xử lý Add
+  // Handle Add User
   const toggleAddModal = () => setAddOpen((o) => !o);
   const handleNewUserChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -200,8 +212,7 @@ const Section_admin_users: React.FC = () => {
     });
   };
 
-  // Xử lý Edit
-  const toggleEditModal = () => setEditOpen((o) => !o);
+  // Handle Edit User
   const handleEditClick = (u: UserType) => {
     setEditUser({
       id: u.id,
@@ -214,16 +225,25 @@ const Section_admin_users: React.FC = () => {
       Address: u.Address ?? "",
       PhoneNumber: u.PhoneNumber ?? "",
     });
+    setConfirmPassword("");
     setEditOpen(true);
   };
   const handleEditChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setEditUser((prev) => ({ ...prev, [name]: value }));
+    if (name === "password") {
+      setEditUser((prev) => ({ ...prev, password: value }));
+    } else if (name === "confirmPassword") {
+      setConfirmPassword(value);
+    }
   };
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (editUser.password !== confirmPassword) {
+      alert("Password và Confirm Password không khớp.");
+      return;
+    }
     try {
-      await updateUser(editUser);
+      await updateUser({ id: editUser.id, password: editUser.password });
       const data = await fetchUsers();
       setUsers(data);
       setFilteredUsers(data);
@@ -233,8 +253,9 @@ const Section_admin_users: React.FC = () => {
     }
     setEditOpen(false);
   };
-
-  // Xóa selected
+  const handleRoleSelect = (role: number) =>
+    setNewUser((prev) => ({ ...prev, roleId: role }));
+  // Handle Delete Selected
   const handleDeleteSelected = async () => {
     const ids = Object.entries(checkedRows)
       .filter(([, v]) => v)
@@ -281,9 +302,14 @@ const Section_admin_users: React.FC = () => {
           >
             Delete
           </button>
-          <button className="export_button_admin" onClick={toggleAddModal}>
-            Add
-          </button>
+          {userId === 1 && (
+        <button
+          className="export_button_admin"
+          onClick={toggleAddModal}
+        >
+          Add
+        </button>
+      )}
           <div className="filter_dropdown_admin" ref={filterRef}>
             <button
               className="filter_button_admin"
@@ -293,27 +319,17 @@ const Section_admin_users: React.FC = () => {
             </button>
             {filterOpen && (
               <ul className="filter_menu_admin">
-                {[
-                  "Admin",
-                  "User",
-                  "Newest first",
-                  "Oldest first",
-                  "A → Z",
-                  "Z → A",
-                ].map((opt) => (
-                  <li key={opt} onClick={() => applyFilter(opt)}>
-                    {opt}
-                  </li>
+                {["Admin","User","Newest first","Oldest first","A → Z","Z → A"].map((opt) => (
+                  <li key={opt} onClick={() => applyFilter(opt)}>{opt}</li>
                 ))}
               </ul>
             )}
           </div>
         </div>
       </div>
-
       {/* TABLE */}
       <div className="users_table_admin">
-        <div className="table_header_admin">
+      <div className="table_header_admin">
           <div className="table_cell_admin checkbox_cell_admin">
             <input
               type="checkbox"
@@ -392,16 +408,28 @@ const Section_admin_users: React.FC = () => {
                 Edit
               </button>
               <button
-                className="delete_button_admin"
-                onClick={() => handleEditClick(u)}    
-              >
-                Delete
-              </button>
+  className="delete_button_admin"
+  disabled={!checkedRows[u.id]} // <-- chỉ bật nếu checkbox được chọn
+  onClick={async () => {
+    if (window.confirm(`Bạn có chắc muốn xoá user "${u.userName}"?`)) {
+      try {
+        await deleteUser(u.id);
+        const data = await fetchUsers();
+        setUsers(data);
+        setFilteredUsers(data);
+      } catch (err) {
+        console.error(err);
+        alert("Xoá user thất bại.");
+      }
+    }
+  }}
+>
+  Delete
+</button>
             </div>
           </div>
         ))}
       </div>
-
       {/* Modal Add User */}
       {addOpen && (
         <div className="modal_overlay_admin">
@@ -459,29 +487,14 @@ const Section_admin_users: React.FC = () => {
               <div className="role_field_admin">
                 <span className="role_label_admin">Role:</span>
                 <div className="role_toggle_group_admin">
-                  <button
-                    type="button"
-                    className={
-                      newUser.roleId === 1
-                        ? "role_button_admin active"
-                        : "role_button_admin"
-                    }
-                    onClick={() => handleRoleSelect(1)}
-                  >
-                    User
-                  </button>
-                  <button
-                    type="button"
-                    className={
-                      newUser.roleId === 2
-                        ? "role_button_admin active"
-                        : "role_button_admin"
-                    }
-                    onClick={() => handleRoleSelect(2)}
-                  >
-                    Admin
-                  </button>
-                </div>
+  <button
+    type="button"
+    className="role_button_admin active"
+    onClick={() => handleRoleSelect(2)}
+  >
+    Admin
+  </button>
+</div>
               </div>
               <div className="modal_actions_admin">
                 <button type="submit" className="save_button_admin">
@@ -499,98 +512,35 @@ const Section_admin_users: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Modal Edit User */}
       {editOpen && (
         <div className="modal_overlay_admin">
           <div className="modal_content_admin">
             <h3>Edit User</h3>
             <form onSubmit={handleEditSubmit}>
-              <input
-                name="userName"
-                placeholder="Username"
-                value={editUser.userName}
-                onChange={handleEditChange}
-                required
-              />
-              <input
-                name="email"
-                type="email"
-                placeholder="Email"
-                value={editUser.email}
-                onChange={handleEditChange}
-                required
-              />
+              <div className="form_group_admin">
+                <label>User:</label>
+                <input name="userName" value={editUser.userName} readOnly />
+              </div>
               <input
                 name="password"
                 type="password"
-                placeholder="New Password (leave blank to keep current)"
+                placeholder="New Password"
                 value={editUser.password}
                 onChange={handleEditChange}
+                required
               />
               <input
-                name="Name"
-                placeholder="Full Name"
-                value={editUser.Name}
+                name="confirmPassword"
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
                 onChange={handleEditChange}
+                required
               />
-              <input
-                name="Birthday"
-                type="date"
-                placeholder="Birthday"
-                value={editUser.Birthday}
-                onChange={handleEditChange}
-              />
-              <input
-                name="Address"
-                placeholder="Address"
-                value={editUser.Address}
-                onChange={handleEditChange}
-              />
-              <input
-                name="PhoneNumber"
-                placeholder="Phone Number"
-                value={editUser.PhoneNumber}
-                onChange={handleEditChange}
-              />
-              <div className="role_field_admin">
-                <span className="role_label_admin">Role:</span>
-                <div className="role_toggle_group_admin">
-                  <button
-                    type="button"
-                    className={
-                      editUser.roleId === 1
-                        ? "role_button_admin active"
-                        : "role_button_admin"
-                    }
-                    onClick={() => handleRoleEditSelect(1)}
-                  >
-                    User
-                  </button>
-                  <button
-                    type="button"
-                    className={
-                      editUser.roleId === 2
-                        ? "role_button_admin active"
-                        : "role_button_admin"
-                    }
-                    onClick={() => handleRoleEditSelect(2)}
-                  >
-                    Admin
-                  </button>
-                </div>
-              </div>
               <div className="modal_actions_admin">
-                <button type="submit" className="save_button_admin">
-                  Save
-                </button>
-                <button
-                  type="button"
-                  className="cancel_button_admin"
-                  onClick={toggleEditModal}
-                >
-                  Cancel
-                </button>
+                <button type="submit" className="save_button_admin">Save</button>
+                <button type="button" className="cancel_button_admin" onClick={() => setEditOpen(false)}>Cancel</button>
               </div>
             </form>
           </div>

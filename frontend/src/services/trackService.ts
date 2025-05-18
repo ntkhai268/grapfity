@@ -4,6 +4,7 @@ import axios from "axios";
 // Interface representing a joined track item from the API
 export interface JoinedTrack {
   listenCount: number;
+  createdAt: string;
   metadata: {
     trackname?: string;
     release_date?: string;
@@ -14,6 +15,7 @@ export interface JoinedTrack {
     imageUrl: string;
     uploaderId: number;
     status: "pending" | "approved" | "rejected";
+  createdAt: string;
     User: {
       id: number;
       UploaderName: string;
@@ -53,3 +55,4 @@ export const updateTrackStatus = async (
   );
   return res.data.data;
 };
+

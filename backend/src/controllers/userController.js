@@ -11,16 +11,29 @@ import {
 import { verityJWT } from '../middleware/JWTActions.js';
 
 const getAllUsersController = async (req, res) => {
-    try {
-        const data = await getAllUsers();
-        return res.status(200).json({
-            message: 'ok',
-            data: data
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+  try {
+    // 1. Lấy token từ cookie
+    const token = req.cookies.jwt;
+    let userId = null;
+    if (token) {
+      const decoded = verityJWT(token);
+      userId = decoded.userId;
     }
+
+    // 2. Lấy danh sách users
+    const data = await getAllUsers();
+
+    // 3. Trả về response kèm userId
+    return res.status(200).json({
+      message: 'ok',
+      userId,    // đây là userId lấy từ cookie
+      data       // mảng users
+    });
+  } catch (err) {
+    console.error('getAllUsersController error:', err);
+    // nếu token không hợp lệ cũng coi như unauthorized
+    return res.status(401).json({ message: 'Invalid or missing token' });
+  }
 };
 
 const registerController = async (req, res) => {
