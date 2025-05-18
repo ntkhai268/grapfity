@@ -149,6 +149,7 @@ const createTrackController = async (req, res) => {
     const uploaderId = data.userId;
     const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
     const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
+    const privacy = req.body.privacy || 'public';
     console.log(req.body.audioFeatures)
     const metadata = JSON.parse(req.body.audioFeatures);
     console.log('>>> Metadata sau parse:', metadata); 
@@ -181,14 +182,15 @@ const createTrackController = async (req, res) => {
 
    
     try {
-        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, metadata);
+         const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, privacy, metadata);
         return res.status(200).json({
             message: 'Create track succeed!',
             data: newTrack
         });
     } catch (err) {
         console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+        // res.status(500).send('Internal Server Error');
+        res.status(500).json({ message: err.message || 'Internal Server Error' });
     }
 };
 
@@ -207,16 +209,18 @@ const updateTrackController = async (req, res) => {
 
     if (title) updateData.title = title;
     if (lyrics !== undefined) updateData.lyrics = lyrics;
+    if (req.body.privacy) updateData.privacy = req.body.privacy;
 
     // ✅ Nhận file nếu có
-    if (req.files?.image?.[0]) {
-      updateData.imageUrl = '/assets/track_image/' + req.files.image[0].filename;
+    if (req.file) {
+     updateData.imageUrl = '/assets/track_image/' + req.file.filename;
     }
-    if (req.files?.audio?.[0]) {
-      updateData.trackUrl = '/assets/track_audio/' + req.files.audio[0].filename;
-    }
+    console.log("📥 Uploaded file:", req.file);
+
+    
    
     const updatedTrack = await updateTrack(id, updateData, userId);
+    
 
     if (title || lyrics !== undefined) {
       const metadataUpdate = {};

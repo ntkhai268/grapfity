@@ -1,4 +1,5 @@
 import db from '../models/index.js';
+import bcrypt from 'bcrypt';
 import {
     getAllUsers,
     getUserById,
@@ -8,6 +9,7 @@ import {
     deleteUser
 } from '../services/user_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
+
 
 const getAllUsersController = async (req, res) => {
     try {
@@ -162,6 +164,31 @@ const logoutController = (req, res) => {
   req.session?.destroy?.(); // nếu dùng session
   res.status(200).json({ message: 'Đăng xuất thành công' });
 };
+
+
+const verifyPasswordController = async (req, res) => {
+  try {
+    const userId = req.userId; // ✅ từ middleware authenticateUser
+    const { password } = req.body;
+        console.log("✅ [verify-password] userId:", userId);
+    console.log("✅ [verify-password] password received:", password);
+
+    if (!password) {
+      return res.status(400).json({ valid: false, message: 'Thiếu mật khẩu cần xác minh.' });
+    }
+
+    const user = await db.User.findByPk(userId);
+    if (!user) {
+      return res.status(404).json({ valid: false, message: 'Không tìm thấy người dùng.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    return res.status(200).json({ valid: isMatch });
+  } catch (error) {
+    console.error('Lỗi xác thực mật khẩu:', error);
+    return res.status(500).json({ valid: false, message: 'Lỗi máy chủ khi xác thực mật khẩu.' });
+  }
+};
 export {
     getAllUsersController,
     getUserByIdController,
@@ -170,5 +197,6 @@ export {
     handleUserLoginController,
     updateUserController,
     deleteUserController,
-    logoutController
+    logoutController,
+    verifyPasswordController
 };
