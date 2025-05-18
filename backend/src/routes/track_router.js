@@ -11,7 +11,7 @@ import {
 } from '../controllers/trackController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 // import { uploadTrackImage} from "../middleware/uploadMiddleware.js";
-import { uploadTrackFields } from '../middleware/uploadMiddleware.js';
+import { uploadTrackFields, uploadTrackImage  } from '../middleware/uploadMiddleware.js';
 
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.get('/trackswithuploader/:id', getTrackWithUploaderByIdController);
 //     { name: 'image', maxCount: 1 },
 // ]), createTrackController);
 router.post('/tracks/create-track',authenticateUser, uploadTrackFields, createTrackController);
-router.put('/tracks/update-track/:id', authenticateUser,uploadTrackFields, updateTrackController);
+router.put('/tracks/update-track/:id', authenticateUser,uploadTrackImage, updateTrackController);
 router.delete('/tracks/:id',authenticateUser, deleteTrackController);
 
 export default router;
