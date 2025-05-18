@@ -31,6 +31,7 @@
     font-size: 24px;
     font-weight: bold;
     margin: 0;
+    height: 20px;
   }
   
   .see-more {
@@ -102,8 +103,11 @@
   .track-item {
     display: flex;
     align-items: center;
+    background-color: #ffffff;
   }
-  
+  .track-item:hover {
+    background-color: #d5d5d5;
+  }
   .track-icon {
     width: 50px;
     height: 50px;
@@ -132,7 +136,7 @@
   .top-listeners-section h2 {
     font-size: 24px;
     font-weight: bold;
-    margin: 0 0 20px 0;
+    margin: -40px 0 20px 0;
   }
   
   .listener-tabs {
@@ -216,7 +220,7 @@
     }
   
     .tracks-list {
-      gap: 10px; /* Giảm khoảng cách giữa các item */
+      gap: 0px; /* Giảm khoảng cách giữa các item */
     }
   }
   .track-item .track-icon {
@@ -234,3 +238,55 @@
     object-fit: cover;
   }
   
+/* TopUpload.css */
+.top-listeners-section {
+  margin-top: 2rem;
+}
+
+.listener-tabs {
+  margin-bottom: 1rem;
+}
+
+.listener-profile {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.listener-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #6c63ff;      /* màu nền */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;                   /* chữ màu trắng */
+  font-weight: bold;
+  font-size: 1.25rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.listener-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.listener-name {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.listener-stats {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.pro-message {
+  margin-top: 1rem;
+  font-style: italic;
+  color: #999;
+}

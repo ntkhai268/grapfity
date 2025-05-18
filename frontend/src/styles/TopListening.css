@@ -21,6 +21,7 @@
   border-radius: 8px; /* Bo góc cho các phần tử */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Thêm bóng mờ cho phần tử */
   position: relative; /* Đặt vị trí cho các phần tử con */
+  
 }
 
 .stats-header_listening {
@@ -77,7 +78,7 @@
 .date-range {
   font-size: 14px; /* Kích thước font cho khoảng thời gian */
   color: #666; /* Màu sắc của khoảng thời gian */
-  margin-bottom: 15px; /* Khoảng cách dưới khoảng thời gian */
+  margin-bottom: 0px; /* Khoảng cách dưới khoảng thời gian */
   margin-top: 20px;
 }
 
@@ -86,7 +87,8 @@
   color: #666; /* Màu sắc của nhãn */
   position: absolute; /* Đặt vị trí tuyệt đối cho Streams */
   right: 10px; /* Di chuyển Streams sang bên phải của container */
-  top: 115px;
+  top: 80px;
+  
 }
 
 .stats-list {
@@ -142,7 +144,7 @@
   }
 
   .stats-section {
-    margin-bottom: 30px; /* Khoảng cách dưới mỗi section khi xếp theo cột */
+    margin-bottom: 5px; /* Khoảng cách dưới mỗi section khi xếp theo cột */
   }
 }
 /* Thu nhỏ ảnh trong các card Top Tracks */
@@ -159,4 +161,45 @@
   height: 48px;
   object-fit: cover;
   border-radius: 4px;
+}
+/* listener-list */
+.listener-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.listener-item {
+  border-bottom: 1px solid #eee;
+  padding: 0.75rem 0;
+}
+
+.listener-profile {
+  display: flex;
+  align-items: center;
+}
+
+.item-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #6c63ff;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.listener-name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.listener-stats {
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
 }

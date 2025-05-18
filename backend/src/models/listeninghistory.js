@@ -29,13 +29,14 @@ export default (sequelize, DataTypes) => {
   listeningHistory.init({
     userId:      DataTypes.INTEGER,
     trackId:     DataTypes.INTEGER,
-    listenCount: DataTypes.INTEGER
+
+    listenCount: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'listeningHistory',
 
     defaultScope: {
-      attributes: ['listenCount'],   // chỉ trả về listenCount ở root
+      attributes: ['listenCount','createdAt'],   // chỉ trả về listenCount ở root
       include: [
         {
           association: 'metadata',   // Model.Metadata → trackname
@@ -43,7 +44,7 @@ export default (sequelize, DataTypes) => {
         },
         {
           association: 'track',      // Model.Track → trackUrl, imageUrl, uploaderId
-          attributes: ['id','trackUrl', 'imageUrl', 'uploaderId','status'],
+          attributes: ['id','trackUrl', 'imageUrl', 'uploaderId','status','createdAt'],
           include: [
             {
               // từ Track.belongsTo(models.User) để lấy tên uploader :contentReference[oaicite:0]{index=0}:contentReference[oaicite:1]{index=1}

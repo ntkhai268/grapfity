@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { getUserTracks, TrackWithCount } from '../services/uploadService';
 import '../styles/TopUpload.css';
 
 // 1. Import tất cả ảnh trong src/assets/images qua Vite
@@ -13,70 +14,57 @@ const imageModules = import.meta.glob('../assets/images/*.{jpg,jpeg,png,svg}', {
 // 2. Build map filename → URL
 const imageMap: Record<string, string> = {};
 Object.entries(imageModules).forEach(([fullPath, url]) => {
-  const filename = fullPath.split('/').pop()!; // ex: "bacphan.jpg"
+  const filename = fullPath.split('/').pop()!;
   imageMap[filename] = url;
 });
 
-interface MinimalTrack {
+interface Listener {
   id: number;
-  title: string;
-  imageUrl: string;   // ex "/assets/images/bacphan.jpg" hoặc "bacphan.jpg"
-  listenCount: number;
+  Name: string;
+  count: number;
 }
 
 const TopUpload: React.FC = () => {
-  const [tracks, setTracks] = useState<MinimalTrack[]>([]);
+  const [tracks, setTracks] = useState<TrackWithCount[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // state cho time tabs
-  const [activeTimeTab, setActiveTimeTab] = useState<
-    'lastMonth' | 'last6months' | 'last12months'
-  >('last12months');
-
-  const handleTimeTabClick = (tab: 'lastMonth' | 'last6months' | 'last12months') => {
-    setActiveTimeTab(tab);
-    // TODO: nếu cần lọc lại tracks theo khoảng thời gian, xử lý ở đây
-  };
+  const [listeners, setListeners] = useState<Listener[]>([]);
 
   useEffect(() => {
     (async () => {
       try {
-        // 3. Fetch listening histories và tất cả tracks của user
-        const [histRes, tracksRes] = await Promise.all([
-          axios.get<{ histories: { trackId: number; listenCount: number }[] }>(
-            'http://localhost:8080/api/listening-histories',
-            { withCredentials: true }
-          ),
-          axios.get<{ data: { id: number; title?: string; imageUrl: string }[] }>(
-            'http://localhost:8080/api/tracks/user',
-            { withCredentials: true }
-          )
-        ]);
-
-        // 4. Build map trackId → tổng listenCount
-        const countMap = histRes.data.histories.reduce<Record<number, number>>((acc, h) => {
-          acc[h.trackId] = (acc[h.trackId] || 0) + h.listenCount;
-          return acc;
-        }, {});
-
-        // 5. Merge, sort giảm dần và slice top 3
-        const merged: MinimalTrack[] = tracksRes.data.data
-          .map(t => {
-            const raw = t.imageUrl.split('/').pop()!;
-            return {
-              id: t.id,
-              title: t.title || `Track ${t.id}`,
-              imageUrl: imageMap[raw] || '',
-              listenCount: countMap[t.id] || 0
-            };
-          })
+        // 1. Fetch track data
+        const allTracks = await getUserTracks();
+        // lấy top 3 tracks
+        const top3 = allTracks
+          .slice()
           .sort((a, b) => b.listenCount - a.listenCount)
-          .slice(0, 3);
+          .slice(0, 3)
+          .map(track => {
+            const raw = track.imageUrl.split('/').pop()!;
+            return { ...track, imageUrl: imageMap[raw] || '' };
+          });
+        setTracks(top3);
 
-        setTracks(merged);
+        // 2. Fetch raw listening histories
+        const histRes = await axios.get<{ histories: Array<{ trackId: number; listenCount: number; listener: { id: number; Name: string } }> }>('/api/listening-histories', { withCredentials: true });
+        const agg: Record<number, { Name: string; count: number }> = {};
+        histRes.data.histories.forEach(h => {
+          if (agg[h.listener.id]) {
+            agg[h.listener.id].count += h.listenCount;
+          } else {
+            agg[h.listener.id] = { Name: h.listener.Name, count: h.listenCount };
+          }
+        });
+        // sort và lấy top 3 listeners
+        const topL = Object.entries(agg)
+          .map(([id, data]) => ({ id: Number(id), Name: data.Name, count: data.count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3);
+        setListeners(topL);
       } catch (err) {
         console.error('Lỗi fetch TopUpload:', err);
         setTracks([]);
+        setListeners([]);
       } finally {
         setLoading(false);
       }
@@ -88,37 +76,14 @@ const TopUpload: React.FC = () => {
       <div className="top-tracks-section">
         <div className="section-header">
           <h2>Top tracks on Graptify</h2>
-          <Link to="/top-tracks-page" className="see-more">See more</Link>
+          <Link to="/top-tracks-page" className="see-more">
+            See more
+          </Link>
         </div>
-
-        {/* Thêm time tabs */}
-        <div className="time-tabs">
-          <button
-            className={activeTimeTab === 'lastMonth' ? 'active' : ''}
-            onClick={() => handleTimeTabClick('lastMonth')}
-          >
-            Last month
-          </button>
-          <button
-            className={activeTimeTab === 'last6months' ? 'active' : ''}
-            onClick={() => handleTimeTabClick('last6months')}
-          >
-            Last 6 months
-          </button>
-          <button
-            className={activeTimeTab === 'last12months' ? 'active' : ''}
-            onClick={() => handleTimeTabClick('last12months')}
-          >
-            Last 12 months
-          </button>
-        </div>
-
-        {/* Thêm date range & header cho cột Streams */}
         <div className="section-header">
-          <div className="date-range">Mar. 2024 - Mar. 2025</div>
+          <div className="date-range">Tracks</div>
           <div className="track-streams">Streams</div>
         </div>
-
         <div className="tracks-list">
           {loading ? (
             <div>Đang tải top uploads…</div>
@@ -128,13 +93,20 @@ const TopUpload: React.FC = () => {
             tracks.map(track => (
               <div key={track.id} className="track-item">
                 <div className="track-icon">
-                  {track.imageUrl
-                    ? <img src={track.imageUrl} alt={track.title} className="track-cover" />
-                    : <div className="placeholder-cover">No image</div>
-                  }
+                  {track.imageUrl ? (
+                    <img
+                      src={track.imageUrl}
+                      alt={track.trackName || `Track ${track.id}`}
+                      className="track-cover"
+                    />
+                  ) : (
+                    <div className="placeholder-cover">No image</div>
+                  )}
                 </div>
                 <div className="track-info">
-                  <span className="track-title">{track.title}</span>
+                  <span className="track-title">
+                    {track.trackName || `Track ${track.id}`}
+                  </span>
                 </div>
                 <div className="track-time">{track.listenCount} plays</div>
               </div>
@@ -146,18 +118,28 @@ const TopUpload: React.FC = () => {
       <div className="top-listeners-section">
         <h2>Top listeners</h2>
         <div className="listener-tabs">
-          <button className="active">Last 7 days</button>
+         
         </div>
-        <div className="listener-profile">
-          <img src="/placeholder.svg" alt="Listener avatar" className="listener-avatar" />
-          <div className="listener-info">
-            <div className="listener-name">Phạm Huy</div>
-            <div className="listener-stats">
-              <span className="play-count">1 play</span>
-              <span className="followers-count">0 followers</span>
+        {loading ? (
+          <div>Đang tải listeners…</div>
+        ) : listeners.length === 0 ? (
+          <div>Chưa có listener nào.</div>
+        ) : (
+          listeners.map(listener => (
+            <div key={listener.id} className="listener-profile">
+              <div className="listener-avatar">
+                {/* dùng chữ cái đầu làm avatar */}
+                <span className="initial">{listener.Name.charAt(0).toUpperCase()}</span>
+              </div>
+              <div className="listener-info">
+                <div className="listener-name">{listener.Name}</div>
+                <div className="listener-stats">
+                  <span className="play-count">{listener.count} plays</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ))
+        )}
         <div className="pro-message">
           Meet the rest of your listeners with Artist Pro
         </div>

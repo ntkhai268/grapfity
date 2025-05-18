@@ -294,7 +294,7 @@ const Section_admin_tracks: React.FC = () => {
               <div className="table_cell_admin position_cell_admin">
                 <div className="position_title_admin">{artist}</div>
               </div>
-              <div className="table_cell_admin country_cell_admin">{day}</div>
+              <div className="table_cell_admin country_cell_admin">{formatDate(t.track.createdAt)}</div>
               <div className="table_cell_admin status_cell_admin">
                 <span className={`status_badge_admin ${statusClass}`}>
                   <span className="status_dot_admin" /> {statusText}

@@ -1188,3 +1188,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .users_table_admin .table_row_admin .action_cell_admin button {
   white-space: nowrap;
 }
+/* Loại bỏ khung của container group */
+.form_group_admin {
+  border: none !important;
+  background: transparent !important;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Loại bỏ khung và outline của input */
+.form_group_admin input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+.form_group_admin label{
+  color: #000;
+}
+.delete_button_admin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

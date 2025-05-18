@@ -1,7 +1,7 @@
 // src/components/Recent_Uploads.tsx
 import React, { useState, useEffect } from 'react';
 import '../styles/Recent_LnU.css';
-import { getUserTracks, MinimalTrack } from '../services/uploadService';
+import { getUserTracks, TrackWithCount } from '../services/uploadService';
 
 // Import tất cả ảnh từ src/assets/images (Vite)
 const imageModules = import.meta.glob(
@@ -15,18 +15,22 @@ Object.entries(imageModules).forEach(([path, url]) => {
 });
 
 const Recent_Uploads: React.FC = () => {
-  const [tracks, setTracks] = useState<MinimalTrack[]>([]);
+  const [tracks, setTracks] = useState<TrackWithCount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await getUserTracks();
-        // Sort giảm dần theo createdAt và lấy 5 bản mới nhất
-        const recent5 = data
+        const allTracks = await getUserTracks();
+
+        // Sort giảm dần theo createdAt và lấy 5 bản gần nhất
+        const recent = allTracks
+          .slice()
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
           .slice(0, 5);
-        setTracks(recent5);
+
+        console.log('[Recent_Uploads] recent tracks:', recent);
+        setTracks(recent);
       } catch (e) {
         console.error('Fetch uploads error:', e);
         setTracks([]);
@@ -47,18 +51,30 @@ const Recent_Uploads: React.FC = () => {
           <p>Không có bài hát nào.</p>
         ) : (
           tracks.map(track => {
-            // Lấy filename từ đường dẫn tương đối
             const filename = track.imageUrl.split('/').pop() || '';
             const imgUrl = imageMap[filename] || '';
             return (
               <div key={track.id} className="track_LnU">
                 <div className="track_LnU-image">
-                  {imgUrl && <img src={imgUrl} alt={`Track ${track.id}`} />}
+                  {imgUrl ? (
+                    <img
+                      src={imgUrl}
+                      alt={track.trackName || `Track ${track.id}`}
+                      className="track-cover"
+                    />
+                  ) : (
+                    <div className="placeholder-cover">No image</div>
+                  )}
                 </div>
                 <div className="track_LnU-info">
-                  <span className="track-title">{`Track ${track.id}`}</span>
-                  <span className="track-artist">{`Uploader ${track.uploaderId}`}</span>
-                  <span className="track-time">{new Date(track.createdAt).toLocaleString()}</span>
+                  <span className="track-title">
+                    {track.trackName || `Track ${track.id}`}
+                  </span>
+                  {/* Hiển thị tên nghệ sĩ với tiền tố */}
+                  <span className="track-artist">
+                     {track.artist?.UploaderName ?? `Uploader ${track.uploaderId}`}
+                  </span>
+                  
                 </div>
               </div>
             );
