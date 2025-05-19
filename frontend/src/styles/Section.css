@@ -133,10 +133,11 @@
     overflow-x: auto;
     padding: 10px;
     margin-left: 30px;
+    overflow-y: hidden  ;
 }
 
 /* Mỗi bài hát */
-.song-item {
+.song-item-section {
     background: none;
     border: none;
     padding: 0;
@@ -149,7 +150,7 @@
     gap: 5px;
 }
 /* Default ảnh bài hát (vuông) */
-.song-item img {
+.song-item-section img {
     width: 200px;
     height: 200px;
     object-fit: cover;
@@ -183,27 +184,45 @@ position: relative;
 }
 
 /* Riêng phần Recently released: hình tròn */
-.song-list-circle .song-item img {
+.song-list-circle .song-item-section img {
     border-radius: 50%; /* chuyển thành hình tròn */
     width: 100px;
     height: 100px;
 }
 
 /* Tiêu đề bài hát */
-.song-item .title {
+.song-item-section {
+  width: 200px;       /* hoặc 200px tùy ý */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: transparent;
+  border: none;
+}
+.song-item-section .title {
     font-size: 18px;
     font-weight: bold;
+     white-space: nowrap;        /* Không xuống dòng */
+  overflow: hidden;           /* Ẩn phần tràn ra */
+  text-overflow: ellipsis;    /* Hiển thị "..." */
+  max-width: 100%;            /* Giới hạn chiều ngang (hoặc bạn có thể đặt cụ thể như 200px) */
+  display: block;             /* Đảm bảo là khối để áp dụng các thuộc tính trên */
 }
+/* .song-item-section .title:hover {
+  overflow: visible;
+  white-space: normal;
+} */
 
 /* Tên nghệ sĩ */
-.song-item .artist {
+.song-item-section .artist {
     margin-top: 10px;
     font-size: 14px;
     color: #ccc;
 }
 
 /* Hover bài hát */
-.song-item:hover {
+.song-item-section:hover {
     opacity: 0.85;
     transform: scale(1.02);
     transition: all 0.2s ease-in-out;

@@ -175,6 +175,7 @@ const getPlaylistDetailsById = async (playlistId) => {
                     model: db.Track,
                     // Chọn các trường cần thiết từ bảng Track
                     attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+                    where: { privacy: 'public' },
                     through: { attributes: [] }, // Quan trọng: Không lấy các trường từ bảng PlaylistTrack
                     // Sắp xếp các track trong playlist nếu cần (ví dụ: theo thứ tự thêm vào)
                     // order: [[ db.PlaylistTrack, 'createdAt', 'ASC' ]], // Cần include PlaylistTrack để order theo nó
@@ -227,12 +228,78 @@ const getPlaylistDetailsById = async (playlistId) => {
         throw error; 
     }
 };
+const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
+    const numericPlaylistId = Number(playlistId);
+    if (isNaN(numericPlaylistId)) {
+        console.error(`[PlaylistService] Invalid playlist ID: ${playlistId}`);
+        const error = new Error("Playlist ID không hợp lệ.");
+        error.statusCode = 400;
+        throw error;
+    }
 
+    console.log(`[PlaylistService] Fetching details for playlist ID: ${numericPlaylistId}`);
+
+    try {
+        const playlist = await db.Playlist.findByPk(numericPlaylistId, {
+            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId'], 
+            include: [
+                {
+                    model: db.User, // Người tạo playlist
+                    attributes: ['id', 'userName', 'Name'] 
+                },
+                {
+                    model: db.Track,
+                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'],
+                    through: { attributes: [] },
+
+                    // ✅ LỌC TRACK THEO: public || uploader là chính người dùng hiện tại
+                    where: {
+                        [Op.or]: [
+                            { privacy: 'public' },
+                            { uploaderId: currentUserId }
+                        ]
+                    },
+
+                    include: [
+                        {
+                            model: db.User,
+                            attributes: ['id', 'userName', 'Name'],
+                        },
+                        {
+                            model: db.Metadata,
+                            as: 'Metadatum',
+                            attributes: ['trackname', 'duration_ms', 'lyrics'],
+                            required: false
+                        }
+                    ]
+                }
+            ]
+        });
+
+        if (!playlist) {
+            console.warn(`[PlaylistService] Playlist with ID ${numericPlaylistId} not found.`);
+            const error = new Error('Playlist not found');
+            error.statusCode = 404;
+            throw error;
+        }
+
+        console.log(`[PlaylistService] Successfully fetched details for playlist ID: ${numericPlaylistId}`);
+        return playlist;
+
+    } catch (error) {
+        console.error(`[PlaylistService] Error fetching details for playlist ${playlistId}:`, error);
+        if (!error.statusCode) {
+            error.statusCode = 500;
+        }
+        throw error;
+    }
+};
 
 // --- Export các hàm ---
 export {
     addTrackToPlaylist,
     removeTrackFromPlaylist,
     // getTracksInPlaylist,
-    getPlaylistDetailsById
+    getPlaylistDetailsById,
+     getPlaylistDetailsByIdforme
 };

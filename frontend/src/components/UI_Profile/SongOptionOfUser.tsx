@@ -133,10 +133,10 @@ const SongOptionOfUser: React.FC<SongOptionOfUserProps> = ({ onEdit, onDelete, t
               <div className="submenu_all">
                 <div className="submenu_item_all" onClick={handleCreatePlaylist}>
                   <i className="fas fa-plus"></i>
-                  <span> Danh sách phát mới</span>
+                  <span>  Create new playlist</span>
                 </div>
                 {isLoading && (
-                  <div className="submenu_item_all">Đang tải...</div>
+                  <div className="submenu_item_all">Loading...</div>
                 )}
 
                 {error && (
@@ -156,8 +156,8 @@ const SongOptionOfUser: React.FC<SongOptionOfUserProps> = ({ onEdit, onDelete, t
               </div>
             )}
           </div>
-          <div className="dropdown_item_all" onClick={onEdit}>Chỉnh sửa nhạc</div>
-          <div className="dropdown_item_all" onClick={onDelete}>Xoá nhạc</div>
+          <div className="dropdown_item_all" onClick={onEdit}>Edit</div>
+          <div className="dropdown_item_all" onClick={onDelete}>Delete</div>
         </div>
       )}
     </div>

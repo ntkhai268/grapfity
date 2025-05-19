@@ -106,7 +106,7 @@ input[type="date"].meta-form-input::-webkit-calendar-picker-indicator {
   flex-direction: column;
   gap: 10px; /* Khoảng cách giữa các nhóm label/input */
 }
-
+/* ----------------privacy----------------------- */
 /* Giữ lại cho nhóm Radio Button (Privacy) */
 .meta-form-group {
   display: flex;
@@ -352,7 +352,7 @@ input[type="date"].meta-form-input::-webkit-calendar-picker-indicator {
   font-size: 0.75rem;
   margin-top: 2px;
 }
-
+/* --------------------------------------------------------- */
 
 /* ----- Footer ----- */
 .meta-form-footer {

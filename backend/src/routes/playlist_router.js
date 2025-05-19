@@ -4,13 +4,13 @@ import express from 'express';
 // 1. Import ĐẦY ĐỦ các controller cần thiết
 import {
     getMyPlaylistsController,
+    getPublicPlaylistsController,
+    getAllPublicPlaylistsController,
     createPlaylistController,
     deletePlaylistController,
     updatePlaylistController,
     uploadPlaylistCoverController
-    // getPlaylistByIdController,
-    // addTrackToPlaylistController,
-    // removeTrackFromPlaylistController 
+ 
 } from '../controllers/playlistController.js';
 
 // Import middleware xác thực
@@ -24,6 +24,8 @@ const router = express.Router();
 
 // GET / -> Lấy playlist của người dùng đã đăng nhập
 router.get('/', authenticateUser, getMyPlaylistsController);
+router.get('/user/:userId', authenticateUser, getPublicPlaylistsController);
+router.get('/public', getAllPublicPlaylistsController); // GET /api/playlists/public
 
 // POST / -> Tạo playlist mới
 router.post('/', authenticateUser, createPlaylistController);
@@ -43,11 +45,7 @@ router.post(
     uploadPlaylistCoverController // Controller xử lý sau khi ảnh đã được upload
 );
 
-// POST /:playlistId/tracks -> Thêm track vào playlist
-// router.post('/:playlistId/tracks', authenticateUser, addTrackToPlaylistController);
 
-// DELETE /:playlistId/tracks/:trackId -> Xóa track khỏi playlist
-// router.delete('/:playlistId/tracks/:trackId', authenticateUser, removeTrackFromPlaylistController); 
 
 // (Tùy chọn) Route xóa playlist
 router.delete('/:playlistId', authenticateUser, deletePlaylistController);
