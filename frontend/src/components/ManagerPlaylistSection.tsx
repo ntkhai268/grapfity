@@ -1,65 +1,7 @@
-// import React, { useState} from "react";
-// import ControlPlaylist from "./Manager_Playlists/ControlPlaylist";
-// import PlaylistHeader from "./Manager_Playlists/HeaderPlaylist";
-// import DataPlaylist from "./Manager_Playlists/DataPlaylist";
-// import { getPlaylists } from "../components/Manager_Playlists/ManagerDataPlaylist";
-
-// import "../styles/ManagerSongLayout.css";
-
-// interface ManagerPlaylistSectionProps {
-//   playlistId: number;
-// }
-
-// interface TrackItem {
-//   title: string;
-//   src: string;
-//   artist: string;
-//   cover: string;
-// }
-
-// interface PlaylistData {
-//   id: number;
-//   title: string;
-//   artist: string;
-//   timeAgo: string;
-//   cover: string;
-//   tracks: TrackItem[];
-// }
-
-// const ManagerPlaylistSection: React.FC<ManagerPlaylistSectionProps> = ({ playlistId }) => {
-//   const [bgColor, setBgColor] = useState("#7D3218");
-
-//   const playlists = getPlaylists();
-//   const playlist = playlists.find((pl: PlaylistData) => pl.id === playlistId);
-
-//   if (!playlist) {
-//     return <div>Không tìm thấy playlist với id {playlistId}</div>;
-//   }
-  
-
-//   return (
-//     <div className="container">
-//       <div className="song_side_playlist"
-//          style={{
-//           background: `linear-gradient(to bottom, ${bgColor}, var(--spotify-black) 70%)`,
-//         }}
-//       >
-//         <div
-//           className="Management_playlist"
-//         >
-//           <PlaylistHeader onColorExtract={setBgColor} />
-//           <ControlPlaylist />
-//           <DataPlaylist />
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ManagerPlaylistSection;
 
 
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
 import * as React from 'react';
 import Sidebar from "./Sidebar";
 
@@ -69,6 +11,8 @@ import PlaylistHeader from "./Manager_Playlists/HeaderPlaylist";   // Component 
 import DataPlaylist from "./Manager_Playlists/DataPlaylist";     // Component hiển thị danh sách bài hát
 
 import "../styles/ManagerSongLayout.css"; // Import CSS
+import { PlaylistData } from "./Manager_Playlists/ManagerDataPlaylist";
+import { getTracksInPlaylistAPI } from "../services/trackPlaylistService";
 
 // Component ManagerPlaylistSection
 const ManagerPlaylistSection: React.FC = () => {
@@ -79,6 +23,8 @@ const ManagerPlaylistSection: React.FC = () => {
   // Lấy playlistId từ tham số URL bằng useParams
   // Kiểu dữ liệu là string | undefined vì tham số có thể không tồn tại
   const { playlistId } = useParams<{ playlistId: string }>();
+
+  const [playlist, setPlaylist] = useState<PlaylistData | null>(null);
 
   // Sử dụng useNavigate để có thể điều hướng sau khi xóa (tùy chọn)
   const navigate = useNavigate();
@@ -101,6 +47,16 @@ const ManagerPlaylistSection: React.FC = () => {
   const handleSidebarExpandChange = (expanded: boolean) => {
     setSidebarExpanded(expanded);
   };
+  // ✅ Fetch playlist once ở đây
+  useEffect(() => {
+      const fetchPlaylistDetails = async () => {
+          if (!playlistId) return;
+          const result = await getTracksInPlaylistAPI(Number(playlistId));
+          setPlaylist(result || null);
+      };
+      fetchPlaylistDetails();
+  }, [playlistId]);
+ 
 
   return (
     <div className="container">
@@ -119,11 +75,16 @@ const ManagerPlaylistSection: React.FC = () => {
 
           {/* === SỬA ĐỔI QUAN TRỌNG === */}
           {/* Chỉ render ControlPlaylist nếu playlistId có giá trị (không phải undefined) */}
-          {playlistId ? (
+          
+          {playlistId && playlist ?(
+            <>
+            {console.log("✅ Tracks trước khi truyền vào ControlPlaylist:", playlist.tracks)}
             <ControlPlaylist
               playlistId={playlistId} // Truyền playlistId (giờ chắc chắn là string)
+              tracks={playlist.tracks} 
               onDeleteSuccess={handlePlaylistDeleted} // Truyền hàm callback xử lý xóa thành công
             />
+            </>
           ) : (
             // Hiển thị một thông báo hoặc trạng thái loading nếu ID không có
             // Ví dụ:

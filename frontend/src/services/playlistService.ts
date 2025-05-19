@@ -72,7 +72,10 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
     })
   };
 };
-
+interface ApiResponse<T> {
+  message: string;
+  data: T;
+}
 
 
 // --- Các hàm gọi API ---
@@ -83,11 +86,10 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
 export const getMyPlaylistsAPI = async (): Promise<PlaylistData[]> => {
     console.log("Attempting to fetch playlists for the logged-in user...");
     try {
-        const response = await axios.get<any[]>(`${API_BASE_URL}/`, {
-            withCredentials: true,
-        });
+        const response = await axios.get<ApiResponse<PlaylistData[]>>(`${API_BASE_URL}/`, { withCredentials: true });
+
         console.log("Fetched playlists data (raw):", response.data);
-        const playlists = response.data.map(mapApiDataToPlaylistData);
+        const playlists = response.data.data.map(mapApiDataToPlaylistData);
         console.log("Formatted playlists data:", playlists);
         return playlists;
 
@@ -113,40 +115,36 @@ export const getMyPlaylistsAPI = async (): Promise<PlaylistData[]> => {
     }
 };
 
-/**
- * Lấy chi tiết một playlist bằng ID.
- */
-// export const getPlaylistByIdAPI = async (id: string | number): Promise<PlaylistData | null> => {
-//     console.log(`Fetching playlist details for ID: ${id}`);
-//     try {
-//         const response = await axios.get<any>(`${API_BASE_URL}/${id}`);
-//         console.log(`Data received for playlist ${id}:`, response.data);
-//         const formattedPlaylist = mapApiDataToPlaylistData(response.data);
-//         console.log(`Formatted playlist data for ${id}:`, formattedPlaylist);
-//         return formattedPlaylist;
 
-//     } catch (error) { // error là 'unknown'
-//         console.error(`Error fetching playlist with id ${id}:`, error);
-//         // --- SỬA LẠI CÁCH KIỂM TRA LỖI ---
-//         if (error && typeof error === 'object' && 'response' in error) {
-//             const axiosError = error as any;
-//             console.error('Server response status:', axiosError.response?.status);
-//             console.error('Server response data:', axiosError.response?.data);
-//             if (axiosError.response?.status === 404) {
-//                 console.log(`Playlist with ID ${id} not found (404).`);
-//                 return null; // Trả về null nếu 404
-//             }
-//         } else if (error && typeof error === 'object' && 'request' in error) {
-//             const axiosError = error as any;
-//             console.error('No response received:', axiosError.request);
-//         } else if (error instanceof Error) {
-//             console.error('Generic error:', error.message);
-//         } else {
-//             console.error('Unknown error occurred:', error);
-//         }
-//         throw error; // Ném lại các lỗi khác 404
-//     }
-// };
+// lấy playlist public của người khác
+
+export const getPublicPlaylistsByUserIdAPI = async (userId: string | number): Promise<PlaylistData[]> => {
+    try {
+        const response = await axios.get<{ message: string; data: any[] }>(
+            `${API_BASE_URL}/user/${userId}`,
+            { withCredentials: true }
+        );
+        return response.data.data.map(mapApiDataToPlaylistData);
+    } catch (error) {
+        console.error('Error fetching public playlists for user:', error);
+        throw error;
+    }
+};
+
+export const getAllPublicPlaylistsAPI = async (): Promise<PlaylistData[]> => {
+    console.log("📂 Fetching all public playlists from server...");
+    try {
+        const response = await axios.get<{ message: string; data: any[] }>(
+            `${API_BASE_URL}/public`
+        );
+        const playlists = response.data.data.map(mapApiDataToPlaylistData);
+        console.log("✅ Fetched public playlists:", playlists);
+        return playlists;
+    } catch (error) {
+        console.error('❌ Error fetching all public playlists:', error);
+        throw error;
+    }
+};
 
 /**
  * Tạo một playlist mới cho người dùng ĐÃ ĐĂNG NHẬP.
@@ -398,154 +396,3 @@ export const updatePlaylistAPI = async (playlistId: string | number, title: stri
 };
 
 
-// ----- HÀM MỚI ĐỂ THÊM TRACK VÀO PLAYLIST (Không dùng isAxiosError) -----
-/**
- * Thêm một bài hát vào playlist cụ thể thông qua API backend.
- * LƯU Ý: Backend controller hiện tại (PlaylistTrackController) trả về association object,
- * không phải full playlist. Component CẦN phải tự fetch lại playlist sau khi thành công.
- */
-// export const addTrackToPlaylistAPI = async (playlistId: string | number, trackId: string | number): Promise<{ success: boolean; message: string }> => {
-//     console.log(`Frontend Service: Attempting to add track ${trackId} to playlist ${playlistId}`);
-//     try {
-//         // Giả định route là POST /api/playlists/:playlistId/tracks
-//         // --> Đảm bảo route này đúng với backend của bạn <--
-//         const response = await axios.post<{ message: string; data: any }>( // data là PlaylistTrack object
-//             `${API_BASE_URL}/${playlistId}/tracks`, // Endpoint
-//             { trackId: Number(trackId) },        // Body chứa trackId dạng số
-//             { withCredentials: true }          // Gửi cookie xác thực
-//         );
-
-//         console.log("Backend response after adding track:", response.data);
-
-//         // Backend hiện tại trả về 200 OK khi thành công
-//         if (response.status === 200 && response.data.message) {
-//             console.log(`Successfully added track ${trackId} to playlist ${playlistId}. Message: ${response.data.message}`);
-//             // Trả về thành công, component gọi hàm này sẽ cần fetch lại dữ liệu playlist
-//             return { success: true, message: response.data.message };
-//         } else {
-//             // Trường hợp không mong muốn khác
-//             console.warn("Unexpected successful response structure:", response);
-//             // Không nên throw Error ở đây nếu kiểu trả về là Promise<{success, message}>
-//             // throw new Error("Phản hồi từ server không như mong đợi sau khi thêm bài hát.");
-//              return { success: false, message: "Phản hồi từ server không như mong đợi sau khi thêm bài hát." };
-//         }
-
-//     } catch (error: any) { // Bắt lỗi dưới dạng 'any'
-//         console.error(`Error adding track ${trackId} to playlist ${playlistId} via API:`, error);
-
-//         let errorMessage = "Lỗi không xác định khi thêm bài hát vào playlist.";
-
-//         // Kiểm tra trực tiếp cấu trúc lỗi thay vì dùng isAxiosError
-//         if (error && error.response) {
-//             // Có phản hồi lỗi từ server (status code 4xx, 5xx)
-//             const axiosResponseError = error as { response: { status: number; data: any } }; // Type assertion đơn giản
-//              console.error('Server Response Error:', {
-//                  status: axiosResponseError.response.status,
-//                  data: axiosResponseError.response.data
-//              });
-//             const responseData = axiosResponseError.response.data;
-//             // Ưu tiên lấy lỗi từ responseData.error hoặc responseData.message
-//             errorMessage = responseData?.error || responseData?.message || `Lỗi từ server: ${axiosResponseError.response.status}`;
-
-//             const status = axiosResponseError.response.status;
-//             if (status === 400) {
-//                 console.warn(`Bad Request (400): ${errorMessage}`);
-//             } else if (status === 401 || status === 403) {
-//                 console.warn(`Authentication/Authorization Error (${status}).`);
-//                 errorMessage = "Bạn không được phép thực hiện hành động này.";
-//             } else if (status === 404) {
-//                 console.warn(`Not Found (404): ${errorMessage}`);
-//                 // Cập nhật message nếu backend trả về cụ thể hơn
-//                 if (errorMessage.toLowerCase().includes('playlist')) {
-//                      errorMessage = "Không tìm thấy playlist.";
-//                 } else if (errorMessage.toLowerCase().includes('track') || errorMessage.toLowerCase().includes('bài hát')) {
-//                      errorMessage = "Không tìm thấy bài hát.";
-//                 } else {
-//                       errorMessage = "Không tìm thấy tài nguyên được yêu cầu.";
-//                 }
-//             } else if (status === 409) {
-//                  console.warn(`Conflict (409): ${errorMessage}`); // Ví dụ: Bài hát đã tồn tại
-//                  errorMessage = responseData?.message || "Bài hát này đã có trong playlist.";
-//             }
-//             // Bạn có thể thêm các case khác cho các status code cụ thể
-
-//         } else if (error && error.request) {
-//             // Request đã được gửi đi nhưng không nhận được phản hồi
-//              console.error('No response received (Network Error):', error.request);
-//             errorMessage = "Không nhận được phản hồi từ server. Vui lòng kiểm tra kết nối mạng.";
-//         } else if (error instanceof Error) {
-//             // Lỗi Javascript thông thường (ví dụ: lỗi trong logic trước khi gọi axios)
-//              console.error('Generic JavaScript error:', error.message);
-//              errorMessage = error.message; // Lấy message từ lỗi JS
-//          } else {
-//             // Các loại lỗi không xác định khác
-//              console.error('Unknown error occurred:', error);
-//              // Có thể cố gắng chuyển đổi error sang string để xem thông tin
-//              try {
-//                 errorMessage = String(error);
-//              } catch (e) { /* Bỏ qua nếu không thể chuyển đổi */ }
-//         }
-
-//         // Trả về trạng thái thất bại để component xử lý
-//         return { success: false, message: errorMessage };
-//     }
-// };
-// ------------------kết thúc API thêm playlist mới---------------------------------------- 
-
-// =====================================================
-// === HÀM MỚI ĐỂ XÓA TRACK KHỎI PLAYLIST ===
-// =====================================================
-/**
- * Xóa một bài hát khỏi playlist cụ thể.
- * @param playlistId ID của Playlist chứa bài hát.
- * @param trackId ID của Track cần xóa.
- * @returns Promise<{ success: boolean; message: string }>
- */
-// export const removeTrackFromPlaylistAPI = async (playlistId: string | number, trackId: string | number): Promise<{ success: boolean; message: string }> => {
-//     console.log(`Frontend Service: Attempting to remove track ${trackId} from playlist ${playlistId}`);
-//     try {
-//         // Gọi API backend với phương thức DELETE
-//         // Endpoint: DELETE /api/playlists/:playlistId/tracks/:trackId
-//         const response = await axios.delete<{ message: string }>( // Backend có thể chỉ trả về message
-//             `${API_BASE_URL}/${playlistId}/tracks/${trackId}`, // URL bao gồm cả trackId
-//             { withCredentials: true } // Gửi cookie xác thực
-//         );
-
-//         console.log("Backend response after removing track:", response.data);
-
-//         // Giả định thành công nếu status là 200 hoặc 204 (No Content) và có message (nếu status là 200)
-//         if ((response.status === 200 && response.data.message) || response.status === 204) {
-//             console.log(`Successfully removed track ${trackId} from playlist ${playlistId}.`);
-//             return { success: true, message: response.data?.message || "Đã xóa bài hát khỏi playlist." }; // Lấy message nếu có
-//         } else {
-//             console.warn("Unexpected successful response structure after delete:", response);
-//             return { success: false, message: "Phản hồi từ server không như mong đợi." };
-//         }
-
-//     } catch (error: any) {
-//         console.error(`Error removing track ${trackId} from playlist ${playlistId} via API:`, error);
-//         let errorMessage = "Lỗi không xác định khi xóa bài hát.";
-//         if (error.response) {
-//             const status = error.response.status;
-//             const responseData = error.response.data;
-//             errorMessage = responseData?.error || `Lỗi từ server: ${status}`;
-//             console.error('Server Response Error:', { status, data: responseData });
-//             // Xử lý các status code cụ thể
-//             if (status === 401 || status === 403) errorMessage = "Bạn không có quyền xóa khỏi playlist này.";
-//             else if (status === 404) errorMessage = responseData?.error || "Không tìm thấy playlist hoặc bài hát trong playlist.";
-//             else if (status === 400) errorMessage = responseData?.error || "Dữ liệu không hợp lệ.";
-//         } else if (error.request) {
-//             errorMessage = "Không nhận được phản hồi từ server.";
-//         } else {
-//             errorMessage = `Lỗi không xác định: ${error.message}`;
-//         }
-//         // Trả về thất bại kèm message lỗi
-//         return { success: false, message: errorMessage };
-//     }
-// };
-
-// ----- Các hàm API khác (nếu có) -----
-
-
-
-// ----- Các hàm API khác -----

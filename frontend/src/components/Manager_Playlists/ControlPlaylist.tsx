@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useSongManager from "../../hooks/Manager_Song_Play";
 import EditPlaylistForm from "../../components/Manager_Playlists/Edit_Playlist_Form";
 // import PlaylistEditModal from './PlaylistEditModal';
 // --- 1. Import hàm deletePlaylistAPI ---
 // !!! Đảm bảo đường dẫn này đúng với vị trí file service của bạn !!!
 import { deletePlaylistAPI } from "../../services/playlistService"; // Hoặc tên file service tương ứng
+import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager";
 
 interface ISongManagerOutput {
   audioRef: React.RefObject<HTMLAudioElement | null>;
@@ -16,10 +17,11 @@ interface ISongManagerOutput {
 // --- 2. Sửa props cho component ---
 interface ControlPlaylistProps {
   playlistId: string | number; // <-- Sửa: Chỉ chấp nhận string hoặc number, không chấp nhận undefined/null
+   tracks: Song[];
   onDeleteSuccess?: () => void; // Hàm callback để xử lý khi xóa thành công (tùy chọn)
 }
 
-const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId, onDeleteSuccess }) => { // <-- Nhận props
+const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId,tracks, onDeleteSuccess }) => { // <-- Nhận props
   const { audioRef, songUrl, isPlaying, togglePlay }: ISongManagerOutput = useSongManager();
   const [isEditing, setIsEditing] = useState(false); // popup state
   const [isDeleting, setIsDeleting] = useState(false); // Trạng thái đang xóa (để vô hiệu hóa nút)
@@ -64,6 +66,11 @@ const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId, onDeleteS
       setIsDeleting(false); // Kết thúc xóa, kích hoạt lại nút
     }
   };
+  useEffect(() => {
+  if (tracks.length > 0 && !GlobalAudioManager.getCurrentSong()) {
+    GlobalAudioManager.setPlaylist(tracks, 0, { id: playlistId, type: 'playlist' });
+  }
+}, [tracks, playlistId]);
 
   return (
     <>
@@ -71,8 +78,27 @@ const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId, onDeleteS
         <audio ref={audioRef} src={songUrl} />
 
         {/* Nút Play hình tròn màu xanh */}
-        <button className="play-button-circle" onClick={togglePlay} disabled={isDeleting}>
-          <i className={isPlaying ? "fas fa-pause" : "fas fa-play"}></i>
+        <button
+          className="play-button-circle"
+          onClick={() => {
+            const currentSong = GlobalAudioManager.getCurrentSong();
+            const isSamePlaylist = GlobalAudioManager.getCurrentContext()?.id === playlistId;
+
+            if (!currentSong || !isSamePlaylist) {
+              // ⚠️ Reset playlist và phát từ đầu nếu chưa có gì đang phát hoặc khác playlist
+              GlobalAudioManager.setPlaylist(tracks, 0, { id: playlistId, type: 'playlist' });
+              GlobalAudioManager.playSongAt(0);
+            } else {
+              // ✅ Nếu đúng bài, chỉ toggle Play/Pause
+              togglePlay();
+            }
+          }}
+          disabled={isDeleting}
+        >
+          <i className={isPlaying && GlobalAudioManager.getCurrentContext()?.id === playlistId
+              ? "fas fa-pause"
+              : "fas fa-play"}>
+          </i>
         </button>
 
         {/* Các nút chức năng khác */}

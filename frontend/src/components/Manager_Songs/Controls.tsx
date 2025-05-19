@@ -14,7 +14,7 @@ interface ControlsProps {
   
   currentTrackId?: string | number | null;
   trackId?: string | number | null;
-  playlistIndex: number;
+  // playlistIndex: number;
   // Thêm các props khác nếu ManagerSongSection truyền xuống (ví dụ: playNext, playPrevious, etc.)
 }
 
@@ -26,7 +26,7 @@ const Controls: React.FC<ControlsProps> = ({
   isPlaying,
   currentTrackId,
   trackId,
-  playlistIndex,
+  // playlistIndex,
   // ...destructure các props khác nếu có
 }) => {
   // --- Hooks & State ---
@@ -99,9 +99,38 @@ const Controls: React.FC<ControlsProps> = ({
   }, [currentTrackId, closeDropdown, isAddingTrack]); // currentTrackId giờ là prop
 
 
-const handlePlayButtonClick = () => {
+// const handlePlayButtonClick = () => {
+//   const currentSong = GlobalAudioManager.getCurrentSong();
+//   const currentIsPlaying = GlobalAudioManager.getIsPlaying();
+//   const audio = GlobalAudioManager.getAudioElement();
+
+//   if (!trackId || !songUrl) {
+//     console.error("Missing trackId or songUrl");
+//     return;
+//   }
+
+//   const isCurrentSong = currentSong && currentSong.id === trackId;
+
+//   if (!isCurrentSong) {
+//     // 🔥 Chỉ phát bài đầu tiên đã được set từ ManagerSongSection
+//     console.log("📀 Bài khác đang phát. Phát bài đã được setup trong ManagerSongSection.");
+//     GlobalAudioManager.playSongAt(playlistIndex); // chỉ phát bài đã được set
+//   } else {
+//     if (currentIsPlaying) {
+//       GlobalAudioManager.pausePlayback();
+//     } else if (audio && currentSong) {
+//       GlobalAudioManager.playAudio(audio, currentSong);
+//     }
+//   }
+// };
+
+
+
+  // --- Effects ---
+  
+  const handlePlayButtonClick = () => {
   const currentSong = GlobalAudioManager.getCurrentSong();
-  const currentIsPlaying = GlobalAudioManager.getIsPlaying();
+  const isCurrentlyPlaying = GlobalAudioManager.getIsPlaying();
   const audio = GlobalAudioManager.getAudioElement();
 
   if (!trackId || !songUrl) {
@@ -112,11 +141,19 @@ const handlePlayButtonClick = () => {
   const isCurrentSong = currentSong && currentSong.id === trackId;
 
   if (!isCurrentSong) {
-    // 🔥 Chỉ phát bài đầu tiên đã được set từ ManagerSongSection
-    console.log("📀 Bài khác đang phát. Phát bài đã được setup trong ManagerSongSection.");
-    GlobalAudioManager.playSongAt(playlistIndex); // chỉ phát bài đã được set
+    // ✅ Lúc này mới load đúng playlist đã được xem
+    const playlist = JSON.parse(localStorage.getItem("viewedPlaylist") || "[]");
+    const index = parseInt(localStorage.getItem("viewedIndex") || "0");
+
+    const context = {
+      id: `manager-${trackId}`,
+      type: "queue"
+    };
+
+    GlobalAudioManager.setPlaylist(playlist, index, context);
+    GlobalAudioManager.playSongAt(index);
   } else {
-    if (currentIsPlaying) {
+    if (isCurrentlyPlaying) {
       GlobalAudioManager.pausePlayback();
     } else if (audio && currentSong) {
       GlobalAudioManager.playAudio(audio, currentSong);
@@ -125,8 +162,6 @@ const handlePlayButtonClick = () => {
 };
 
 
-
-  // --- Effects ---
   useEffect(() => {
     fetchPlaylists();
   }, [fetchPlaylists]);

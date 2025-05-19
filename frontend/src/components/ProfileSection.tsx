@@ -1,6 +1,8 @@
 // import React from "react";
 // import Header from "./Header";
-import  { useState } from "react";
+import { useParams } from 'react-router-dom';
+import { getCurrentUser } from '../services/authService';
+import  { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Tab from "./UI_Profile/Tab";
 // import Footer from "./Footer";
@@ -13,23 +15,33 @@ import Playlists from "./UI_Profile/Playlist";
 import ProfileSlide from "./UI_Profile/Profile_Slide";
 import ProfileStat from "./UI_Profile/Profile_Stats";
 
-// import css
 
-// import "../styles/ProfileSlide.css";
-// import "../styles/Song_Side.css";
-// import "../styles/MidSection.css";
-// import "../styles/BottomSection.css";
 import "../styles/ProfileLayout.css";
 
 
 
 const ProfileSection = () => {
+  // Lấy userId trong URL (profile đang xem)
+  const { userId: profileUserId } = useParams<{ userId: string }>();
+  const [currentUserId, setCurrentUserId] = useState<string | number | null>(null);
+  const safeProfileUserId: string | number = profileUserId ?? "";
   const [profileBgColor, setProfileBgColor] = useState<string>("#f2f2f2");
 
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const handleSidebarExpandChange = (expanded: boolean) => {
     setSidebarExpanded(expanded);
   };
+
+   useEffect(() => {
+    const fetchUser = async () => {
+      const user = await getCurrentUser();
+      if (user?.id) {
+        setCurrentUserId(user.id);
+      }
+    };
+
+    fetchUser();
+  }, []);
   return (
     <div>
       <div className="container">
@@ -54,21 +66,13 @@ const ProfileSection = () => {
                     <Song />
                     <PopularTracks />
                     <Tracks />
-                    <Playlists />
+                    <Playlists viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""} />
                     </div>
 
                     <SongRight />
                 </div>
             </div>
-            {/* -------------------------UI quản lí bài hát---------------------------------------- */}
-           {/* <div className="Management_song">
-                <SongHeader />
-                <Controls />
-                <Lyrics />
-                <Recommendations />
-                <PopularSongs />
-            </div>  */}
-            {/* -------------------------------------------------------------------- */}
+           
         </div>
         {/* <Footer /> */}
       </div>

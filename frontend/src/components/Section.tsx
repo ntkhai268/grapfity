@@ -8,6 +8,8 @@ import GlobalAudioManager, { Song, PlaylistContext } from "../hooks/GlobalAudioM
 // Import service API và kiểu dữ liệu TrackData
 // Đảm bảo đường dẫn này chính xác
 import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
+import { PlaylistData } from "../components/Manager_Playlists/ManagerDataPlaylist";
+import { getAllPublicPlaylistsAPI } from "../services/playlistService"; 
 
 
 import "../styles/Section.css"; // Đảm bảo đường dẫn CSS đúng
@@ -34,6 +36,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     const [error, setError] = useState<string | null>(null);    
     const [currentPlayingId, setCurrentPlayingId] = useState<string | number | null>(null);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [publicPlaylists, setPublicPlaylists] = useState<PlaylistData[]>([]);
 
     // Fetch dữ liệu khi component mount
     useEffect(() => {
@@ -65,8 +68,21 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     // --- Chia nhỏ dữ liệu (sử dụng mảng Song[] đã map) ---
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
     const recommendedTracks: Song[] = allTracks.slice(0, 3); 
-    const recentTracks: Song[] = allTracks.slice(3, 7);     
-    const popularTracks: Song[] = allTracks.slice(7, 15);   
+    const recentTracks: Song[] = allTracks.slice(3, 7);  
+    const publicTracks: Song[] = allTracks; 
+    // const popularTracks: Song[] = publicPlaylists
+    //     .flatMap((playlist) =>
+    //         playlist.tracks.map((track) => ({
+    //         id: track.id,
+    //         src: track.src,
+    //         title: track.title,
+    //         artist: track.artist,
+    //         cover: track.cover,
+    //         }))
+    //     )
+    //     .filter((track, index, self) =>
+    //         index === self.findIndex((t) => t.id === track.id)
+    //     ); // ✅ Lấy tất cả bài hát, lọc trùng nếu cần
 
     const handleSidebarExpandChange = (expanded: boolean) => {
         setSidebarExpanded(expanded);
@@ -173,6 +189,19 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             GlobalAudioManager.playAudio(GlobalAudioManager.getAudioElement()!, clickedSong, context);
         }
     };
+    // /fetch lấy dữ liệu playlist public của mọi người
+    useEffect(() => {
+        const fetchPublicPlaylists = async () => {
+        try {
+            const playlists: PlaylistData[] = await getAllPublicPlaylistsAPI();
+            setPublicPlaylists(playlists);
+            } catch (err) {
+            console.error("Lỗi khi tải playlist công khai:", err);
+            }
+        };
+
+        fetchPublicPlaylists();
+    }, []);
 
 
     return (
@@ -195,7 +224,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                     // Truyền context type là 'queue' và id là 'recommended' (ví dụ)
                                         <button
                                             key={`rec-${song.id}-${index}`}
-                                            className="song-item"
+                                            className="song-item-section"
                                            onClick={() => handleClicktest(song, recommendedTracks, index, 'queue', 'recommended')}
 
                                             >
@@ -220,7 +249,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                                 </div>
                                             </div>
 
-                                            <p className="title">{song.title || 'Unknown Title'}</p>
+                                            <p className="title"title={song.title}>{song.title || 'Unknown Title'}</p>
                                             <p className="artist">{song.artist || 'Unknown Artist'}</p>
                                         </button>
 
@@ -236,7 +265,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                             {recentTracks.length > 0 ? (
                                 recentTracks.map((song, index) => (
                                      // Truyền context type là 'queue' và id là 'recent' (ví dụ)
-                                    <button key={`rel-${song.id}-${index}`} className="song-item" onClick={() => handleClick(recentTracks, index, 'queue', 'recent')}>
+                                    <button key={`rel-${song.id}-${index}`} className="song-item-section" onClick={() => handleClick(recentTracks, index, 'queue', 'recent')}>
                                         <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
                                     </button>
                                 ))
@@ -246,22 +275,72 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                         </div>
 
                         {/* --- SECTION 3: POPULAR --- */}
-                        <h1>Popular albums and singles</h1>
+                        <h1>Playlists</h1>
                         <div className="song-list">
-                            {popularTracks.length > 0 ? (
-                                popularTracks.map((song, index) => (
-                                     // Truyền context type là 'queue' và id là 'popular' (ví dụ)
-                                    <button key={`pop-${song.id}-${index}`} className="song-item" onClick={() => handleClick(popularTracks, index, 'queue', 'popular')}>
-                                        <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
-                                        <p className="title">{song.title || 'Unknown Title'}</p>
-                                        <p className="artist">{song.artist || 'Unknown Artist'}</p>
-                                    </button>
+                            {publicPlaylists.length > 0 ? (
+                                publicPlaylists.map((playlist, index) => (
+                                <button
+                                    key={`playlist-${playlist.id}-${index}`}
+                                    className="song-item-section"
+                                    onClick={() => {
+                                    // 👉 Chuyển đến trang hiển thị playlist chi tiết
+                                        navigate(`/ManagerPlaylistLayout/${playlist.id}`)
+                                    }}
+                                >
+                                    <img src={playlist.cover || 'assets/anhmau.png'} alt={playlist.title} />
+                                    <p className="title" title={playlist.title}>{playlist.title}</p>
+                                    <p className="artist">{playlist.artist}</p>
+                                </button>
                                 ))
                             ) : (
-                                <p>Chưa có album/single phổ biến.</p>
+                                <p>Không có playlist công khai nào.</p>
                             )}
                         </div>
-                    </>
+
+                        {/* ------------------------- */}
+                        {/* --- SECTION 4: Tracks --- */}
+                        <h1>Tracks</h1>
+                        <div className="song-list">
+                            {publicTracks.length > 0 ? (
+                                publicTracks.map((song, index) => (
+                                    // Truyền context type là 'queue' và id là 'recommended' (ví dụ)
+                                        <button
+                                            key={`rec-${song.id}-${index}`}
+                                            className="song-item-section"
+                                           onClick={() => handleClicktest(song, publicTracks, index, 'queue', 'recommended')}
+
+                                            >
+                                            <div className="song-image-wrapper">
+                                                <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
+                                                
+                                                <div
+                                                className="play-button-section"
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Ngăn chuyển trang
+                                                    handlePlayButtonClick(publicTracks, index, 'queue', 'recommended');
+                                                }}
+                                                >
+                                                <i
+                                                    className={
+                                                     currentPlayingId === song.id && isPlaying
+                                                        ? "fas fa-pause"
+                                                        : "fas fa-play"
+                                                    }
+                                                    style={{ color: "black" }}
+                                                ></i>
+                                                </div>
+                                            </div>
+
+                                            <p className="title" title={song.title}>{song.title || 'Unknown Title'}</p>
+                                            <p className="artist">{song.artist || 'Unknown Artist'}</p>
+                                        </button>
+
+                                ))
+                            ) : (
+                                <p>Không có bài hát nào được đề xuất.</p>
+                            )}
+                        </div>
+                </>
                 )}
             </section>
         </>

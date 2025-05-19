@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
 import { UserData } from '../../services/userService';
 import '../../styles/EditProfileModal.css';
+import { verifyPassword } from '../../services/authService';
 
 interface EditProfileModalProps {
-  user: UserData;
+  user: UserData; 
   onClose: () => void;
   onSave: (formData: FormData) => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSave }) => {
   const [formData, setFormData] = useState<UserData>({ ...user, password: '' });
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -40,9 +43,10 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
   const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setConfirmPassword(value);
+
     if (value.includes('<') || value.includes('>')) {
       setPasswordError('Mật khẩu không được chứa ký tự không an toàn.');
-    } else if (value !== formData.password) {
+    } else if (value !== newPassword) {
       setPasswordError('Mật khẩu xác nhận không khớp.');
     } else {
       setPasswordError(null);
@@ -57,6 +61,21 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+
+    // 🔒 Nếu người dùng nhập mật khẩu mới → kiểm tra mật khẩu cũ
+    if (newPassword) {
+      if (!oldPassword) {
+        alert("Vui lòng nhập mật khẩu hiện tại.");
+        return;
+      }
+
+      const isValid = await verifyPassword(oldPassword);
+      if (!isValid) {
+        alert("❌ Mật khẩu hiện tại không đúng.");
+        return;
+      }
+    }
+
     const dataToSend = new FormData();
 
     Object.entries(formData).forEach(([key, value]) => {
@@ -69,13 +88,20 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
       dataToSend.append('userImage', avatarFile);
     }
 
-      for (const [key, value] of dataToSend.entries()) {
-    console.log('FormData:', key, value);
-  }
+    if (newPassword) {
+      dataToSend.append('password', newPassword);
+    }
+
+    // 🧪 Debug log
+    // for (const [key, value] of dataToSend.entries()) {
+    //   console.log('FormData:', key, value);
+    // }
 
     onSave(dataToSend);
     setIsEditing(false);
   };
+
+
 
   return (
     <div className="modal_overlay">
@@ -108,7 +134,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
 
             {isEditing && (
               <>
-                <input type="password" name="password" value={formData.password} onChange={handleChange} placeholder="Nhập mật khẩu mới" />
+                <input type="password" name="password" value={oldPassword}  onChange={(e) => setOldPassword(e.target.value)} placeholder="Nhập mật khẩu hiện tại" />
+                <input type="password" name="password"  value={newPassword}onChange={(e) => setNewPassword(e.target.value)} placeholder="Nhập mật khẩu mới" />
                 <input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} placeholder="Xác nhận mật khẩu mới" />
                 {passwordError && <div className="error_text">{passwordError}</div>}
               </>
@@ -123,11 +150,11 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
 
         <div className="modal_footer">
           {!isEditing ? (
-            <button type="button" className="edit_button" onClick={() => setIsEditing(true)}>Chỉnh sửa</button>
+            <button type="button" className="edit_button_profile" onClick={() => setIsEditing(true)}>Edit</button>
           ) : (
             <>
-              <button type="button" className="cancel_button" onClick={() => setIsEditing(false)}>Hủy</button>
-              <button type="submit" className="save_button" disabled={!!passwordError}>Lưu</button>
+              <button type="button" className="cancel_button" onClick={() => setIsEditing(false)}>Cancel</button>
+              <button type="submit" className="save_button" disabled={!!passwordError}>Save</button>
             </>
           )}
         </div>

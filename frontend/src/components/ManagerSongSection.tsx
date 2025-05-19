@@ -10,7 +10,7 @@ import Sidebar from "./Sidebar";
 // Import hook useSongManager và kiểu dữ liệu của nó
 // Đảm bảo đường dẫn này chính xác đến file hook của bạn
 import useSongManager from "../hooks/Manager_Song_Play"; 
-import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager";
+import { Song } from "../hooks/GlobalAudioManager";
 
 // Định nghĩa (hoặc import) kiểu dữ liệu trả về của hook useSongManager
 // Kiểu này cần khớp với những gì hook useSongManager thực sự trả về
@@ -32,9 +32,12 @@ const ManagerSongSection: React.FC = () => {
   const [viewSong, setViewSong] = useState(songFromState || null);
   const playlistFromState = location.state?.songs;
   const indexFromState = location.state?.currentIndex;
-
-  const [playlist, setPlaylist] = useState<Song[]>(playlistFromState || []);
-  const [playlistIndex, setPlaylistIndex] = useState<number>(
+  const [, setPlaylist] = useState<Song[]>(playlistFromState || []);
+  // const [playlist, setPlaylist] = useState<Song[]>(playlistFromState || []);
+  // const [playlistIndex, setPlaylistIndex] = useState<number>(
+  //   indexFromState !== undefined ? indexFromState : 0
+  // );
+   const [, setPlaylistIndex] = useState<number>(
     indexFromState !== undefined ? indexFromState : 0
   );
 
@@ -73,16 +76,28 @@ const ManagerSongSection: React.FC = () => {
   }
 }, [songFromState]);
 
+// useEffect(() => {
+//   if (playlist.length > 0 && viewSong) {
+//     console.log("🧪 Playlist được truyền vào ManagerSongSection:", playlist.map(s => s.id));
+//     const context = {
+//       id: `manager-${viewSong.id}`,
+//       type: "queue"
+//     };
+//     GlobalAudioManager.setPlaylist(playlist, playlistIndex, context);
+//   }
+// }, [playlist, playlistIndex, viewSong]);
+
+
 useEffect(() => {
-  if (playlist.length > 0 && viewSong) {
-    console.log("🧪 Playlist được truyền vào ManagerSongSection:", playlist.map(s => s.id));
-    const context = {
-      id: `manager-${viewSong.id}`,
-      type: "queue"
-    };
-    GlobalAudioManager.setPlaylist(playlist, playlistIndex, context);
+  const song = location.state?.currentSong;
+  if (song && (!viewSong || song.id !== viewSong.id)) {
+    setViewSong(song);
   }
-}, [playlist, playlistIndex, viewSong]);
+}, [location.state?.currentSong]);
+
+useEffect(() => {
+  console.log("🔁 ManagerSongSection reloaded:", location.state?._forceKey);
+}, [location.state?._forceKey]);
 
 
   return (
@@ -110,7 +125,7 @@ useEffect(() => {
               isPlaying={isPlaying}
               
                trackId={viewSong?.id ?? null}
-               playlistIndex={playlistIndex}
+              //  playlistIndex={playlistIndex}
               
             />
             <Lyrics trackId={viewSong?.id ?? null} />

@@ -255,6 +255,7 @@ export const createTrackAPI = async (
   fileAudio: File,
   fileImage: File,
   title: string,
+  privacy: string,
   audioFeatures?: any // Đã bao gồm lyrics trong object này
 ): Promise<TrackData> => {
   try {
@@ -262,6 +263,8 @@ export const createTrackAPI = async (
     formData.append('audio', fileAudio);
     formData.append('image', fileImage);
     formData.append('title', title);
+    formData.append('privacy', privacy);
+
 
     // 🎯 Chỉ gửi audioFeatures (đã bao gồm lyrics bên trong)
     formData.append('audioFeatures', JSON.stringify(audioFeatures));

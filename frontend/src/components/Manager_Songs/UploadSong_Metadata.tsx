@@ -30,7 +30,7 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
   const [description, setDescription] = useState('');
   // --- State cho ô textarea riêng biệt ---
   const [notes, setNotes] = useState(''); // Dùng cho textarea Notes
-  const [privacy, setPrivacy] = useState('Public');
+  const [privacy, setPrivacy] = useState('public');
   const [releaseDate, setReleaseDate] = useState(''); // String format YYYY-MM-DD
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -107,31 +107,33 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
     }
 
     // Tạo FormData
-    const formData = new FormData();
-    formData.append('title', title.trim());
-    formData.append('permalink', permalink);
-    formData.append('playlistType', playlistType);
-    formData.append('genre', genre);
-    formData.append('tags', tags.trim());
-    formData.append('description', description.trim());
-    // --- Gửi giá trị từ ô TEXTAREA NOTES ---
-    formData.append('notes', notes.trim());
-    formData.append('privacy', privacy);
-    formData.append('releaseDate', releaseDate);
-    if (selectedImageFile) { formData.append('image', selectedImageFile, selectedImageFile.name); }
-    if (selectedAudioFile) { formData.append('audio', selectedAudioFile, selectedAudioFile.name); }
-    // --- Gửi cả object audioFeatures (JSON string) ---
-    if (audioFeatures) {
-        formData.append('audioFeatures', JSON.stringify(audioFeatures));
-    }
+    // const formData = new FormData();
+    // formData.append('title', title.trim());
+    // formData.append('permalink', permalink);
+    // formData.append('playlistType', playlistType);
+    // formData.append('genre', genre);
+    // formData.append('tags', tags.trim());
+    // formData.append('description', description.trim());
+    // // --- Gửi giá trị từ ô TEXTAREA NOTES ---
+    // // formData.append('notes', notes.trim());
+    // // formData.append('privacy', privacy);
+    // formData.append('releaseDate', releaseDate);
+    // if (selectedImageFile) { formData.append('image', selectedImageFile, selectedImageFile.name); }
+    // if (selectedAudioFile) { formData.append('audio', selectedAudioFile, selectedAudioFile.name); }
+    // // --- Gửi cả object audioFeatures (JSON string) ---
+    // if (audioFeatures) {
+    //     formData.append('audioFeatures', JSON.stringify(audioFeatures));
+    // }
 
     // Gửi request
     try {
-    console.log("Gửi tới createTrackAPI:", { title, audioFeatures, lyrics: audioFeatures.lyrics });
+    // console.log("Gửi tới createTrackAPI:", { title, audioFeatures, lyrics: audioFeatures.lyrics });
+    console.log("Form to backend:", audioFeatures);
     const result = await createTrackAPI(
       selectedAudioFile,
       selectedImageFile,
       title,
+      privacy,
       audioFeatures // hoặc bạn filter các field cần thiết
     );
 
@@ -277,8 +279,8 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
               id="privacyPublic" // ID cho label htmlFor
               name="privacy"     // Cần cùng name để nhóm radio
               type="radio"
-              value="Public"     // Giá trị khi chọn
-              checked={privacy === 'Public'} // Kiểm tra với state 'privacy'
+              value="public"     // Giá trị khi chọn
+              checked={privacy === 'public'} // Kiểm tra với state 'privacy'
               onChange={(e) => setPrivacy(e.target.value)} // <<< Gọi setPrivacy
               className="meta-form-radio"
             />
@@ -293,8 +295,8 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
               id="privacyPrivate" // ID cho label htmlFor
               name="privacy"      // Cần cùng name
               type="radio"
-              value="Private"    // Giá trị khi chọn
-              checked={privacy === 'Private'} // Kiểm tra với state 'privacy'
+              value="private"    // Giá trị khi chọn
+              checked={privacy === 'private'} // Kiểm tra với state 'privacy'
               onChange={(e) => setPrivacy(e.target.value)} // <<< Gọi setPrivacy
               className="meta-form-radio"
             />
