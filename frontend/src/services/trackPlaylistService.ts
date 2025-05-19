@@ -31,7 +31,7 @@ export const getTracksInPlaylistAPI = async (id: string | number): Promise<Playl
     try {
         const response = await axios.get<any>(`${API_BASE_URL_PLAYLISTS}/${id}`);
         console.log(`Data received for playlist ${id}:`, response.data);
-        const formattedPlaylist = mapApiDataToPlaylistData(response.data);
+        const formattedPlaylist = mapApiDataToPlaylistData(response.data.data);
         console.log(`Formatted playlist data for ${id}:`, formattedPlaylist);
         return formattedPlaylist;
 

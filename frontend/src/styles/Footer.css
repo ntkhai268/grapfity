@@ -110,14 +110,7 @@
 }
 
 
-.footer-right-progress{
-  display: flex;
-  background-color: black;
-  max-width: 30%;
-  margin-left: auto;
-  width: 30%;
-  height: 100%;
-}
+
 
 /* Nút thêm */
 .btn-DC{
@@ -154,4 +147,76 @@
     border-radius: 10px;
   }
 
-  
+  /* --------------vol-------------------- */
+  .footer-right-progress{
+  display: flex;
+  justify-content: flex-end;
+  background-color: black;
+  max-width: 30%;
+  margin-left: auto;
+  width: 30%;
+  height: 100%;
+  padding-right: 16px;
+}
+  .volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+}
+.volume-control input[type="range"] {
+  width: 80px;
+  height: 4px;
+  appearance: none;
+  background: linear-gradient(to right, #1db954 0%, white 0%);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+/* WebKit: track */
+.volume-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: transparent;
+  border-radius: 2px;
+}
+
+/* Thumb */
+.volume-control input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  background: #1db954;
+  border-radius: 50%;
+  margin-top: -3px;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+/* Firefox */
+.volume-control input[type="range"]::-moz-range-track {
+  background: white;
+  height: 4px;
+  border-radius: 2px;
+}
+.volume-control input[type="range"]::-moz-range-progress {
+  background: #1db954;
+  height: 4px;
+  border-radius: 2px;
+}
+.volume-control input[type="range"]::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  background: #1db954;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+.volume-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;}
+/* -------------------------------------------- */

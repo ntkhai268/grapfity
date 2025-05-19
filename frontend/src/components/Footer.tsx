@@ -2,18 +2,23 @@ import React from "react";
 // Import hook và kiểu dữ liệu trả về của nó
 import useFooterAudioPlayer, { UseFooterAudioPlayerReturn } from "../hooks/FooterAudioPlayer"; 
 // Import kiểu Song nếu cần (hoặc dùng Song từ GlobalAudioManager)
-import { Song } from "../hooks/GlobalAudioManager"; 
+import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager"; 
 import "../styles/Footer.css";
 import  { RepeatButton, ShuffleButton } from './modeControl';
+import { useNavigate } from "react-router-dom";
+import VolumeControl from "./VolumeControl";
+
 
 // Interface cho FooterLeft (có thể giữ nguyên hoặc điều chỉnh)
 interface FooterLeftProps {
   // Nhận toàn bộ đối tượng song hoặc các thuộc tính riêng lẻ
   song: Song | null; // Cho phép null
+  onTitleClick?: () => void;
 }
 
-const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
-   
+const FooterLeft: React.FC<FooterLeftProps> = ({ song, onTitleClick  }) => {
+  
+  
   // Xử lý trường hợp song là null
   if (!song) {
     return (
@@ -31,6 +36,9 @@ const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
       </div>
     );
   }
+
+ 
+
   // test xem có id ko 
   //  console.log(song.id);
 
@@ -42,7 +50,9 @@ const FooterLeft: React.FC<FooterLeftProps> = ({ song }) => {
         <img src={song.cover || "/assets/anhmau.png"} alt={song.title || 'Song cover'} />
       </div>
       <div className="title-playing-song">
-        <p className="song-title">{song.title || 'Unknown Title'}</p>
+       <p className="song-title" onClick={onTitleClick} style={{ cursor: 'pointer' }}>
+          {song.title || 'Unknown Title'}
+        </p>
         <p className="song-artist">{song.artist || 'Unknown Artist'}</p>
       </div>
       <button className="btn-DC">
@@ -157,27 +167,51 @@ const Footer: React.FC = () => {
     isShuffle,           // 👈 Thêm dòng này
     toggleRepeat,        // 👈 Thêm dòng này
     toggleShuffle,       // 👈 Thêm dòng này
+    audioRef, 
+    volume, 
+    setVolume  
   }: UseFooterAudioPlayerReturn = useFooterAudioPlayer();
   // -----------------------------------------
+  const navigate = useNavigate();
 
-  // Hàm formatTime có thể để ở đây hoặc trong ProgressBar
-  // const formatTime = ... (Đã chuyển vào ProgressBar)
+const goToManagerSong = () => {
+  if (!currentSong) return;
 
-  // progress đã được tính trong hook, không cần tính lại
-  // const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const playlist = GlobalAudioManager.getPlaylist();
+  const index = playlist.findIndex((s) => s.id === currentSong.id);
+  if (index === -1) return;
+
+  localStorage.setItem("viewedSong", JSON.stringify(currentSong));
+  localStorage.setItem("viewedPlaylist", JSON.stringify(playlist));
+  localStorage.setItem("viewedIndex", index.toString());
+
+  navigate("/ManagerSong", {
+    state: {
+      songs: playlist,
+      currentIndex: index,
+      currentSong: currentSong,
+      context: { id: `footer-${currentSong.id}`, type: "queue" },
+       _forceKey: Date.now(), // 🔥 ép state thay đổi để trigger re-render
+    },
+  });
+};
+
+  
+
+
 
   // Hàm handleSeek giờ chỉ cần gọi seekTo từ hook với phần trăm
   const handleSeek = (percent: number) => {
     seekTo(percent);
   };
 
-  // Phần render khi không có bài hát (có thể giữ nguyên hoặc dùng FooterLeft)
-  // if (!currentSong) { ... } // Có thể dùng trực tiếp FooterLeft với song={null}
+
 
   return (
     <footer className="footer">
       {/* Truyền currentSong vào FooterLeft */}
-      <FooterLeft song={currentSong} /> 
+      <FooterLeft song={currentSong} onTitleClick={goToManagerSong} />
+
       <div className="music-player">
         {/* Truyền đúng tên hàm vào MusicControls */}
         <MusicControls
@@ -198,6 +232,9 @@ const Footer: React.FC = () => {
         />
       </div>
       {/* Phần Volume Control và các phần khác có thể thêm vào đây */}
+      <div className="footer-right-progress">
+        <VolumeControl audioRef={audioRef} volume={volume} setVolume={setVolume} />
+      </div>
     </footer>
   );
 };

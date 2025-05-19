@@ -21,6 +21,8 @@ export interface UseFooterAudioPlayerReturn {
   isShuffle: boolean;
   toggleRepeat: () => void;
   toggleShuffle: () => void;
+  volume: number;
+  setVolume: (val: number) => void;
 
 }
 
@@ -41,6 +43,7 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
   const audioRef = useRef<HTMLAudioElement | null>(managerState._audioElement); 
   const [repeatMode, setRepeatMode] = useState<'off' | 'one' | 'all'>(GlobalAudioManager.getRepeat());
   const [isShuffle, setIsShuffle] = useState(GlobalAudioManager.getShuffle());
+  const [volume, setVolume] = useState(1); // volume từ 0 đến 1
 
   useEffect(() => {
       if (audioRef.current !== managerState._audioElement) {
@@ -141,6 +144,8 @@ const useFooterAudioPlayer = (): UseFooterAudioPlayerReturn => {
     isShuffle,
     toggleRepeat,
     toggleShuffle,
+    volume,
+    setVolume,
   };
 };
 

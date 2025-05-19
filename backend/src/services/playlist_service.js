@@ -1,41 +1,67 @@
 import db from '../models/index.js';
 import { Op } from 'sequelize';
 
-const getAllPlaylistsByUserId = async (userId) => {
-    try {
-        const playlists = await db.Playlist.findAll({
-            where: { userId: userId },
-            include: [
-                {
-                    model: db.Track,
-                    attributes: ['id', 'trackUrl', 'imageUrl'],
-                    include: [
-                        {
-                            model: db.User,
-                            attributes: ['id','userName','Name']
-                        },
-                        {
-                            model: db.Metadata,
-                            as: 'Metadatum', // QUAN TRỌNG: Dùng alias 'Metadatum' (số ít, viết hoa M)
-                                             // nếu Track.hasOne(models.Metadata) không có 'as'
-                                             // Hoặc dùng alias bạn đã đặt trong Track.hasOne(models.Metadata, { as: '...' })
-                            attributes: ['trackname', 'duration_ms'] // Các trường cần từ Metadata
-                        }
-                    ],
-                    
-                },
-                
-            ],
-        });
-        return playlists;
-    } catch (error) {
-        console.error('Error fetching playlists:', error);
-        throw error;
-    }
+const getAllPlaylistsByUserId = async (userId, currentUserId) => {
+  try {
+    const isOwner = Number(userId) === Number(currentUserId); // 👈 So sánh người dùng
+
+    const playlists = await db.Playlist.findAll({
+      where: {
+        userId: userId,
+        ...(isOwner ? {} : { privacy: 'public' }) // 👈 Nếu không phải chủ sở hữu, chỉ thấy public
+      },
+      include: [
+        {
+          model: db.Track,
+          attributes: ['id', 'trackUrl', 'imageUrl'],
+          include: [
+            {
+              model: db.User,
+              attributes: ['id', 'userName', 'Name']
+            },
+            {
+              model: db.Metadata,
+              as: 'Metadatum',
+              attributes: ['trackname', 'duration_ms']
+            }
+          ],
+        }
+      ]
+    });
+
+    return playlists;
+  } catch (error) {
+    console.error('Error fetching playlists:', error);
+    throw error;
+  }
+};
+const getAllPublicPlaylists = async () => {
+  return await db.Playlist.findAll({
+    where: { privacy: 'public' },
+    include: [
+      {
+        model: db.Track,
+        attributes: ['id', 'trackUrl', 'imageUrl'],
+        include: [
+          {
+            model: db.User,
+            attributes: ['id', 'userName', 'Name']
+          },
+          {
+            model: db.Metadata,
+            as: 'Metadatum',
+            attributes: ['trackname', 'duration_ms']
+          }
+        ]
+      }
+    ]
+  });
 };
 
+
+
 const createPlaylist = async (userId, trackId) => {
-    let title, createDate, imageUrl;
+    let title, createDate, imageUrl, privacy;
     const playlistCount = await db.Playlist.count({
         where: { userId: userId }
     });
@@ -60,7 +86,7 @@ const createPlaylist = async (userId, trackId) => {
         }
     }
 
-    const newPlaylist = await db.Playlist.create({ userId, title, createDate, imageUrl });
+    const newPlaylist = await db.Playlist.create({ userId, title, createDate, imageUrl, privacy });
 
     if (trackId) {
         console.log(">>playlistId: ", newPlaylist.id);
@@ -264,96 +290,11 @@ const deletePlaylist = async (playlistId, userId) => {
         throw error;
     }
 };
-/**
- * Lấy thông tin chi tiết một playlist bằng ID, bao gồm tracks và metadata (trackname).
- */
-// -------------------
-// const getPlaylistById = async (playlistId) => {
-//     const numericPlaylistId = Number(playlistId);
-//      if (isNaN(numericPlaylistId)) {
-//          console.error(`Invalid playlist ID received in getPlaylistById: ${playlistId}`);
-//          // Có thể throw lỗi thay vì return null để controller xử lý nhất quán
-//          throw new Error("Playlist ID không hợp lệ.");
-//          // return null;
-//      }
 
-//     try {
-//         // --- TRUY VẤN 1: Lấy Playlist và Tracks ---
-//         const playlistRaw = await db.Playlist.findByPk(numericPlaylistId, {
-//             include: [
-//                 {
-//                     model: db.Track,
-//                     attributes: ['id', 'trackUrl', 'imageUrl'],
-//                     through: { attributes: [] },
-//                     include: [
-//                         {
-//                             model: db.User, // User của Track
-//                             attributes: ['id', 'userName']
-//                         }
-//                     ]
-//                 },
-//                 {
-//                     model: db.User, // User của Playlist
-//                     attributes: ['id', 'userName']
-//                 }
-//             ],
-//         });
-
-//         if (!playlistRaw) return null; // Trả về null nếu không tìm thấy
-
-//         const playlist = playlistRaw.get({ plain: true });
-
-//         // --- Thu thập track IDs ---
-//         const trackIds = new Set();
-//         playlist.Tracks?.forEach(track => {
-//              if (track.id) {
-//                  trackIds.add(track.id);
-//              }
-//         });
-
-//         let metadataMap = new Map();
-
-//         // --- TRUY VẤN 2: Lấy Metadata ---
-//         if (trackIds.size > 0) {
-//              const metadataResults = await db.Metadata.findAll({
-//                  where: {
-//                      track_id: {
-//                          [Op.in]: Array.from(trackIds)
-//                      }
-//                  },
-//                  attributes: ['track_id', 'trackname'],
-//                  raw: true
-//              });
-//              metadataResults.forEach(meta => {
-//                  metadataMap.set(meta.track_id, meta.trackname);
-//              });
-//         }
-
-//         // --- Kết hợp dữ liệu ---
-//         playlist.Tracks?.forEach(track => {
-//              track.title = metadataMap.get(track.id) || "Unknown Title";
-//         });
-
-//         if (!playlist.Tracks) {
-//              playlist.Tracks = [];
-//         }
-
-//         return playlist;
-
-//     } catch (error) {
-//         console.error(`Error fetching playlist with ID ${numericPlaylistId}:`, error);
-//          if (error.sql) {
-//               console.error("Failed SQL:", error.sql);
-//          }
-//         throw error;
-//     }
-// };
-
-
-// ------------
 
 export {
     getAllPlaylistsByUserId,
+    getAllPublicPlaylists,
     createPlaylist,
     updatePlaylist,
     // getPlaylistById,
