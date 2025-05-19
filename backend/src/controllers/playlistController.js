@@ -3,6 +3,7 @@
 import {
     createPlaylist,
     getAllPlaylistsByUserId,
+    getAllPublicPlaylists,
     updatePlaylist,
     deletePlaylist
     // getPlaylistById
@@ -14,19 +15,70 @@ import {
  * Controller để lấy tất cả playlist của người dùng ĐÃ ĐĂNG NHẬP.
  */
 const getMyPlaylistsController = async (req, res) => {
-    try {
-        const userId = req.userId;
-        if (!userId) {
-            console.error('getMyPlaylistsController Error: userId không tìm thấy trên req.');
-            return res.status(401).json({ error: 'Unauthorized: Thông tin người dùng không hợp lệ.' });
-        }
-        console.log(`Controller: Đang lấy playlists cho user ID: ${userId}`);
-        const playlists = await getAllPlaylistsByUserId(userId);
-        res.status(200).json(playlists);
-    } catch (error) {
-        console.error(`Lỗi trong getMyPlaylistsController cho user ${req.userId || 'UNKNOWN'}:`, error);
-        res.status(500).json({ error: 'Lỗi server khi lấy danh sách playlist.' });
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      console.error('getMyPlaylistsController Error: userId không tìm thấy trên req.');
+      return res.status(401).json({ error: 'Unauthorized: Thông tin người dùng không hợp lệ.' });
     }
+
+    console.log(`Controller: Đang lấy playlists cho user ID: ${userId}`);
+
+    // Lấy playlist của chính chủ
+    const playlists = await getAllPlaylistsByUserId(userId, userId);
+
+    // console.log('Dữ liệu playlists trả về từ service:', playlists);
+
+    res.status(200).json({
+      message: 'Lấy danh sách playlist thành công!',
+      data: playlists
+    });
+  } catch (error) {
+    console.error(`Lỗi trong getMyPlaylistsController cho user ${req.userId || 'UNKNOWN'}:`, error);
+    res.status(500).json({ error: 'Lỗi server khi lấy danh sách playlist.' });
+  }
+};
+// lấy playlists public để hiển thị cho uer coi trong profile người khác
+const getPublicPlaylistsController = async (req, res) => {
+  try {
+    //ko dùng thằng req.body.userId vì là dữ leiu65 từ cilent gửi lên có thể bị fake 
+    const userId = req.params.userId;
+    const currentUserId = req.userId;
+
+    if (!userId || isNaN(Number(userId))) {
+        return res.status(400).json({ error: 'userId không hợp lệ.' });
+    }
+    if (!userId) {
+      return res.status(400).json({ error: 'Thiếu userId trong request.' });
+    }
+
+    const playlists = await getAllPlaylistsByUserId(userId, currentUserId);
+
+    res.status(200).json({
+      message: 'Lấy playlist công khai thành công!',
+      data: playlists
+    });
+  } catch (error) {
+    console.error('Lỗi trong getPublicPlaylistsController:', error);
+    res.status(500).json({ error: 'Lỗi server khi lấy playlist công khai.' });
+  }
+};
+
+// Controller lấy tất cả các playlist public của mọi người
+const getAllPublicPlaylistsController = async (req, res) => {
+  try {
+    const playlists = await getAllPublicPlaylists(); // GỌI service
+    res.status(200).json({
+      message: 'Lấy tất cả playlist public thành công!',
+      data: playlists
+    });
+  } catch (err) {
+    console.error('Lỗi khi lấy playlist public:', err);
+    res.status(500).json({
+      message: 'Lỗi server khi lấy playlist public.',
+      error: err.message
+    });
+  }
 };
 
 /**
@@ -273,6 +325,8 @@ const updatePlaylistController = async (req, res) => {
 // --- CẬP NHẬT KHỐI EXPORT Ở CUỐI FILE ---
 export {
     getMyPlaylistsController,
+    getPublicPlaylistsController,
+    getAllPublicPlaylistsController,
     createPlaylistController,
     uploadPlaylistCoverController,
     updatePlaylistController,   

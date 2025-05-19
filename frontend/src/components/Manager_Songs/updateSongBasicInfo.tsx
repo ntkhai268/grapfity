@@ -12,7 +12,7 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
   const [title, setTitle] = useState('');
   const [lyrics, setLyrics] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [privacy, setPrivacy] = useState<'public' | 'private'>('public');
   const [previewImage, setPreviewImage] = useState<string>('');
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,10 +59,7 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
       if (imageInputRef.current) { imageInputRef.current.value = ''; }
   };
 
-  const handleAudioChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setAudioFile(file);
-  };
+
 
   const handleTriggerImageInput = () => {
     imageInputRef.current?.click();
@@ -80,15 +77,14 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
       const formData = new FormData();
       formData.append('title', title.trim());
       formData.append('lyrics', lyrics.trim());
+      formData.append('privacy', privacy);
 
       // Chỉ thêm nếu người dùng chọn file mới
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append('trackImage', imageFile);
       }
 
-      if (audioFile) {
-        formData.append('audio', audioFile);
-      }
+      
 
       await updateTrackAPI(trackId, formData);
       const updatedTrack = await getTrackByIdAPI(trackId);
@@ -139,14 +135,48 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
 
           <div className="edit-song-title-fields">
             <div className="edit-song-field">
-              <label>Tiêu đề *</label>
+              <label>Title</label>
               <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} required />
             </div>
+            {/* chua fetch privacy để set cho nút hiển thị lúc update */}
+            <fieldset className="meta-form-group">
+                <legend className="meta-form-label">Privacy</legend>
+                <div className="meta-radio-group">
+                  <div className="meta-radio-option">
+                    <input
+                      id="privacyPublic"
+                      name="privacy"
+                      type="radio"
+                      value="public"
+                      checked={privacy === 'public'}
+                      onChange={(e) => setPrivacy(e.target.value as 'public' | 'private')}
+                      className="meta-form-radio"
+                    />
+                    <div className="meta-radio-label-group">
+                      <label htmlFor="privacyPublic" className="meta-radio-label-main">Public</label>
+                      <p className="meta-radio-label-description">Anyone will be able to listen to this.</p>
+                    </div>
+                  </div>
 
-            <div className="edit-song-field">
-              <label>File nhạc *</label>
-              <input type="file" accept="audio/*" onChange={handleAudioChange} />
-            </div>
+                  <div className="meta-radio-option">
+                    <input
+                      id="privacyPrivate"
+                      name="privacy"
+                      type="radio"
+                      value="private"
+                      checked={privacy === 'private'}
+                      onChange={(e) => setPrivacy(e.target.value as 'public' | 'private')}
+                      className="meta-form-radio"
+                    />
+                    <div className="meta-radio-label-group">
+                      <label htmlFor="privacyPrivate" className="meta-radio-label-main">Private</label>
+                    </div>
+                  </div>
+                </div>
+              </fieldset>
+
+
+            
           </div>
 
           <input type="file" accept="image/*" ref={imageInputRef} style={{ display: 'none' }} onChange={handleImageChange} />
@@ -155,13 +185,13 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
 
         
         <div className="edit-song-field">
-          <label>Lời bài hát</label>
+          <label>Lyrics</label>
           <textarea value={lyrics} onChange={(e) => setLyrics(e.target.value)} placeholder="Nhập lyrics ở đây..." />
         </div>
 
         <div className="edit-song-buttons">
-          <button type="button" onClick={onCancel}>Hủy</button>
-          <button type="submit">Lưu thay đổi</button>
+          <button type="button" onClick={onCancel}>Cancel</button>
+          <button type="submit">Save change</button>
         </div>
       </form>
     </div>

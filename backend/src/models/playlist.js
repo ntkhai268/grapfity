@@ -22,7 +22,12 @@ export default (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     title: DataTypes.STRING,
     createDate: DataTypes.DATE,
-    imageUrl: DataTypes.STRING
+    imageUrl: DataTypes.STRING,
+    privacy: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: 'public'  // hoặc 'private' tùy bạn
+    }
   }, {
     sequelize,
     modelName: 'Playlist'
