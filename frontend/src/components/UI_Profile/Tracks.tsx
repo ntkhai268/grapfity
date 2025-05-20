@@ -12,7 +12,7 @@ const tracks: Track[] = [
     title: "Lạc Trôi",
     artist: "Sơn Tùng M-TP",
     src: "assets/LacTroi.mp3",
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
 ];
 
@@ -31,7 +31,7 @@ const Tracks: React.FC = () => {
           <div className="song_left">
             <img src={track.cover} alt="Album Cover" className="album_cover" />
             <button className="play_button">
-              <img src="assets/play.png" alt="Play" />
+              <img src="/assets/play.png" alt="Play" />
             </button>
           </div>
           <div className="song_info">
