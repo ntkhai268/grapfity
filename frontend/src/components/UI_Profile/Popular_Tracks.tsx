@@ -12,13 +12,13 @@ const popularTracks: PopularTrack[] = [
     title: "Bánh Mì Không",
     artist: "Đạt G, Du Uyên",
     src: "assets/Bánh Mì Không.mp3",
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
   {
     title: "Bạc Phận",
     artist: "K-ICM, Jack",
     src: "assets/BacPhanRapVersion-TuiHat-6184759.mp3",
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
 ];
 
@@ -37,7 +37,7 @@ const PopularTracks: React.FC = () => {
           <div className="song_left">
             <img src={track.cover} alt="Album Cover" className="album_cover" />
             <button className="play_button">
-              <img src="assets/play.png" alt="Play" />
+              <img src="/assets/play.png" alt="Play" />
             </button>
           </div>
           <div className="song_info">

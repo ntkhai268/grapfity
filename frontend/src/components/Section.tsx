@@ -70,19 +70,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     const recommendedTracks: Song[] = allTracks.slice(0, 3); 
     const recentTracks: Song[] = allTracks.slice(3, 7);  
     const publicTracks: Song[] = allTracks; 
-    // const popularTracks: Song[] = publicPlaylists
-    //     .flatMap((playlist) =>
-    //         playlist.tracks.map((track) => ({
-    //         id: track.id,
-    //         src: track.src,
-    //         title: track.title,
-    //         artist: track.artist,
-    //         cover: track.cover,
-    //         }))
-    //     )
-    //     .filter((track, index, self) =>
-    //         index === self.findIndex((t) => t.id === track.id)
-    //     ); // ✅ Lấy tất cả bài hát, lọc trùng nếu cần
+    const currentContext = GlobalAudioManager.getCurrentContext();
 
     const handleSidebarExpandChange = (expanded: boolean) => {
         setSidebarExpanded(expanded);
@@ -169,6 +157,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
         const clickedSong = list[index];
         const currentSong = GlobalAudioManager.getCurrentSong();
         const isCurrentlyPlaying = GlobalAudioManager.getIsPlaying();
+        
 
         const context: PlaylistContext = {
             id: contextId,
@@ -240,7 +229,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                                 >
                                                 <i
                                                     className={
-                                                     currentPlayingId === song.id && isPlaying
+                                                     currentPlayingId === song.id && isPlaying &&  currentContext?.type === 'queue' &&  currentContext?.id === 'recommended'
                                                         ? "fas fa-pause"
                                                         : "fas fa-play"
                                                     }
@@ -307,7 +296,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                         <button
                                             key={`rec-${song.id}-${index}`}
                                             className="song-item-section"
-                                           onClick={() => handleClicktest(song, publicTracks, index, 'queue', 'recommended')}
+                                           onClick={() => handleClicktest(song, publicTracks, index, 'queue', 'trakcs')}
 
                                             >
                                             <div className="song-image-wrapper">
@@ -317,12 +306,12 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                                 className="play-button-section"
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // Ngăn chuyển trang
-                                                    handlePlayButtonClick(publicTracks, index, 'queue', 'recommended');
+                                                    handlePlayButtonClick(publicTracks, index, 'queue', 'tracks');
                                                 }}
                                                 >
                                                 <i
                                                     className={
-                                                     currentPlayingId === song.id && isPlaying
+                                                     currentPlayingId === song.id && isPlaying &&  currentContext?.type === 'queue' &&  currentContext?.id === 'tracks'
                                                         ? "fas fa-pause"
                                                         : "fas fa-play"
                                                     }
