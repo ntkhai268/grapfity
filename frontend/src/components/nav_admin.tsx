@@ -28,7 +28,7 @@ const Nav_admin: React.FC = () => {
               <line x1="18" y1="20" x2="18" y2="10"></line>
             </svg>
 
-            <span>Thống kê</span>
+            <span>Statistical</span>
           </NavLink>  
         </li>
         <li>
@@ -49,7 +49,7 @@ const Nav_admin: React.FC = () => {
               <rect x="14" y="14" width="7" height="7"></rect>
               <rect x="3" y="14" width="7" height="7"></rect>
             </svg>
-            <span>Danh sách bài hát</span>
+            <span>Song list</span>
           </NavLink>
         </li>
         <li>
@@ -67,7 +67,7 @@ const Nav_admin: React.FC = () => {
             >
               <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
             </svg>
-            <span>Bài hát chờ duyệt</span>
+            <span>Song waiting for approval</span>
           </NavLink>
         </li>
         <li>
@@ -88,7 +88,7 @@ const Nav_admin: React.FC = () => {
               <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
             </svg>
-            <span>Quản lý người dùng</span>
+            <span>User management</span>
           </NavLink>
         </li>
       </ul>

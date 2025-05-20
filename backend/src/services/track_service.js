@@ -48,9 +48,16 @@ const updateTrack = async (id, updateData) => {
 };
 
 const deleteTrack = async (id) => {
-    return await Sequelize.Transaction(async (t) => {
-        await db.Track.destroy({ where: { id }, individualHooks: true, transaction: t });
-    })
+  // dùng db.sequelize.transaction chứ không phải Sequelize.Transaction
+  return await db.sequelize.transaction(async (t) => {
+    // destroy trả về số bản ghi đã xóa
+    const deletedCount = await db.Track.destroy({
+      where: { id },
+      individualHooks: true,
+      transaction: t
+    });
+    return deletedCount;
+  });
 };
 
 //dangkhoi them

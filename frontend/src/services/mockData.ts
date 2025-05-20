@@ -2,7 +2,12 @@
 
 import { SearchResultItem, Song, Artist } from "../components/SearchResult";
 import img1 from "../assets/images/bacphan.jpg";
-
+import img2 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/lactroi.jpg";
+import img3 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/dunglamtraitimanhdau.jpg"
+import img4 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/chungtacuahientai.jpg"
+import img5 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/châcidoseve.jpg"
+import img6 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/anhsairoi.jpg"
+import img7 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/sontung.jpeg"
 // ---- Dữ liệu mẫu chung cho tất cả songs ----
 const ALL_SONGS: Song[] = [
   {
@@ -10,7 +15,7 @@ const ALL_SONGS: Song[] = [
     title: "Đừng Làm Trái Tim Anh Đau",
     artist: "Sơn Tùng M-TP",
     duration: "4:39",
-    coverUrl: img1,
+    coverUrl: img3,
     type: "song",
   },
   {
@@ -18,7 +23,7 @@ const ALL_SONGS: Song[] = [
     title: "Chúng Ta Của Hiện Tại",
     artist: "Sơn Tùng M-TP",
     duration: "5:01",
-    coverUrl: img1,
+    coverUrl: img4,
     type: "song",
   },
   {
@@ -26,7 +31,7 @@ const ALL_SONGS: Song[] = [
     title: "Chắc Ai Đó Sẽ Về",
     artist: "Sơn Tùng M-TP",
     duration: "4:22",
-    coverUrl: img1,
+    coverUrl: img5,
     type: "song",
   },
   {
@@ -34,7 +39,7 @@ const ALL_SONGS: Song[] = [
     title: "Anh Sai Rồi",
     artist: "Sơn Tùng M-TP",
     duration: "4:12",
-    coverUrl: img1,
+    coverUrl: img6,
     type: "song",
   },
   {
@@ -54,7 +59,7 @@ export function getMockTopResult(query: string): SearchResultItem {
       id: "artist1",
       name: "Sơn Tùng M-TP",
       type: "artist",
-      imageUrl: img1,
+      imageUrl: img7,
     };
   }
   if (query === "Lạc trôi") {
@@ -63,7 +68,7 @@ export function getMockTopResult(query: string): SearchResultItem {
       title: "Lạc trôi",
       artist: "Sơn Tùng M-TP",
       duration: "4:02",
-      coverUrl: img1,
+      coverUrl: img2,
       type: "song",
     };
   }
@@ -110,7 +115,7 @@ export function getMockArtists(query: string): Artist[] {
       id: `artist_${artistName.replace(/\s+/g, "")}`,
       name: artistName,
       type: "artist",
-      imageUrl: img1,
+      imageUrl: img7,
     },
   ];
 }

@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/admin.css";
+import anhbietroi from '../assets/images/anhbietroi.jpg'; // đường dẫn tương đối từ file hiện tại
+
+
 
 type ProfileData = {
   name: string;
@@ -227,21 +230,21 @@ const Header_admin: React.FC = () => {
             <button className="modal_close_admin" onClick={() => setModalOpen(false)}>
               &times;
             </button>
-            <h5>Hồ sơ</h5>
+            <h5>Profile</h5>
             <div className="modal_body_admin">
               <div className="profile_left_admin">
-                <img src="/placeholder-large.svg" alt="Profile" className="profile_image_admin" />
+              <img src={anhbietroi} alt="Profile" className="profile_image_admin" />
                 <button className="btn_change_avatar_admin">CHANGE</button>
               </div>
               <div className="profile_right_admin">
-                {renderRow("Tên", "name")}
-                {renderRow("Năm sinh", "birthYear")}
-                {renderRow("Địa chỉ", "address")}
-                {renderRow("Số điện thoại", "phone", "tel")}
+                {renderRow("Name", "name")}
+                {renderRow("Birthday", "birthYear")}
+                {renderRow("Address", "address")}
+                {renderRow("PhoneNumber", "phone", "tel")}
                 {renderRow("Email", "email", "email")}
-                {renderRow("Tài khoản", "username")}
-                {renderRow("Đổi mật khẩu mới", "password", "password")}
-                {renderRow("Xác nhận mật khẩu mới", "confirmPassword", "password")}
+                {renderRow("Username", "username")}
+                {renderRow("Change new password", "password", "password")}
+                {renderRow("Confirm new password", "confirmPassword", "password")}
                 {passwordError && <div className="error_text_admin">{passwordError}</div>}
               </div>
             </div>
