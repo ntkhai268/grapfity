@@ -319,7 +319,7 @@ function attachPlayButtonListenerAndSubscribe(
       currentGlobalIsPlaying &&
       currentGlobalAudio === thisWaveformMediaElement;
 
-    playButton.src = isActiveAndPlayingThisTrack ? "assets/stop.png" : "assets/play.png";
+    playButton.src = isActiveAndPlayingThisTrack ? "/assets/stop.png" : "/assets/play.png";
 
     // MODIFIED: Reset vị trí của waveform này NẾU nó KHÔNG PHẢI là bài hát toàn cục đang được phát qua chính audio của nó
     if (waveTrack.getDuration() > 0) { // Chỉ reset nếu waveform đã load

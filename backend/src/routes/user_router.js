@@ -2,8 +2,9 @@ import { Router } from 'express';
 import { getAllUsersController,
      updateUserController,
       deleteUserController,
-     getMyProfileController,
-     getUserByIdController,
+    getUserByIdforuser,
+    getMyProfileController,
+    getUserByIdController,
      verifyPasswordController
      } from '../controllers/userController.js'; //import hàm getAllUsers từ file apiController.js
      import { authenticateUser } from '../middleware/authMiddleware.js';
@@ -11,7 +12,8 @@ import { getAllUsersController,
 const router = Router();
 
 router.get('/users', getAllUsersController) //sử dụng hàm getAllUsers để xử lý request cho route /users
-router.get('/users/me', authenticateUser, getMyProfileController);
+router.get('/users/me', authenticateUser, getMyProfileController); // để user coi profile chính mình
+router.get('/users/profile/:id', getUserByIdforuser); // hàm để user coi profile của nhau
 router.get('/users/:id', getUserByIdController); 
 router.put('/users/me', authenticateUser,uploadUserImage, updateUserController);
 router.delete('/delete-user/', deleteUserController) //sử dụng hàm getAllUsers để xử lý request cho route /users

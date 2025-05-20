@@ -23,6 +23,8 @@ import "../styles/ProfileLayout.css";
 const ProfileSection = () => {
   // Lấy userId trong URL (profile đang xem)
   const { userId: profileUserId } = useParams<{ userId: string }>();
+
+  const viewedUserId = profileUserId ?? "me"; 
   const [currentUserId, setCurrentUserId] = useState<string | number | null>(null);
   const safeProfileUserId: string | number = profileUserId ?? "";
   const [profileBgColor, setProfileBgColor] = useState<string>("#f2f2f2");
@@ -33,14 +35,15 @@ const ProfileSection = () => {
   };
 
    useEffect(() => {
-    const fetchUser = async () => {
-      const user = await getCurrentUser();
-      if (user?.id) {
-        setCurrentUserId(user.id);
+    const fetchCurrentUser = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user?.id) setCurrentUserId(user.id);
+      } catch (err) {
+        console.error("Không thể lấy current user:", err);
       }
     };
-
-    fetchUser();
+    fetchCurrentUser();
   }, []);
   return (
     <div>
@@ -50,7 +53,11 @@ const ProfileSection = () => {
         <div className={`song_side_profile ${sidebarExpanded ? "shrink" : ""}`}>
             {/* -------------------------UI profile------------------------------------------- */}
             <div className="profile_slide" style={{ background: `linear-gradient(to bottom, ${profileBgColor}, #454545  50%)`,}}>
-               <ProfileSlide onColorExtract={setProfileBgColor} />
+               <ProfileSlide
+                viewedUserId={viewedUserId}
+                currentUserId={currentUserId}
+                onColorExtract={setProfileBgColor}
+              />
 
                 <div className="mid_section_profile">
                     <Tab />
@@ -63,7 +70,7 @@ const ProfileSection = () => {
 
                 <div className="bottom_section">
                     <div className="left_section">
-                    <Song />
+                    <Song viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
                     <PopularTracks />
                     <Tracks />
                     <Playlists viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""} />
