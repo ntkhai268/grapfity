@@ -1,7 +1,8 @@
-// src/components/TopStats.tsx
+// src/components/TopListening.tsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../styles/TopListening.css";
+import "../styles/TopUpload.css"; // Dùng chung CSS của TopUpload
+
 import {
   fetchListeningHistory,
   ListeningHistoryRecord,
@@ -19,16 +20,13 @@ Object.entries(imageModules).forEach(([fullPath, url]) => {
   imageMap[filename] = url;
 });
 
-type Category = "tracks" | "artists";
-
 interface StatsItem {
-  id: number | string;      // với artists dùng string key (tên artist)
-  name: string;
-  streams: number;
-  imageUrl?: string;        // optional cho track hoặc artist
+  id: number | string;
+  title: string;
+  plays: number;
+  coverUrl?: string;
 }
 
-// Lấy chữ cái đầu hoặc hai chữ cái đầu làm avatar
 function getInitials(name: string): string {
   return name
     .split(" ")
@@ -38,125 +36,134 @@ function getInitials(name: string): string {
     .toUpperCase();
 }
 
-const TopStats: React.FC = () => {
-  const [tracksData, setTracksData] = useState<StatsItem[]>([]);
-  const [artistsData, setArtistsData] = useState<StatsItem[]>([]);
-  const [loading, setLoading] = useState(true);
-
-
+const TopListening: React.FC = () => {
+  const [topTracks, setTopTracks] = useState<StatsItem[]>([]);
+  const [topListeners, setTopListeners] = useState<StatsItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const histories = await fetchListeningHistory();
+        const history = await fetchListeningHistory();
 
-        // 1. Tính tổng streams theo track
-        const trackCounts = new Map<number, { record: ListeningHistoryRecord; count: number }>();
-        histories.forEach(h => {
-          const tid = h.track.id;
-          const prev = trackCounts.get(tid);
-          if (prev) prev.count += h.listenCount;
-          else trackCounts.set(tid, { record: h, count: h.listenCount });
+        // Tổng plays theo track
+        const trackMap = new Map<number, { record: ListeningHistoryRecord; count: number }>();
+        history.forEach(item => {
+          const id = item.track.id;
+          const prev = trackMap.get(id);
+          if (prev) prev.count += item.listenCount;
+          else trackMap.set(id, { record: item, count: item.listenCount });
         });
 
-        // 2. Tính tổng streams theo artist (UploaderName)
-        const artistCounts = new Map<string, { sample: ListeningHistoryRecord; count: number }>();
-        histories.forEach(h => {
-          const name = h.track.User.UploaderName;
-          const prev = artistCounts.get(name);
-          if (prev) prev.count += h.listenCount;
-          else artistCounts.set(name, { sample: h, count: h.listenCount });
+        // Tổng plays theo listener (artist ở đây coi như người nghe)
+        const listenerMap = new Map<string, { sample: ListeningHistoryRecord; count: number }>();
+        history.forEach(item => {
+          const name = item.track.User.UploaderName;
+          const prev = listenerMap.get(name);
+          if (prev) prev.count += item.listenCount;
+          else listenerMap.set(name, { sample: item, count: item.listenCount });
         });
 
-        // 3. Chuẩn bị mảng StatsItem cho tracks
-        const tracksList: StatsItem[] = Array.from(trackCounts.entries()).map(
+        // Chuẩn bị mảng top tracks
+        const tracksArray: StatsItem[] = Array.from(trackMap.entries()).map(
           ([id, { record, count }]) => {
             const fname = record.track.imageUrl.split("/").pop()!;
             return {
               id,
-              name: record.metadata?.trackname ?? `Track ${id}`,
-              streams: count,
-              imageUrl: imageMap[fname] || record.track.imageUrl,
+              title: record.metadata?.trackname ?? `Track ${id}`,
+              plays: count,
+              coverUrl: imageMap[fname] || record.track.imageUrl,
             };
           }
         );
 
-        // 4. Chuẩn bị mảng StatsItem cho artists
-        const artistsList: StatsItem[] = Array.from(artistCounts.entries()).map(
-          ([name, { sample, count }]) => ({
+        // Chuẩn bị mảng top listeners
+        const listenersArray: StatsItem[] = Array.from(listenerMap.entries()).map(
+          ([name, { count }]) => ({
             id: name,
-            name,
-            streams: count,
-            imageUrl: undefined, // để tạo avatar chữ cái
+            title: name,
+            plays: count,
           })
         );
 
-        // Lấy top 3
-        const topTracks = tracksList.sort((a, b) => b.streams - a.streams).slice(0, 3);
-        const topArtists = artistsList.sort((a, b) => b.streams - a.streams).slice(0, 3);
-
-        setTracksData(topTracks);
-        setArtistsData(topArtists);
+        setTopTracks(tracksArray.sort((a, b) => b.plays - a.plays).slice(0, 3));
+        setTopListeners(listenersArray.sort((a, b) => b.plays - a.plays).slice(0, 3));
       } catch (err) {
         console.error("Error loading listening history", err);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     })();
   }, []);
 
-  const renderListSection = (
-    title: string,
-    category: Category,
-    data: StatsItem[]
+  const renderSection = (
+    heading: string,
+    items: StatsItem[],
+    mode: "tracks" | "listeners"
   ) => (
-    <div className="stats-section">
-      <div className="stats-header_listening">
-        <h2>{title}</h2>
-        <Link to={`/top-${category}`} className="see-more">
+    <div className={mode === "tracks" ? "top-tracks-section" : "top-listeners-section"}>
+      <div className="section-header">
+        <h2>{heading}</h2>
+        <Link to={mode === "tracks" ? "/top-tracks" : "/top-artists"} className="see-more">
           See more
         </Link>
       </div>
 
-      <div className="date-range">{category === 'tracks' ? 'Tracks' : 'Artists'}</div>
-      <div className="streams-label">Played</div>
+      {mode === "tracks" && (
+        <div className="section-header">
+        </div>
+      )}
 
-      <ul className="stats-list">
-        {loading ? (
-          <li>Loading...</li>
+      <div className={mode === "tracks" ? "tracks-list" : ""}>
+        {isLoading ? (
+          <div>Đang tải…</div>
+        ) : items.length === 0 ? (
+          <div>Chưa có dữ liệu.</div>
         ) : (
-          data.map(item => (
-            <li key={item.id} className="stats-item">
-              <div className="item-info">
-                {category === 'artists' ? (
-                  <div className="item-avatar">
-                    {getInitials(item.name)}
-                  </div>
-                ) : (
-                  item.imageUrl && (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="item-thumb"
-                    />
-                  )
-                )}
-                <span className="item-name">{item.name}</span>
+          items.map(item =>
+            mode === "tracks" ? (
+              <div key={item.id} className="track-item">
+                <div className="track-icon">
+                  {item.coverUrl ? (
+                    <img src={item.coverUrl} alt={item.title} className="track-cover" />
+                  ) : (
+                    <div className="placeholder-cover">No image</div>
+                  )}
+                </div>
+                <div className="track-info">
+                  <span className="track-title">{item.title}</span>
+                </div>
+                <div className="track-time">{item.plays} plays</div>
               </div>
-              <div className="item-streams">{item.streams}</div>
-            </li>
-          ))
+            ) : (
+              <div key={item.id} className="listener-profile">
+                <div className="listener-avatar">{getInitials(item.title)}</div>
+                <div className="listener-info">
+                  <div className="listener-name">{item.title}</div>
+                  <div className="listener-stats">
+                    <span className="play-count">{item.plays} plays</span>
+                  </div>
+                </div>
+              </div>
+            )
+          )
         )}
-      </ul>
+      </div>
+
+      {mode === "listeners" && (
+        <div className="pro-message">
+          
+        </div>
+      )}
     </div>
   );
 
   return (
-    <div className="top-stats-container">
-      {renderListSection("Top Tracks", "tracks", tracksData)}
-      {renderListSection("Top Artists", "artists", artistsData)}
+    <div className="top-upload-container">
+      {renderSection("Top Tracks", topTracks, "tracks")}
+      {renderSection("Top Artist", topListeners, "listeners")}
     </div>
   );
 };
 
-export default TopStats;
+export default TopListening;

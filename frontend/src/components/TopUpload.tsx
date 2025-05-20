@@ -1,7 +1,6 @@
 // src/components/TopUpload.tsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { getUserTracks, TrackWithCount } from '../services/uploadService';
 import '../styles/TopUpload.css';
 
@@ -20,47 +19,64 @@ Object.entries(imageModules).forEach(([fullPath, url]) => {
 
 interface Listener {
   id: number;
-  Name: string;
+  name: string;
   count: number;
 }
 
 const TopUpload: React.FC = () => {
   const [tracks, setTracks] = useState<TrackWithCount[]>([]);
-  const [loading, setLoading] = useState(true);
   const [listeners, setListeners] = useState<Listener[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        // 1. Fetch track data
+        // 1. Lấy tất cả tracks kèm theo listenCount và artist (uploader)
         const allTracks = await getUserTracks();
-        // lấy top 3 tracks
-        const top3 = allTracks
+
+        // 2. Tính top 3 tracks
+        const top3Tracks = allTracks
           .slice()
           .sort((a, b) => b.listenCount - a.listenCount)
           .slice(0, 3)
           .map(track => {
             const raw = track.imageUrl.split('/').pop()!;
-            return { ...track, imageUrl: imageMap[raw] || '' };
+            return {
+              ...track,
+              imageUrl: imageMap[raw] || track.imageUrl
+            };
           });
-        setTracks(top3);
+        setTracks(top3Tracks);
 
-        // 2. Fetch raw listening histories
-        const histRes = await axios.get<{ histories: Array<{ trackId: number; listenCount: number; listener: { id: number; Name: string } }> }>('/api/listening-histories', { withCredentials: true });
-        const agg: Record<number, { Name: string; count: number }> = {};
-        histRes.data.histories.forEach(h => {
-          if (agg[h.listener.id]) {
-            agg[h.listener.id].count += h.listenCount;
+        // 3. Tính tổng plays theo listener (uploader)
+        const listenerAgg = new Map<number, { name: string; count: number }>();
+
+        allTracks.forEach(track => {
+          const id = track.uploaderId;                         // dùng uploaderId từ TrackWithCount
+          const name = track.artist?.UploaderName;             // tên từ artist nếu có
+          if (!name) return;
+
+          const prev = listenerAgg.get(id);
+          if (prev) {
+            listenerAgg.set(id, {
+              name: prev.name,
+              count: prev.count + track.listenCount
+            });
           } else {
-            agg[h.listener.id] = { Name: h.listener.Name, count: h.listenCount };
+            listenerAgg.set(id, {
+              name,
+              count: track.listenCount
+            });
           }
         });
-        // sort và lấy top 3 listeners
-        const topL = Object.entries(agg)
-          .map(([id, data]) => ({ id: Number(id), Name: data.Name, count: data.count }))
+
+        // 4. Chuyển Map → mảng, sort và lấy top 3 listeners
+        const top3Listeners: Listener[] = Array.from(listenerAgg.entries())
+          .map(([id, { name, count }]) => ({ id, name, count }))
           .sort((a, b) => b.count - a.count)
           .slice(0, 3);
-        setListeners(topL);
+
+        setListeners(top3Listeners);
       } catch (err) {
         console.error('Lỗi fetch TopUpload:', err);
         setTracks([]);
@@ -73,6 +89,7 @@ const TopUpload: React.FC = () => {
 
   return (
     <div className="top-upload-container">
+      {/* Top Tracks */}
       <div className="top-tracks-section">
         <div className="section-header">
           <h2>Top tracks on Graptify</h2>
@@ -115,10 +132,10 @@ const TopUpload: React.FC = () => {
         </div>
       </div>
 
+      {/* Top Listeners */}
       <div className="top-listeners-section">
-        <h2>Top listeners</h2>
-        <div className="listener-tabs">
-         
+        <div className="section-header">
+          <h2>Top listeners</h2>
         </div>
         {loading ? (
           <div>Đang tải listeners…</div>
@@ -128,13 +145,16 @@ const TopUpload: React.FC = () => {
           listeners.map(listener => (
             <div key={listener.id} className="listener-profile">
               <div className="listener-avatar">
-                {/* dùng chữ cái đầu làm avatar */}
-                <span className="initial">{listener.Name.charAt(0).toUpperCase()}</span>
+                <span className="initial">
+                  {listener.name.charAt(0).toUpperCase()}
+                </span>
               </div>
               <div className="listener-info">
-                <div className="listener-name">{listener.Name}</div>
+                <div className="listener-name">{listener.name}</div>
                 <div className="listener-stats">
-                  <span className="play-count">{listener.count} plays</span>
+                  <span className="play-count">
+                    {listener.count} plays
+                  </span>
                 </div>
               </div>
             </div>
