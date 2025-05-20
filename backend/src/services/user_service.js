@@ -5,7 +5,33 @@ import { createJWT, verityJWT } from '../middleware/JWTActions.js';
 const getAllUsers = async () => {
     return db.User.findAll(); // Lấy tất cả dữ liệu trong bảng User
 };
+//dùng để 2 user coi profile của nhau
+const getUserByIdPublic = async (id) => {
+  try {
+    return await db.User.findByPk(id, {
+      attributes: ['id', 'userName', 'Name', 'Avatar', 'createdAt']
+    });
+  } catch (error) {
+    console.error(`Lỗi khi tìm user (public) với id ${id}:`, error);
+    throw new Error('Không thể truy cập dữ liệu người dùng công khai');
+  }
+};
+// dùng để uer coi profile của chính mình
+const getUserByIdProfile = async (id) => {
+  try {
+    return await db.User.findByPk(id, {
+      attributes: [
+        'id', 'userName', 'Name', 'Avatar', 'email',
+        'Birthday', 'Address', 'PhoneNumber', 'password'
+      ]
+    });
+  } catch (error) {
+    console.error(`Lỗi khi tìm user (full) với id ${id}:`, error);
+    throw new Error('Không thể truy cập dữ liệu đầy đủ của người dùng');
+  }
+};
 
+// của khôi
 const getUserById = async (id) => {
     try {
         const user = await db.User.findByPk(id);
@@ -15,6 +41,8 @@ const getUserById = async (id) => {
         throw new Error('Không thể truy cập dữ liệu người dùng');
     }
 };
+
+
 
 const createUser = async (userName, email, password, roleId) => {
     try {
@@ -139,6 +167,8 @@ const deleteUser = async (userId) => {
 
 export {
     getAllUsers,
+    getUserByIdPublic,
+    getUserByIdProfile,
     getUserById,
     createUser,
     handleUserLogin,

@@ -242,6 +242,29 @@ export const getMyUploadedTracksAPI = async (): Promise<TrackData[]> => {
     }
 };
 
+/**
+ * Lấy các track công khai của một người dùng (dùng trong profile người khác).
+ * @param userId ID của người dùng bị xem
+ */
+export const getPublicTracksOfUserAPI = async (userId: string | number): Promise<TrackData[]> => {
+  console.log(`[trackServiceAPI] Fetching public tracks of user ID: ${userId}`);
+  
+  try {
+    const response = await axios.get<{ message: string; data: any[] }>(
+      `http://localhost:8080/api/tracks/user/${userId}`
+    );
+
+    const rawTracks = response.data?.data || [];
+    const formattedTracks = rawTracks.map(mapApiDataToTrackData);
+
+    console.log(`[trackServiceAPI] Formatted public tracks of user ${userId}:`, formattedTracks);
+    return formattedTracks;
+
+  } catch (error: any) {
+    console.error(`[trackServiceAPI] Error fetching public tracks of user ${userId}:`, error);
+    throw new Error("Không thể tải các bài hát công khai của người dùng này.");
+  }
+};
 
 /**
  * Tạo một track mới (Upload thông tin track lên server).

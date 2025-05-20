@@ -114,54 +114,50 @@ const getTrackWithUploaderById = async (id) => {
     });
 };
 
-const getTracksByUploaderId = async (userId) => {
-    const numericUserId = Number(userId);
-    if (isNaN(numericUserId)) {
-        console.error(`TrackService: Invalid user ID received in getTracksByUploaderId: ${userId}`);
-        // Có thể ném lỗi hoặc trả về mảng rỗng tùy logic xử lý lỗi của bạn
-        throw new Error("User ID không hợp lệ."); 
-        // Hoặc: return [];
-    }
+const getTracksByUploaderId = async (userId, currentUserId) => {
+  const numericUserId = Number(userId);
+  const numericCurrentUserId = Number(currentUserId);
 
-    try {
-        const tracks = await db.Track.findAll({
-            where: {
-                uploaderId: numericUserId, // Lọc theo uploaderId
-                status : 'approved'
-            },
-            // Include các thông tin cần thiết giống như khi lấy chi tiết một track
-            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
-            include: [
-                {
-                    model: db.User, // Thông tin người upload (chính là user đang truy vấn)
-                    as: 'User',     // Đảm bảo alias khớp với model Track
-                    attributes: ['id', 'Name']
-                },
-                {
-                    model: db.Metadata,
-                    as: 'Metadatum', // Đảm bảo alias khớp với model Track
-                    attributes: [ // Liệt kê các trường metadata cần thiết
-                        'trackname',
-                        'duration_ms',
-                        'lyrics' // Lấy cả lyrics
-                        // Thêm các trường khác nếu cần
-                    ]
-                }
-            ],
-            order: [
-                ['createdAt', 'DESC'] // Sắp xếp theo ngày tạo mới nhất (tùy chọn)
-            ]
-        });
+  if (isNaN(numericUserId)) {
+    console.error(`TrackService: Invalid user ID received in getTracksByUploaderId: ${userId}`);
+    throw new Error("User ID không hợp lệ.");
+  }
 
-        console.log(`TrackService: Found ${tracks.length} tracks for uploader ID ${numericUserId}`);
-        // Dữ liệu trả về đã bao gồm các include
-        return tracks; 
+  const isOwner = numericUserId === numericCurrentUserId;
 
-    } catch (error) {
-        console.error(`TrackService: Error fetching tracks for uploader ID ${numericUserId}:`, error);
-        throw error; // Ném lỗi để controller xử lý
-    }
+  const whereClause = {
+    uploaderId: numericUserId,
+    status: 'approved',
+    ...(isOwner ? {} : { privacy: 'public' }) // 👈 Nếu không phải chủ sở hữu thì chỉ thấy bài public
+  };
+
+  try {
+    const tracks = await db.Track.findAll({
+      where: whereClause,
+      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'privacy', 'createdAt', 'updatedAt'],
+      include: [
+        {
+          model: db.User,
+          as: 'User',
+          attributes: ['id', 'Name']
+        },
+        {
+          model: db.Metadata,
+          as: 'Metadatum',
+          attributes: ['trackname', 'duration_ms', 'lyrics']
+        }
+      ],
+      order: [['createdAt', 'DESC']]
+    });
+
+    console.log(`TrackService: Found ${tracks.length} tracks for user ID ${numericUserId} (isOwner: ${isOwner})`);
+    return tracks;
+  } catch (error) {
+    console.error(`TrackService: Error fetching tracks for user ID ${numericUserId}:`, error);
+    throw error;
+  }
 };
+
 
 const createTrack = async (trackUrl, imageUrl, uploaderId,privacy,  metadata) => {
      const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId, status: 'pending', privacy} );

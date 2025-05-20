@@ -11,6 +11,10 @@ const getAllPlaylistsByUserId = async (userId, currentUserId) => {
         ...(isOwner ? {} : { privacy: 'public' }) // 👈 Nếu không phải chủ sở hữu, chỉ thấy public
       },
       include: [
+         {
+            model: db.User, // ✅ Lấy người tạo playlist
+            attributes: ['id', 'Name'] 
+          },
         {
           model: db.Track,
           attributes: ['id', 'trackUrl', 'imageUrl'],
@@ -39,6 +43,10 @@ const getAllPublicPlaylists = async () => {
   return await db.Playlist.findAll({
     where: { privacy: 'public' },
     include: [
+      {
+        model: db.User,
+        attributes: ['id', 'Name']
+      },
       {
         model: db.Track,
         attributes: ['id', 'trackUrl', 'imageUrl'],

@@ -100,6 +100,7 @@ const App = () => {
         }
       />
       <Route path="/profile" element={<ProfileLayout />} />
+      <Route path="/profile/:userId" element={<ProfileLayout />} />
       <Route path="/ManagerSong" element={<ManagerSongLayout />} />
       <Route path="/ManagerPlaylistLayout/:playlistId" element={<ManagerPlaylistLayout />} />
       <Route path="/stats/*" element={<StatsLayouts />} />
