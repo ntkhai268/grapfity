@@ -134,7 +134,12 @@
     padding: 10px;
     margin-left: 30px;
     overflow-y: hidden  ;
+    scrollbar-width: none; 
 }
+.song-list::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
 
 /* Mỗi bài hát */
 .song-item-section {
@@ -177,7 +182,16 @@ position: relative;
   cursor: pointer;
   z-index: 2;
   transition: transform 0.2s ease;
+  opacity: 0;
+}.song-image-wrapper:hover .play-button-section {
+  opacity: 1;
 }
+.play-button-section i {
+  font-size: 16px;
+  color: white;
+}
+
+
 
 .play-button-section {
   transform: scale(1.1);
