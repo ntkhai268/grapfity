@@ -36,7 +36,8 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
   const cover = relativeCover
     ? `${BACKEND_URL}/${relativeCover.replace(/^\/?/, '')}`
     : "";
-
+    console.log("🎤 User info:", playlistFromApi.User);
+    console.log("🎤 User name:", playlistFromApi.User?.Name);
   return {
     id: playlistFromApi.id,
     title: playlistFromApi.title || 'Untitled Playlist',
@@ -131,6 +132,8 @@ export const getPublicPlaylistsByUserIdAPI = async (userId: string | number): Pr
     }
 };
 
+
+// để hiển thị ở trang chủ chơi 
 export const getAllPublicPlaylistsAPI = async (): Promise<PlaylistData[]> => {
     console.log("📂 Fetching all public playlists from server...");
     try {

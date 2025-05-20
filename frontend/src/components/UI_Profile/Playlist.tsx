@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react"; // Import useRef
+import { useEffect, useState, useRef } from "react"; // Import useRef
 import * as React from 'react';
 
 import { useNavigate } from "react-router-dom";
@@ -29,7 +29,7 @@ interface PlaylistData {
 
 interface PlaylistsProps {
   viewedUserId: string | number;  // ID của profile đang xem
-  currentUserId: string | number; // ID của người đang đăng nhập
+  currentUserId: string | number ; // ID của người đang đăng nhập
 }
 
 
@@ -53,40 +53,11 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
     const [hoveringIconMap, setHoveringIconMap] = useState<Record<number, boolean>>({});
 
     // Hàm fetch playlists (Giữ nguyên)
-    const fetchPlaylists = useCallback(async () => {
-        console.log("Playlist Component: Fetching playlists...");
-        setIsLoading(true);
-        setError(null);
-        setImageErrorMap({});
-        setHoveringIconMap({});
-        try {
-            const fetchedPlaylists = await getMyPlaylistsAPI();
-            console.log("Playlist Component: Fetched playlists data:", fetchedPlaylists);
-            if (Array.isArray(fetchedPlaylists)) {
-                 setPlaylists(fetchedPlaylists as PlaylistData[]);
-                 playlistContainerRefs.current = fetchedPlaylists.map(() => null);
-            } else {
-                 console.error("Playlist Component: Fetched data is not an array:", fetchedPlaylists);
-                 setError("Dữ liệu playlist nhận được không hợp lệ.");
-                 setPlaylists([]);
-            }
-        } catch (err: any) {
-            console.error("Playlist Component: Error fetching playlists:", err);
-            if (err.message === 'Unauthorized') {
-                setError("Vui lòng đăng nhập để xem playlist.");
-            } else {
-                setError("Không thể tải danh sách playlist. Vui lòng thử lại sau.");
-            }
-             setPlaylists([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
 
     // useEffect fetch lần đầu (Giữ nguyên)
-    useEffect(() => {
-        fetchPlaylists();
-    }, [fetchPlaylists]);
+    // useEffect(() => {
+    //     fetchPlaylists();
+    // }, [fetchPlaylists]);
 
     // useEffect khởi tạo waveform (Giữ nguyên)
     useEffect(() => {

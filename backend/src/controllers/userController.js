@@ -2,6 +2,8 @@ import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import {
     getAllUsers,
+    getUserByIdPublic,
+    getUserByIdProfile,
     getUserById,
     createUser,
     handleUserLogin,
@@ -24,6 +26,61 @@ const getAllUsersController = async (req, res) => {
     }
 };
 // coi profile người khác thì dùng cái này
+const getUserByIdforuser = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // --- VALIDATION ---
+        if (!id || isNaN(Number(id))) {
+            return res.status(400).json({ error: 'Bad Request: ID người dùng không hợp lệ.' });
+        }
+
+        // --- SERVICE CALL ---
+        const user = await getUserByIdPublic(Number(id));
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+        }
+
+        // --- RESPONSE ---
+        return res.status(200).json({
+            message: 'Lấy thông tin người dùng thành công!',
+            data: user
+        });
+
+    } catch (error) {
+        console.error(`Lỗi trong getUserByIdController với id ${req.params?.id}:`, error);
+        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
+    }
+};
+
+// com tự coi profile của mình thì dùng cái này:
+const getMyProfileController = async (req, res) => {
+    try {
+        const userId = req.userId; // từ middleware gắn sau khi decode JWT
+
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
+        }
+
+        const user = await getUserByIdProfile(userId); 
+        if (!user) {
+            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+        }
+
+        const { password, refreshToken, ...safeUserData } = user.dataValues;
+
+        return res.status(200).json({
+            message: 'Lấy thông tin cá nhân thành công!',
+            data: safeUserData
+        });
+
+    } catch (error) {
+        console.error(`Lỗi trong getMyProfileController:`, error);
+        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
+    }
+};
+
+// mai kkhôi sửa thay vào
 const getUserByIdController = async (req, res) => {
     try {
         const { id } = req.params;
@@ -50,34 +107,6 @@ const getUserByIdController = async (req, res) => {
         return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
     }
 };
-
-// com tự coi profile của mình thì dùng cái này:
-const getMyProfileController = async (req, res) => {
-    try {
-        const userId = req.userId; // từ middleware gắn sau khi decode JWT
-
-        if (!userId) {
-            return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
-        }
-
-        const user = await getUserById(userId); 
-        if (!user) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-        }
-
-        const { password, refreshToken, ...safeUserData } = user.dataValues;
-
-        return res.status(200).json({
-            message: 'Lấy thông tin cá nhân thành công!',
-            data: safeUserData
-        });
-
-    } catch (error) {
-        console.error(`Lỗi trong getMyProfileController:`, error);
-        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
-    }
-};
-
 
 const createUserController = async (req, res) => {
     try {
@@ -191,8 +220,9 @@ const verifyPasswordController = async (req, res) => {
 };
 export {
     getAllUsersController,
-    getUserByIdController,
+    getUserByIdforuser,
     getMyProfileController,
+    getUserByIdController,
     createUserController,
     handleUserLoginController,
     updateUserController,

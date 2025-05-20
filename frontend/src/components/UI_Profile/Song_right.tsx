@@ -16,7 +16,7 @@ const songs_right: Song[] = [
     playCount: 1000,
     likeCount: 2000,
     repostCount: 3000,
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
   {
     title: "Sóng Gió",
@@ -24,7 +24,7 @@ const songs_right: Song[] = [
     playCount: 1000,
     likeCount: 2000,
     repostCount: 3000,
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
   {
     title: "Sóng Gió",
@@ -32,7 +32,7 @@ const songs_right: Song[] = [
     playCount: 1000,
     likeCount: 2000,
     repostCount: 3000,
-    cover: "assets/anhmau.png",
+    cover: "/assets/anhmau.png",
   },
 ];
 
@@ -64,15 +64,15 @@ const SongRight: React.FC<SongRightProps> = () => {
               <p className="artist_right">{song.artist}</p>
               <div className="share">
                 <span className="count_play">
-                  <img src="assets/play.png" alt="play" />
+                  <img src="/assets/play.png" alt="play" />
                 </span>
                 <span className="count_play_show">{song.playCount}</span>
                 <span className="count_tym">
-                  <img src="assets/Heart_Fill_XS.png" alt="tym" />
+                  <img src="/assets/Heart_Fill_XS.png" alt="tym" />
                 </span>
                 <span className="count_tym_show">{song.likeCount}</span>
                 <span className="count_repost">
-                  <img src="assets/Regroup.png" alt="repost" />
+                  <img src="/assets/Regroup.png" alt="repost" />
                 </span>
                 <span className="count_repost_show">{song.repostCount}</span>
               </div>

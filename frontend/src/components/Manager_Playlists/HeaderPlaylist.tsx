@@ -1,6 +1,6 @@
 // D:\web_html\gop\grapfity\frontend\src\components\Manager_Playlists\HeaderPlaylist.tsx
 import React, { useEffect, useState} from "react";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 // 1. Import hàm API lấy chi tiết và cập nhật playlist (ĐÃ XÓA uploadPlaylistImageAPI)
 import { updatePlaylistAPI, uploadPlaylistImageAPI } from "../../services/playlistService";
 import {getTracksInPlaylistAPI} from "../../services/trackPlaylistService"
@@ -63,6 +63,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
 
     // Hook lấy màu nền từ ảnh bìa
     const bgColor = useImageColor(fullCoverUrlForColor);
+    const navigate = useNavigate();
 
     // Fetch dữ liệu playlist khi component mount hoặc ID thay đổi
     useEffect(() => {
@@ -234,7 +235,16 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
                     </h1>
                     <div className="playlist-meta">
                         <img src={"/assets/default_user_avatar.png"} alt={playlist.artist || 'Nghệ sĩ'} className="artist-image" onError={(e) => (e.currentTarget.style.display = 'none')} />
-                        <span>{playlist.artist || 'Unknown Artist'}</span>
+                        <span
+                            style={{ cursor: "pointer", color: "#1DB954", fontWeight: 500 }}
+                            onClick={() => {
+                            if (playlist.uploaderId) {
+                                navigate(`/profile/${playlist.uploaderId}`);
+                            }
+                            }}
+                        >
+                            {playlist.artist}
+                        </span>
                         <span className="dot-separator">•</span>
                         <span>{playlist.timeAgo || ''}</span>
                         <span className="dot-separator">•</span>

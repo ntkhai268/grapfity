@@ -5,55 +5,61 @@ import { Song } from "../../hooks/GlobalAudioManager"; // Import kiểu Song
 // --- THAY ĐỔI API IMPORT ---
 // Import API để lấy bài hát của user và kiểu TrackData
 // Giả sử bạn có hàm getMyUploadedTracksAPI trong trackServiceAPI.ts
-import { getMyUploadedTracksAPI, TrackData,deleteTrackAPI } from "../../services/trackServiceAPI"; 
+import { getMyUploadedTracksAPI, TrackData,deleteTrackAPI,getPublicTracksOfUserAPI  } from "../../services/trackServiceAPI"; 
 import SongOptionOfUser from "./SongOptionOfUser";
 import UpdateSongBasicInfo from "../Manager_Songs/updateSongBasicInfo";
-// --------------------------
 
+
+// --------------------------
+interface SongProps {
+  viewedUserId: string | number;
+  currentUserId: string | number;
+}
 // Hàm map từ TrackData sang Song (giữ nguyên)
 const mapTrackDataToSong = (track: TrackData): Song => ({
     id: track.id, 
     src: track.src || '', 
     title: track.title === null ? undefined : track.title, 
     artist: track.artist === null ? undefined : track.artist, 
-    cover: track.cover || "assets/anhmau.png", 
+    cover: track.cover || "/assets/anhmau.png", 
 });
 
-const SongList: React.FC = () => {
+const SongList: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [editingSongId, setEditingSongId] = useState<number | null>(null);
+  
 
   // Fetch dữ liệu bài hát của user khi component mount
   useEffect(() => {
-    const fetchMyTracks = async () => { // Đổi tên hàm fetch
-      setIsLoading(true);
-      setError(null);
-      try {
-        // --- THAY ĐỔI API CALL ---
-        // Gọi API để lấy các bài hát user đã upload
-        const fetchedTracksData: TrackData[] = await getMyUploadedTracksAPI(); 
-        // --------------------------
-        
-        const fetchedSongs: Song[] = fetchedTracksData.map(mapTrackDataToSong);
-        setSongs(fetchedSongs); 
-        console.log("[SongList] Fetched and mapped user's uploaded songs:", fetchedSongs);
-      } catch (err: any) {
-        console.error("[SongList] Failed to fetch user's uploaded tracks:", err);
-        // Có thể hiển thị lỗi cụ thể hơn nếu API trả về (ví dụ: lỗi xác thực)
-        if (err.message && err.message.includes('Unauthorized')) {
-             setError("Bạn cần đăng nhập để xem bài hát đã tải lên.");
-        } else {
-             setError(err.message || "Không thể tải danh sách bài hát của bạn.");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchTracks = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      let fetchedTracksData: TrackData[] = [];
 
-    fetchMyTracks(); // Gọi hàm fetch mới
-  }, []); 
+      if (viewedUserId === "me" || viewedUserId === currentUserId) {
+        fetchedTracksData = await getMyUploadedTracksAPI();
+      } else {
+        fetchedTracksData = await getPublicTracksOfUserAPI(viewedUserId);
+        console.log("🧪 Public track list:", fetchedTracksData);
+      }
+
+      const fetchedSongs: Song[] = fetchedTracksData.map(mapTrackDataToSong);
+      setSongs(fetchedSongs);
+      console.log("[Song] Fetched tracks:", fetchedSongs);
+    } catch (err: any) {
+      console.error("[Song] Error fetching tracks:", err);
+      setError("Không thể tải danh sách bài hát.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  fetchTracks();
+}, [viewedUserId, currentUserId]);
+
 
   // useEffect để khởi tạo WaveSurfer (giữ nguyên)
   useEffect(() => {
@@ -107,9 +113,9 @@ const SongList: React.FC = () => {
             data-cover={song.cover || ''} 
           >
             <div className="song_left">
-              <img src={song.cover || 'assets/anhmau.png'} alt="Album Cover" className="album_cover" />
+              <img src={song.cover || '/assets/anhmau.png'} alt="Album Cover" className="album_cover" />
               <button className="play_button">
-                <img src="assets/play.png" alt="Play" /> 
+                <img src="/assets/play.png" alt="Play" /> 
               </button>
             </div>
             <div className="song_info">
@@ -120,6 +126,7 @@ const SongList: React.FC = () => {
                 onEdit={() => setEditingSongId(Number(song.id))} // nút chỉnh sửa nhạc ở đây
                 onDelete={() => handleDeleteTrack(Number(song.id))}
                 trackId={Number(song.id)}
+                 isOwner={viewedUserId === "me" || viewedUserId === currentUserId}
               />
             </div>
              {editingSongId === Number(song.id) && (
