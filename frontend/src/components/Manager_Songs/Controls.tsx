@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, RefObject } from "react";
 import { getMyPlaylistsAPI } from "../../services/playlistService";
 import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
+import {  isTrackLikedByUserAPI,  likeTrackAPI,  unlikeTrackAPI,  countLikesForTrackAPI,} from "../../services/likeService";
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 
 // Định nghĩa kiểu dữ liệu cho props mà Controls sẽ nhận từ ManagerSongSection
@@ -42,7 +43,28 @@ const Controls: React.FC<ControlsProps> = ({
   const [playlistError, setPlaylistError] = useState<string | null>(null);
   const [isAddingTrack, setIsAddingTrack] = useState<boolean>(false);
 
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [likeCount, setLikeCount] = useState<number>(0);
   // --- Handlers (Memoized with useCallback) ---
+
+  const handleToggleLike = async () => {
+    if (!trackId || !isLoggedIn) return;
+
+    try {
+      if (isLiked) {
+        await unlikeTrackAPI(trackId);
+        setIsLiked(false);
+        setLikeCount((prev) => Math.max(0, prev - 1));
+      } else {
+        await likeTrackAPI(trackId);
+        setIsLiked(true);
+        setLikeCount((prev) => prev + 1);
+      }
+    } catch (error) {
+      console.error("Lỗi khi toggle like:", error);
+      alert("Có lỗi xảy ra khi like/unlike bài hát.");
+    }
+  };
 
   const toggleDropdown = useCallback(() => {
     setDropdownOpen(prev => !prev);
@@ -166,6 +188,25 @@ const Controls: React.FC<ControlsProps> = ({
     fetchPlaylists();
   }, [fetchPlaylists]);
 
+  //Tải trạng thái like & số like khi trackId thay đổi
+  useEffect(() => {
+    const fetchLikeState = async () => {
+      if (!trackId || !isLoggedIn) return;
+
+      try {
+        const liked = await isTrackLikedByUserAPI(trackId);
+        const count = await countLikesForTrackAPI(trackId);
+        setIsLiked(liked);
+        setLikeCount(count);
+      } catch (error) {
+        console.error("Không thể tải trạng thái like:", error);
+      }
+    };
+
+    fetchLikeState();
+  }, [trackId, isLoggedIn]);
+
+
   
 // console.log("Controls xxxxxxxxxx:", { trackId, currentTrackId, isPlaying,  }); 
   // --- Render ---
@@ -187,9 +228,14 @@ const Controls: React.FC<ControlsProps> = ({
       </div>
 
       {/* Other Icons */}
-      <div className="control-icon">
-        <i className="far fa-heart" style={{ color: "white" }}></i>
+      <div className="control-icon" onClick={handleToggleLike} title={isLiked ? "Bỏ thích" : "Thích"}>
+        <i
+          className={isLiked ? "fas fa-heart" : "far fa-heart"} // fas = solid (đỏ), far = regular (viền)
+          style={{ color: isLiked ? "red" : "white", cursor: "pointer" }}
+        ></i>
+        <span style={{ fontSize: "12px", marginLeft: "4px", color: "#ccc" }}>{likeCount}</span>
       </div>
+
       <div className="control-icon">
         <i className="fas fa-arrow-down" style={{ color: "white" }}></i>
       </div>
@@ -199,7 +245,17 @@ const Controls: React.FC<ControlsProps> = ({
         <i className="fas fa-ellipsis-h" style={{ color: "white" }}></i>
         <div className={`dropdown ${isDropdownOpen ? 'active' : ''}`}>
           <div className="dropdown-content">
-            <a href="#">Like</a>
+           <a
+              href="#"
+              onClick={async (e) => {
+                e.preventDefault(); // Ngăn chuyển trang
+                await handleToggleLike(); // Gọi hàm đã viết sẵn
+                closeDropdown(); // Đóng dropdown sau khi nhấn
+              }}
+              style={{ color: isLiked ? 'red' : 'white' }}
+            >
+              {isLiked ? 'Unlike' : 'Like'}
+            </a>
             {isLoggedIn ? (
               <div className="dropdown-item has-submenu">
                 <span>Add To Playlist</span>
