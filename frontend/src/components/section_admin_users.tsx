@@ -260,8 +260,17 @@ const Section_admin_users: React.FC = () => {
     const ids = Object.entries(checkedRows)
       .filter(([, v]) => v)
       .map(([k]) => Number(k));
+  
     if (!ids.length) return;
+  
+    // Kiểm tra nếu có ID = 1
+    if (ids.includes(1)) {
+      alert("Không thể xoá user có ID = 1 (quản trị viên mặc định).");
+      return;
+    }
+  
     if (!window.confirm(`Xác nhận xóa ${ids.length} user?`)) return;
+  
     try {
       await Promise.all(ids.map((id) => deleteUser(id)));
       const data = await fetchUsers();
@@ -272,6 +281,7 @@ const Section_admin_users: React.FC = () => {
       alert("Xóa user thất bại.");
     }
   };
+  
 
   const formatDate = (iso: string) => new Date(iso).toLocaleDateString();
   const mapRole = (roleId: number | null) =>

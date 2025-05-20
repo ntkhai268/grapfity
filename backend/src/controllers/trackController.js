@@ -108,16 +108,25 @@ const updateTrackController = async (req, res) => {
 };
 
 const deleteTrackController = async (req, res) => {
-    try{
-        await deleteTrack(req.params.id)
-        return res.status(200).json({
-            message: 'Delete track succeed!',
-        });
-    } catch (err){
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+  console.log('→ DELETE /delete-track/:id called, params.id =', req.params.id);
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    console.warn('Invalid id:', req.params.id);
+    return res.status(400).json({ message: 'Invalid track id' });
+  }
+  try {
+    const deletedCount = await deleteTrack(id);   // gọi service
+    console.log(`→ deleteTrackService returned: ${deletedCount}`);
+    if (deletedCount === 0) {
+      return res.status(404).json({ message: 'Track not found' });
     }
+    return res.status(200).json({ message: 'Delete track succeed!' });
+  } catch (err) {
+    console.error('🔥 Error in deleteTrackController:', err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
 };
+
 
 //dangkhoii them
 const getTracksByUserController = async (req, res) => {

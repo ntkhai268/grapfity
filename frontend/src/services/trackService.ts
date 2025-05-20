@@ -1,3 +1,4 @@
+//../src/services/trackService.ts
 import axios from "axios";
 
 // Interface representing a joined track item from the API
@@ -53,4 +54,10 @@ export const updateTrackStatus = async (
     { status }
   );
   return res.data.data;
+};
+export const deleteTrack = async (id: number): Promise<{ message: string }> => {
+  const res = await axios.delete<{ message: string }>(
+    `http://localhost:8080/api/delete-track/${id}`
+  );
+  return res.data;
 };

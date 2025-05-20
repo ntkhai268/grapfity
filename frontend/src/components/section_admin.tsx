@@ -1,9 +1,8 @@
 // src/components/Section_admin.tsx
-import React, { useState, useEffect } from "react";
-import { fetchJoinedTracks, JoinedTrack } from "../services/trackService";
+import React, { useState, useEffect, useRef } from "react";
+import { fetchJoinedTracks, JoinedTrack, deleteTrack } from "../services/trackService";
 import "../styles/admin.css";
 
-// Load ảnh từ thư mục public
 const imageModules = import.meta.glob(
   "../assets/images/*.{png,jpg,jpeg,svg}",
   { eager: true, as: "url" }
@@ -20,10 +19,13 @@ const Section_admin: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [allChecked, setAllChecked] = useState(false);
   const [checkedRows, setCheckedRows] = useState<Record<number, boolean>>({});
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetchJoinedTracks()
-      .then((data) => {
+    const loadData = async () => {
+      try {
+        const data = await fetchJoinedTracks();
         const approved = data.filter((t) => t.status === "approved");
         setTracks(approved);
         setFilteredTracks(approved);
@@ -31,8 +33,21 @@ const Section_admin: React.FC = () => {
         approved.forEach((t) => (init[t.id] = false));
         setCheckedRows(init);
         setAllChecked(false);
-      })
-      .catch((err) => console.error("Lỗi khi fetch joined tracks:", err));
+      } catch (err) {
+        console.error("Lỗi khi fetch joined tracks:", err);
+      }
+    };
+    loadData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -44,38 +59,130 @@ const Section_admin: React.FC = () => {
           return title.includes(term) || artist.includes(term);
         })
       : [...tracks];
-
     setFilteredTracks(result);
     const init: Record<number, boolean> = {};
     result.forEach((t) => (init[t.id] = false));
     setCheckedRows(init);
     setAllChecked(false);
   }, [searchTerm, tracks]);
+  const handleSort = (option: string) => {
+    let sorted = [...filteredTracks];
+    switch (option) {
+      case "name-asc":
+        sorted.sort((a, b) =>
+          (a.Metadatum?.trackname || "").localeCompare(b.Metadatum?.trackname || "")
+        );
+        break;
+      case "name-desc":
+        sorted.sort((a, b) =>
+          (b.Metadatum?.trackname || "").localeCompare(a.Metadatum?.trackname || "")
+        );
+        break;
+      case "date-asc":
+        sorted.sort((a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+        break;
+      case "date-desc":
+        sorted.sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        break;
+      case "played-asc":
+        sorted.sort(
+          (a, b) =>
+            (a.listeningHistories[0]?.listenCount || 0) -
+            (b.listeningHistories[0]?.listenCount || 0)
+        );
+        break;
+      case "played-desc":
+        sorted.sort(
+          (a, b) =>
+            (b.listeningHistories[0]?.listenCount || 0) -
+            (a.listeningHistories[0]?.listenCount || 0)
+        );
+        break;
+      default:
+        return;
+    }
+    setFilteredTracks(sorted);
+    setFilterOpen(false);
+  };
+  
+
+  const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setAllChecked(checked);
+    const updated: Record<number, boolean> = {};
+    filteredTracks.forEach((t) => {
+      updated[t.id] = checked;
+    });
+    setCheckedRows(updated);
+  };
+
+  const handleCheckRow = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updated = { ...checkedRows, [id]: e.target.checked };
+    setCheckedRows(updated);
+    setAllChecked(filteredTracks.every((t) => updated[t.id]));
+  };
+
+  const formatDate = (iso?: string) =>
+    iso ? new Date(iso).toLocaleDateString() : "N/A";
 
   const maxListen =
     tracks.length > 0
       ? Math.max(...tracks.map((t) => t.listeningHistories[0]?.listenCount || 0))
       : 0;
 
-  const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setAllChecked(checked);
-    setCheckedRows(
-      Object.fromEntries(Object.keys(checkedRows).map((k) => [Number(k), checked]))
-    );
-  };
-
-  const handleCheckRow = (id: number) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const updated = { ...checkedRows, [id]: e.target.checked };
-    setCheckedRows(updated);
-    setAllChecked(Object.values(updated).every(Boolean));
-  };
-
-  const formatDate = (iso?: string) =>
-    iso ? new Date(iso).toLocaleDateString() : "N/A";
-
   const selectedCount = Object.values(checkedRows).filter(Boolean).length;
-  const filterCount = filteredTracks.length;
+
+  const handleDeleteSelected = async () => {
+    const idsToDelete = Object.entries(checkedRows)
+      .filter(([_, checked]) => checked)
+      .map(([id]) => Number(id));
+
+    if (!idsToDelete.length) return;
+    if (!window.confirm(`Xác nhận xoá ${idsToDelete.length} tracks?`)) return;
+
+    try {
+      // gọi xoá tuần tự hoặc Promise.all
+      await Promise.all(idsToDelete.map((id) => deleteTrack(id)));
+      // reload lại dữ liệu
+      const data = await fetchJoinedTracks();
+      const approved = data.filter((t) => t.status === "approved");
+      setTracks(approved);
+      setFilteredTracks(approved);
+      // reset checkbox
+      const init: Record<number, boolean> = {};
+      approved.forEach((t) => (init[t.id] = false));
+      setCheckedRows(init);
+      setAllChecked(false);
+    } catch (err) {
+      console.error("Lỗi khi xoá tracks:", err);
+      alert("Xoá không thành công. Vui lòng thử lại.");
+    }
+  };
+
+  // Hàm xoá từng dòng
+  const handleDeleteRow = (id: number) => async () => {
+    if (!window.confirm(`Xác nhận xoá track ID ${id}?`)) return;
+    try {
+      await deleteTrack(id);
+      // remove khỏi state hiện tại để không cần reload toàn bộ
+      const newTracks = tracks.filter((t) => t.id !== id);
+      setTracks(newTracks);
+      setFilteredTracks((prev) => prev.filter((t) => t.id !== id));
+      // cập nhật checkedRows và allChecked
+      const updated = { ...checkedRows };
+      delete updated[id];
+      setCheckedRows(updated);
+      setAllChecked(Object.values(updated).every(Boolean));
+    } catch (err) {
+      console.error(`Lỗi khi xoá track ${id}:`, err);
+      alert("Xoá không thành công. Vui lòng thử lại.");
+    }
+  };
+
 
   return (
     <section className="section_admin">
@@ -91,16 +198,47 @@ const Section_admin: React.FC = () => {
         </div>
         <div className="user_actions_admin">
           <span className="selected_count_admin">{selectedCount} Selected</span>
-          <button className="delete_button_admin" disabled={selectedCount === 0}>
-            Delete
-          </button>
-          <button className="export_button_admin">Add</button>
-          <button className="filter_button_admin">
-            Filter <span className="filter_badge_admin">{filterCount}</span>
-          </button>
+          <button
+          className="delete_button_admin"
+          disabled={selectedCount === 0}
+          onClick={handleDeleteSelected}
+        >
+          Delete
+        </button>
+          <div className="filter_dropdown_admin" ref={filterRef}>
+            <button
+              className="filter_button_admin"
+              onClick={() => setFilterOpen(!filterOpen)}
+            >
+              Filter <span className="filter_badge_admin" />
+            </button>
+            {filterOpen && (
+              <div className="filter_menu_admin" style={{ width: "100%", padding: "4px 0" }}>
+                <div className="filter_option_admin" onClick={() => handleSort("name-asc")}>
+                  A → Z
+                </div>
+                <div className="filter_option_admin" onClick={() => handleSort("name-desc")}>
+                  Z → A
+                </div>
+                <div className="filter_option_admin" onClick={() => handleSort("date-asc")}>
+                  Oldest First
+                </div>
+                <div className="filter_option_admin" onClick={() => handleSort("date-desc")}>
+                  Newest First
+                </div>
+                <div className="filter_option_admin" onClick={() => handleSort("played-asc")}>
+      Played ↑
+    </div>
+    <div className="filter_option_admin" onClick={() => handleSort("played-desc")}>
+      Played ↓
+    </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
+      {/* Table */}
       <div className="users_table_admin">
         <div className="table_header_admin">
           <div className="table_cell_admin checkbox_cell_admin">
@@ -123,13 +261,8 @@ const Section_admin: React.FC = () => {
           const title = t.Metadatum?.trackname || `Track ${t.id}`;
           const fileName = t.imageUrl.split("/").pop()!;
           const imgSrc = imageMap[fileName] || "";
-          const statusClass =
-            t.status === "approved"
-              ? "status_active_admin"
-              : t.status === "pending"
-              ? "status_pending_admin"
-              : "status_rejected_admin";
-          const statusText = t.status.charAt(0).toUpperCase() + t.status.slice(1);
+          const statusClass = "status_active_admin";
+          const statusText = "Approved";
           const listenCount = t.listeningHistories[0]?.listenCount || 0;
 
           return (
@@ -182,18 +315,14 @@ const Section_admin: React.FC = () => {
                 </div>
               </div>
               <div className="table_cell_admin action_cell_admin">
-                <button
-                  className="edit_button_admin"
-                  disabled={!checkedRows[t.id]}
-                >
-                  Edit
-                </button>
-                <button
-                  className="delete_row_button_admin"
-                  disabled={!checkedRows[t.id]}
-                >
-                  Delete
-                </button>
+                
+              <button
+                className="delete_row_button_admin"
+                onClick={handleDeleteRow(t.id)}
+                disabled={!checkedRows[t.id]}
+              >
+                Delete
+              </button>
               </div>
             </div>
           );
