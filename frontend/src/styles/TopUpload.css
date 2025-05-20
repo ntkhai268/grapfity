@@ -10,7 +10,8 @@
     width: 97%; /* Chiếm toàn bộ chiều rộng của trang */
     background-color: #fff; /* Màu nền */
     gap: 20px;
-    top: 280px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
+    top: 580px; /* Dùng 'top' để di chuyển container xuống 100px từ đầu trang */
+
   }
   
   /* Phần Top Tracks */
