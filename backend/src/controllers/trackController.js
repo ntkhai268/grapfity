@@ -61,7 +61,8 @@ const getTrackWithUploaderByIdController = async (req, res) => {
     }
 };
 
-const getMyUploadedTracksController = async (req, res) => {
+// danh cho chính chủ, có thể xem cả public và private trong chính profile của mình
+const getMyTracksController  = async (req, res) => {
     // --- THÊM LOG ĐỂ KIỂM TRA ---
     console.log('>>> getMyUploadedTracksController CALLED'); 
     // ---------------------------
@@ -94,6 +95,40 @@ const getMyUploadedTracksController = async (req, res) => {
         return res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài hát đã tải lên.' });
     }
 };
+
+
+// danh để xem profile người khác
+const getPublicTracksOfUserController = async (req, res) => {
+  console.log('>>> getPublicTracksOfUserController CALLED');
+
+  try {
+    // Chủ sở hữu tracks (bị xem)
+    const userId = req.params.userId;
+
+    // Người đang xem profile (khách)
+    const currentUserId = req.userId;
+
+    if (!userId || isNaN(Number(userId))) {
+      return res.status(400).json({ message: 'userId không hợp lệ trong URL.' });
+    }
+
+    // Dùng chung service giống Playlist: userId (chủ), currentUserId (người xem)
+    const tracks = await getTracksByUploaderId(userId, currentUserId);
+
+    return res.status(200).json({
+      message: 'Lấy danh sách bài hát công khai của người dùng thành công!',
+      data: tracks
+    });
+
+  } catch (error) {
+    console.error('Lỗi trong getPublicTracksOfUserController:', error);
+    if (error?.message === "User ID không hợp lệ.") {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Lỗi server khi lấy danh sách bài hát công khai.' });
+  }
+};
+
 // 
 // controller để tải ảnh cover cho tracks
 const uploadTrackCoverController = async (req, res) => {
@@ -273,6 +308,7 @@ export {
     createTrackController,
     updateTrackController,
     deleteTrackController,
-    getMyUploadedTracksController,
+    getMyTracksController ,
+    getPublicTracksOfUserController
 
 };

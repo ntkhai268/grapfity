@@ -42,7 +42,9 @@ const getMyPlaylistsController = async (req, res) => {
 const getPublicPlaylistsController = async (req, res) => {
   try {
     //ko dùng thằng req.body.userId vì là dữ leiu65 từ cilent gửi lên có thể bị fake 
+    //Người bị xem (chủ của profile)
     const userId = req.params.userId;
+    //  Người đang đăng nhập (đang xem profile của người khác)
     const currentUserId = req.userId;
 
     if (!userId || isNaN(Number(userId))) {

@@ -46,6 +46,14 @@ export const getUserById = async (id: number | string): Promise<UserData> => {
   return mapApiDataToUserData(res.data.data);
 };
 
+export const getUserByIdforUser = async (id: number | string): Promise<UserData> => {
+  if (!id || id === 'undefined') {
+    throw new Error(`❌ ID không hợp lệ khi gọi getUserByIdforUser: ${id}`);
+  }
+  const res = await axios.get<{ message: string; data: any }>(`${API_BASE_URL}/api/users/profile/${id}`);
+  return mapApiDataToUserData(res.data.data);
+};
+
 export const getMyProfile = async (): Promise<UserData> => {
   const res = await axios.get<{ message: string; data: any }>(`${API_BASE_URL}/api/users/me`, {
     withCredentials: true,

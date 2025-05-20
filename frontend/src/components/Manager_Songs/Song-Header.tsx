@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 // Bỏ useLocation nếu không còn dùng location.state để lấy currentSong nữa
 // import { useLocation } from "react-router-dom"; 
 import useImageColor from "../../hooks/useImageColor"; // Đảm bảo hook này tồn tại và đúng đường dẫn
@@ -14,7 +15,7 @@ interface Song {
   artist: string;
   cover: string;
   src: string; // Giữ lại nếu bạn vẫn dùng cho localStorage
-  // Thêm các trường khác nếu cần từ TrackData, ví dụ: year, duration_ms
+  uploaderId?: string | number;
   year?: number | string;
   durationText?: string; // Ví dụ: "4:40"
   playCount?: string;    // Ví dụ: "1,344,940"
@@ -27,6 +28,8 @@ interface SongHeaderProps {
 
 const SongHeader: React.FC<SongHeaderProps> = ({ onColorExtract, currentTrackId }) => {
   // const location = useLocation(); // Không cần nếu không dùng location.state nữa
+  const navigate = useNavigate();
+
   
   // State để lưu thông tin bài hát sẽ hiển thị
   const [displayedSong, setDisplayedSong] = useState<Song | null>(null);
@@ -50,6 +53,7 @@ const SongHeader: React.FC<SongHeaderProps> = ({ onColorExtract, currentTrackId 
               artist: trackData.artist || "Unknown Artist",
               cover: trackData.cover || "/assets/default_song_cover.png", // Cung cấp ảnh bìa mặc định
               src: trackData.src || "",
+              uploaderId: trackData.uploaderId,
               // Ví dụ lấy thêm các trường khác nếu có trong TrackData (sau khi map từ Metadatum)
               // year: trackData.year, 
               // durationText: formatDuration(trackData.duration_ms), // Cần hàm formatDuration
@@ -116,7 +120,16 @@ const SongHeader: React.FC<SongHeaderProps> = ({ onColorExtract, currentTrackId 
         <h1 className="song-title-track">{displayedSong.title}</h1>
         <div className="song-meta">
           <img src={displayedSong.cover} alt={displayedSong.artist} className="artist-image" />
-          <span>{displayedSong.artist}</span>
+          <span
+            style={{ cursor: "pointer", color: "#1DB954", fontWeight: 500 }}
+            onClick={() => {
+              if (displayedSong.uploaderId) {
+                navigate(`/profile/${displayedSong.uploaderId}`);
+              }
+            }}
+          >
+            {displayedSong.artist}
+          </span>
           <span className="dot-separator">•</span>
           {/* Hiển thị title một lần nữa ở đây có vẻ thừa, có thể thay bằng năm hoặc thông tin khác */}
           <span>{displayedSong.title}</span> 

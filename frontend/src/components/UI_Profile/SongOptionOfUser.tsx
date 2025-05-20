@@ -8,9 +8,10 @@ interface SongOptionOfUserProps {
   onEdit: () => void;
   onDelete: () => void;
   trackId : number;
+  isOwner: boolean;
 }
 
-const SongOptionOfUser: React.FC<SongOptionOfUserProps> = ({ onEdit, onDelete, trackId }) => {
+const SongOptionOfUser: React.FC<SongOptionOfUserProps> = ({ onEdit, onDelete, trackId, isOwner }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
@@ -156,8 +157,12 @@ const SongOptionOfUser: React.FC<SongOptionOfUserProps> = ({ onEdit, onDelete, t
               </div>
             )}
           </div>
-          <div className="dropdown_item_all" onClick={onEdit}>Edit</div>
-          <div className="dropdown_item_all" onClick={onDelete}>Delete</div>
+          {isOwner && (
+            <>
+              <div className="dropdown_item_all" onClick={onEdit}>Edit</div>
+              <div className="dropdown_item_all" onClick={onDelete}>Delete</div>
+            </>
+          )}
         </div>
       )}
     </div>

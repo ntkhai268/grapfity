@@ -477,3 +477,11 @@ margin-bottom: 16px;
 font-size: 24px;
 }
 
+.artist-name-link {
+  color: #1db954;
+  text-decoration: none;
+  font-weight: bold;
+}
+.artist-name-link:hover {
+  text-decoration: underline;
+}
