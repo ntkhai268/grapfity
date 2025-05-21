@@ -19,6 +19,7 @@ const SongRight: React.FC = () => {
 
   const [currentPlayingId, setCurrentPlayingId] = useState<string | number | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const currentContext = GlobalAudioManager.getCurrentContext();
 
   useEffect(() => {
     const fetchLikedTracksAndCounts = async () => {
@@ -83,27 +84,45 @@ const SongRight: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
-const handlePlayButtonClick = (track: TrackData, index: number) => {
-  const song = mapTrackDataToSong(track);
-  const playlist: Song[] = likedSongs.map(mapTrackDataToSong);
+const handlePlayButtonClick = (
+  list: Song[],
+  index: number,
+  type: PlaylistContext['type'],
+  contextId: string | number = type
+) => {
+  const clickedSong = list[index];
+  const currentSong = GlobalAudioManager.getCurrentSong();
+  const currentContext = GlobalAudioManager.getCurrentContext();
+  const isCurrentlyPlaying = GlobalAudioManager.getIsPlaying();
 
   const context: PlaylistContext = {
-    id: 'liked',
-    type: 'queue',
+    id: contextId,
+    type: type,
   };
 
-  const current = GlobalAudioManager.getCurrentSong();
+  const sameSong = currentSong?.id === clickedSong.id;
+  const sameContext =
+    currentContext?.id === context.id &&
+    currentContext?.type === context.type;
 
-  if (!current || current.id !== song.id) {
-    GlobalAudioManager.setPlaylist(playlist, index, context);
+  // Nếu là playlist mới hoặc bài khác → chuyển playlist và phát
+  if (!sameSong || !sameContext) {
+    GlobalAudioManager.setPlaylist(list, index, context);
     GlobalAudioManager.playSongAt(index);
+
+ 
     return;
   }
 
-  if (isPlaying) {
+  // Nếu đang phát đúng bài đó → toggle play/pause
+  if (isCurrentlyPlaying) {
     GlobalAudioManager.pausePlayback();
   } else {
-    GlobalAudioManager.playAudio(GlobalAudioManager.getAudioElement()!, song, context);
+    GlobalAudioManager.playAudio(
+      GlobalAudioManager.getAudioElement()!,
+      clickedSong,
+      context
+    );
   }
 };
 
@@ -134,11 +153,11 @@ const handlePlayButtonClick = (track: TrackData, index: number) => {
             />
              <div
                 className="play-button-like-profile"
-                onClick={() => handlePlayButtonClick(song, index)}
+                onClick={() => handlePlayButtonClick(likedSongs.map(mapTrackDataToSong), index,'profile', 'liked')}
               >
                 <i
                   className={
-                    currentPlayingId === song.id && isPlaying
+                    currentPlayingId === song.id && isPlaying &&  currentContext?.type === 'profile' &&  currentContext?.id === 'liked'
                       ? "fas fa-pause"
                       : "fas fa-play"
                   }
@@ -168,7 +187,7 @@ const handlePlayButtonClick = (track: TrackData, index: number) => {
                   >
                     <path d="M7.978 5c.653-1.334 1.644-2 2.972-2 1.992 0 3.405 1.657 2.971 4-.289 1.561-2.27 3.895-5.943 7C4.19 10.895 2.21 8.561 2.035 7c-.26-2.343.947-4 2.972-4 1.35 0 2.34.666 2.971 2z" />
                   </svg>
-</span>
+                </span>
 
                 <span className="count_tym_show">
                   {likeCounts[song.id] ?? 0}

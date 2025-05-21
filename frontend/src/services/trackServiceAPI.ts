@@ -251,7 +251,10 @@ export const getPublicTracksOfUserAPI = async (userId: string | number): Promise
   
   try {
     const response = await axios.get<{ message: string; data: any[] }>(
-      `http://localhost:8080/api/tracks/user/${userId}`
+      `http://localhost:8080/api/tracks/user/${userId}`,
+      {
+        withCredentials: true
+      }
     );
 
     const rawTracks = response.data?.data || [];
@@ -399,5 +402,25 @@ export const deleteTrackAPI = async (id: string | number): Promise<{ success: bo
 };
 
 
+/**
+ * Tải bài hát bằng trackId thông qua API /api/tracks/download/:trackId
+ * Hàm này sẽ tự động mở hộp thoại "Lưu file" trong trình duyệt.
+ * @param trackId ID của bài hát cần tải
+ */
+export const downloadTrackByIdAPI = (trackId: string | number) => {
+  if (!trackId) {
+    console.error("downloadTrackByIdAPI: trackId không hợp lệ.");
+    return;
+  }
+
+  const downloadUrl = `${API_BASE_URL}/download/${trackId}`;
+
+  const a = document.createElement("a");
+  a.href = downloadUrl;
+  a.setAttribute("download", ""); // Gợi ý trình duyệt hiển thị hộp thoại lưu
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 // --- Các hàm API khác liên quan đến Track (nếu có) ---
 // Ví dụ: tìm kiếm track, lấy track theo artist,...
