@@ -52,12 +52,7 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
     const [imageErrorMap, setImageErrorMap] = useState<Record<number, boolean>>({});
     const [hoveringIconMap, setHoveringIconMap] = useState<Record<number, boolean>>({});
 
-    // Hàm fetch playlists (Giữ nguyên)
 
-    // useEffect fetch lần đầu (Giữ nguyên)
-    // useEffect(() => {
-    //     fetchPlaylists();
-    // }, [fetchPlaylists]);
 
     // useEffect khởi tạo waveform (Giữ nguyên)
     useEffect(() => {
@@ -190,7 +185,11 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
                                                 key={track.id || trackIndex}
                                                 onClick={() => {
                                                     const containerElement = playlistContainerRefs.current[playlistIndex];
-                                                    handlePlayTrack(track, playlist, containerElement);
+                                                    handlePlayTrack(track, playlist, containerElement, {
+                                                        id: `playlist_profile_${playlist.id}`,
+                                                        type: "playlist"
+                                                        });
+
                                                 }}
                                                 title={`Play: ${track.title}`}
                                             >

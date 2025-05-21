@@ -9,7 +9,7 @@ export interface Song {
   
   export interface PlaylistContext {
     id: string | number; // ID định danh cho playlist (ví dụ: từ DB, API)
-    type: 'album' | 'playlist' | 'artist' | 'search' | 'queue' | 'waveform' |'section'| string; // Loại ngữ cảnh playlist
+    type: 'profile'| 'album' | 'playlist' | 'artist' | 'search' | 'queue' | 'waveform' |'section'| string; // Loại ngữ cảnh playlist
   }
   
   // --- Constants cho localStorage keys ---
@@ -264,7 +264,7 @@ export interface Song {
       if (!isSamePlaylist(newPlaylist, context)) {
         playlist = [...newPlaylist];
         currentPlaylistContext = context;
-  
+         updateCurrentState(null, -1, context, currentAudio); // mới
         if (newPlaylist.length > 0 && startIndex >= 0 && startIndex < newPlaylist.length) {
           // Chỉ chuẩn bị state, không tự động phát
           // updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);
@@ -540,7 +540,7 @@ export interface Song {
     }
   
     function isSamePlaylist(newPlaylist: Song[], newContext?: PlaylistContext) {
-    
+      if (!newContext || !currentPlaylistContext) return false; // mới
       if (newContext && currentPlaylistContext) {
         if (newContext.id !== currentPlaylistContext.id || newContext.type !== currentPlaylistContext.type) {
           return false;

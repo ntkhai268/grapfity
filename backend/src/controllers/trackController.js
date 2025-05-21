@@ -1,4 +1,10 @@
 import db from '../models/index.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import {
     getAllTracks,
     getTrackById,
@@ -68,7 +74,7 @@ const getMyTracksController  = async (req, res) => {
     // ---------------------------
     try {
         // 1. Lấy userId từ request (do middleware xác thực gắn vào)
-        const userId = req.userId; // Hoặc req.user?.id
+        const userId = req.userId; 
 
         // 2. Kiểm tra xem userId có tồn tại không
         if (!userId) {
@@ -79,7 +85,7 @@ const getMyTracksController  = async (req, res) => {
         console.log(`Controller: Đang lấy các bài hát đã upload cho user ID: ${userId}`);
 
         // 3. Gọi hàm service để lấy tracks theo uploaderId
-        const tracks = await getTracksByUploaderId(userId);
+        const tracks = await getTracksByUploaderId(userId, userId);
 
         // 4. Trả về kết quả
         return res.status(200).json({
@@ -300,6 +306,29 @@ const deleteTrackController = async (req, res) => {
     }
 };
 
+const downloadTrackController = async (req, res) => {
+  try {
+    const trackId = req.params.trackId;
+    const track = await getTrackById(trackId);
+
+    if (!track.trackUrl) {
+      return res.status(404).json({ error: 'Không có đường dẫn âm thanh.' });
+    }
+
+    const filePath = path.join(__dirname, '..', 'public', track.trackUrl.replace(/^\/?/, ''));
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File không tồn tại trên server.' });
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="track-${trackId}${path.extname(filePath)}"`);
+    return res.download(filePath);
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Không thể tải bài hát.' });
+  }
+};
+
 export {
     getAllTracksController,
     getTrackByIdController,
@@ -309,6 +338,7 @@ export {
     updateTrackController,
     deleteTrackController,
     getMyTracksController ,
-    getPublicTracksOfUserController
+    getPublicTracksOfUserController,
+    downloadTrackController
 
 };

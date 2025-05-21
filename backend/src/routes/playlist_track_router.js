@@ -10,7 +10,7 @@ import { authenticateUser } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Thêm authenticateUser nếu cần yêu cầu đăng nhập để xem
-router.get('/playlists/:playlistId',  authenticateUser,  getPlaylistDetailsController);
+router.get('/playlists/:playlistId',  getPlaylistDetailsController);
 // Controller sẽ lấy trackId từ req.body
 router.post('/playlists/:playlistId/tracks', authenticateUser, addTrackToPlaylistController);
 // Sử dụng đường dẫn RESTful hơn (có trackId), thêm middleware xác thực

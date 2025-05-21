@@ -8,7 +8,8 @@ import {
     deleteTrackController,
     getTrackWithUploaderByIdController,
     getMyTracksController,
-    getPublicTracksOfUserController
+    getPublicTracksOfUserController,
+    downloadTrackController
 } from '../controllers/trackController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 // import { uploadTrackImage} from "../middleware/uploadMiddleware.js";
@@ -22,6 +23,7 @@ router.get('/tracks', getAllTracksController);
 router.get('/tracks/getmytracks', authenticateUser, getMyTracksController);
 router.get('/tracks/user/:userId', getPublicTracksOfUserController);
 router.get('/tracks/:id', getTrackByIdController);
+router.get('/tracks/download/:trackId', downloadTrackController);
 router.get('/trackswithuploader/:id', getTrackWithUploaderByIdController);
 
 // router.post('/tracks/create-track',authenticateUser, upload.fields([

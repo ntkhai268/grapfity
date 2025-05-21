@@ -134,6 +134,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
         localStorage.setItem("viewedSong", JSON.stringify(song));
         localStorage.setItem("viewedPlaylist", JSON.stringify(list));
         localStorage.setItem("viewedIndex", index.toString());
+        
 
         // 👉 2. Điều hướng sang trang ManagerSong, truyền kèm state
         navigate("/ManagerSong", {
@@ -163,9 +164,13 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             id: contextId,
             type: type
         };
+         const sameSong = currentSong?.id === clickedSong.id;
+        const sameContext =
+            currentContext?.id === context.id &&
+            currentContext?.type === context.type;
 
         // Nếu chưa có bài hát nào, hoặc bài khác đang phát → chuyển playlist và phát
-        if (!currentSong || currentSong.id !== clickedSong.id) {
+        if (!sameSong || !sameContext) {
             GlobalAudioManager.setPlaylist(list, index, context);
             GlobalAudioManager.playSongAt(index);
             return;

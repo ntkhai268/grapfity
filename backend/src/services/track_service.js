@@ -122,6 +122,7 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
     console.error(`TrackService: Invalid user ID received in getTracksByUploaderId: ${userId}`);
     throw new Error("User ID không hợp lệ.");
   }
+  console.log(">>🧪 userId:", numericUserId, "currentUserId:", numericCurrentUserId);
 
   const isOwner = numericUserId === numericCurrentUserId;
 
