@@ -40,7 +40,8 @@ const SongList: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
       let fetchedTracksData: TrackData[] = [];
 
       if (viewedUserId === "me" || viewedUserId === currentUserId) {
-        fetchedTracksData = await getMyUploadedTracksAPI();
+        fetchedTracksData = await getMyUploadedTracksAPI(); 
+        console.log("🧪 My track list:", fetchedTracksData);
       } else {
         fetchedTracksData = await getPublicTracksOfUserAPI(viewedUserId);
         console.log("🧪 Public track list:", fetchedTracksData);

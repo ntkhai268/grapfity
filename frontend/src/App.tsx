@@ -32,6 +32,8 @@ import { getTracksInPlaylistAPI } from './services/trackPlaylistService';
 import { PlaylistData } from './components/Manager_Playlists/ManagerDataPlaylist';
 // ----------------------------------------------------
 import { getAllTracksAPI} from './services/trackServiceAPI';
+import { getLikedTracksByUserAPI } from './services/likeService';
+import { getMyPlaylistsAPI } from './services/playlistService';
 
 // Hàm tiện ích map từ TrackData (hoặc cấu trúc track trong PlaylistData) sang Song
 const mapTrackDataToSong = (track: any): Song => ({ 
@@ -45,40 +47,68 @@ const mapTrackDataToSong = (track: any): Song => ({
 
 const App = () => {
 
-  useEffect(() => {
-    const fetchPlaylist = async (context: PlaylistContext): Promise<Song[] | null> => {
-      console.log("[App Init] Attempting to fetch playlist for saved context:", context);
-      try {
-        let fetchedSongs: Song[] = [];
-        // --- SỬA LẠI: Dùng getTracksInPlaylistAPI ---
-        if ((context.type === 'playlist' || context.type === 'album') && context.id) {
-          // Gọi hàm getTracksInPlaylistAPI để lấy chi tiết playlist
-          const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(context.id); 
-          // Ánh xạ từ tracks trong playlistData (nếu tồn tại) sang Song[]
-          // Đảm bảo mapApiDataToPlaylistData trong service đã xử lý đúng để playlistData có tracks
-          fetchedSongs = playlistData?.tracks?.map(mapTrackDataToSong) || []; 
-          console.log(`[App Init] Fetched ${fetchedSongs.length} songs using getTracksInPlaylistAPI for ID: ${context.id}`);
-        // ---------------------------------------------
-        } else if (context.type === 'waveform' || context.type === 'queue') {
-          console.log(`[App Init] Fetching all tracks for context type: ${context.type}, ID: ${context.id}`);
-          const allTrackData = await getAllTracksAPI(); 
-          fetchedSongs = allTrackData.map(mapTrackDataToSong);
-          console.log(`[App Init] Fetched ${fetchedSongs.length} total songs for ${context.type}`);
-        } else {
-            console.warn(`[App Init] Unhandled context type or missing ID:`, context);
+ useEffect(() => {
+  const fetchPlaylist = async (context: PlaylistContext): Promise<Song[] | null> => {
+    try {
+      if (!context?.type || !context?.id) return null;
+
+      // if (( context.type === 'album')) {
+      //   const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(context.id);
+      //   return playlistData?.tracks?.map(mapTrackDataToSong) || null;
+      // }
+      if (context.type === 'playlist') {
+        // ⏹ Trường hợp: playlist từ profile cá nhân
+        if (typeof context.id === 'string' && context.id.startsWith('playlist_profile_')) {
+          const rawId = context.id.replace('playlist_profile_', '');
+          const allPlaylists = await getMyPlaylistsAPI();
+          const matched = allPlaylists.find(p => String(p.id) === rawId);
+          if (!matched) return null;
+          return matched.tracks.map(track => ({
+            id: track.id,
+            src: track.src,
+            title: track.title,
+            artist: track.artist,
+            cover: track.cover || "/assets/anhmau.png"
+          }));
         }
 
-        return fetchedSongs.length > 0 ? fetchedSongs : null; 
-      } catch (error) {
-        console.error("[App Init] Error fetching playlist for initial state:", error);
-        return null; 
+        // ⏹ Trường hợp: phát từ playlist detail hoặc public
+        const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(Number(context.id));
+        return playlistData?.tracks?.map(track => ({
+          id: track.id,
+          src: track.src,
+          title: track.title,
+          artist: track.artist,
+          cover: track.cover || "/assets/anhmau.png"
+        })) || null;
       }
-    };
 
-    console.log("[App Init] Calling GlobalAudioManager.loadInitialState...");
-    GlobalAudioManager.loadInitialState(fetchPlaylist);
 
-  }, []); 
+      if (context.type === 'profile' && context.id === 'liked') {
+        const likedTrackData = await getLikedTracksByUserAPI();
+        return likedTrackData.map(mapTrackDataToSong);
+      }
+
+      if (context.type === 'queue') {
+        const allTrackData = await getAllTracksAPI();
+        return allTrackData.map(mapTrackDataToSong);
+      }
+
+      if (context.type === 'waveform') {
+        const rawSongs = localStorage.getItem("lastWaveformPlaylist");
+        if (!rawSongs) return null;
+        return JSON.parse(rawSongs) as Song[];
+      }
+
+      return null; // Không hỗ trợ context này
+    } catch {
+      return null;
+    }
+  };
+
+  GlobalAudioManager.loadInitialState(fetchPlaylist);
+}, []);
+
 
   return (
     <Routes>

@@ -93,8 +93,14 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
 const handlePlayTrack = (
   trackToPlay: TrackItem,
   currentPlaylistData: PlaylistData, // Đổi tên để rõ ràng hơn
-  playlistContainerElement?: HTMLDivElement | null // DOM element của container playlist (tùy chọn)
+  playlistContainerElement?: HTMLDivElement | null, // DOM element của container playlist (tùy chọn)
+    contextOverride?: PlaylistContext
+
 ) => {
+    const newPlaylistContext: PlaylistContext = contextOverride || {
+    id: currentPlaylistData.id,
+    type: "playlist"
+  };
   console.log("==> handlePlayTrack START <==", { trackId: trackToPlay.id, playlistId: currentPlaylistData.id }); 
 
   // Kiểm tra dữ liệu đầu vào
@@ -137,10 +143,7 @@ const handlePlayTrack = (
       console.log(`[handlePlayTrack] Setting playlist and playing new track at index: ${currentTrackIndex}`); 
       
       // Tạo context cho playlist này
-      const newPlaylistContext: PlaylistContext = {
-          id: currentPlaylistData.id, 
-          type: 'playlist' // Giả sử type là 'playlist', điều chỉnh nếu cần
-      };
+      
       
       // Set playlist và context mới cho GlobalAudioManager
       // Truyền undefined cho các callback không dùng đến

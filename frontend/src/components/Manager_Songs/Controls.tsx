@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, RefObject } from "react";
 // Import API và kiểu dữ liệu Playlist từ service của bạn
 import { getMyPlaylistsAPI } from "../../services/playlistService";
 import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
+import {downloadTrackByIdAPI } from"../../services/trackServiceAPI";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
 import {  isTrackLikedByUserAPI,  likeTrackAPI,  unlikeTrackAPI,  countLikesForTrackAPI,} from "../../services/likeService";
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
@@ -236,8 +237,12 @@ const Controls: React.FC<ControlsProps> = ({
         <span style={{ fontSize: "12px", marginLeft: "4px", color: "#ccc" }}>{likeCount}</span>
       </div>
 
-      <div className="control-icon">
-        <i className="fas fa-arrow-down" style={{ color: "white" }}></i>
+     <div
+        className="control-icon"
+        title="Tải bài hát về"
+        onClick={() => trackId != null && downloadTrackByIdAPI(trackId)}
+      >
+        <i className="fas fa-arrow-down" style={{ color: "white", cursor: "pointer" }}></i>
       </div>
 
       {/* Ellipsis Icon & Main Dropdown Trigger */}
