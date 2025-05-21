@@ -152,6 +152,13 @@ function initWaveSurfer(): void {
     id: 'active-waveform-list-' + (activeContent.id || 'default'),
     type: 'waveform'
   };
+  try {
+  localStorage.setItem("lastWaveformPlaylist", JSON.stringify(playlist));
+  localStorage.setItem("lastWaveformContext", JSON.stringify(waveformPlaylistContext));
+  console.log("[WaveForm] Stored waveform context and playlist into localStorage.");
+} catch (err) {
+  console.error("[WaveForm] Failed to save playlist to localStorage:", err);
+}
 
   const currentSrcList: string[] = playlist.map(song => song.src);
 
