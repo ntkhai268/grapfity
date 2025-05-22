@@ -71,7 +71,7 @@ const ProfileSection = () => {
                 <div className="bottom_section">
                     <div className="left_section">
                     <Song viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
-                    <PopularTracks />
+                    <PopularTracks viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
                     <Tracks />
                     <Playlists viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""} />
                     </div>
