@@ -32,6 +32,7 @@ const Controls: React.FC<ControlsProps> = ({
   // ...destructure các props khác nếu có
 }) => {
   // --- Hooks & State ---
+  console.log('[DEBUG] Controls props:', {trackId, songUrl, currentTrackId, isPlaying});
 
   // Giả định có cách lấy trạng thái đăng nhập
   const isLoggedIn = true; // <<< !!! THAY THẾ BẰNG LOGIC LẤY TRẠNG THÁI ĐĂNG NHẬP THỰC TẾ !!!
@@ -174,7 +175,9 @@ const Controls: React.FC<ControlsProps> = ({
     };
 
     GlobalAudioManager.setPlaylist(playlist, index, context);
-    GlobalAudioManager.playSongAt(index);
+    setTimeout(() => {
+      GlobalAudioManager.playSongAt(index);
+    }, 50);
   } else {
     if (isCurrentlyPlaying) {
       GlobalAudioManager.pausePlayback();
@@ -207,7 +210,9 @@ const Controls: React.FC<ControlsProps> = ({
     fetchLikeState();
   }, [trackId, isLoggedIn]);
 
-
+  useEffect(() => {
+  console.log('[DEBUG] Controls nhận props mới:', { trackId, songUrl, currentTrackId, isPlaying });
+}, [trackId, songUrl, currentTrackId, isPlaying]);
   
 // console.log("Controls xxxxxxxxxx:", { trackId, currentTrackId, isPlaying,  }); 
   // --- Render ---
