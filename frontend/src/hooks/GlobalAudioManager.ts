@@ -267,7 +267,7 @@ export interface Song {
          updateCurrentState(null, -1, context, currentAudio); // mới
         if (newPlaylist.length > 0 && startIndex >= 0 && startIndex < newPlaylist.length) {
           // Chỉ chuẩn bị state, không tự động phát
-          // updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);
+          updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);// mới mới
         } else {
           updateCurrentState(null, -1, context, currentAudio);
         }
@@ -283,6 +283,7 @@ export interface Song {
     }
   
     function playSongAt(index: number, preferredAudioElement?: HTMLAudioElement) {
+    
       if (isTransitioning) {
         // console.warn(`[GlobalAudioManager] playSongAt(${index}) ignored: Currently transitioning.`);
         return;
@@ -318,6 +319,8 @@ export interface Song {
       }
   
       if (preferredAudioElement) {
+      console.log('[DEBUGDEBUG][playSongAt] Called with:', { index, playlistLength: playlist.length, currentPlaylistContext, songToPlay });
+
         const currentSrcOfPreferred = preferredAudioElement.src ? new URL(preferredAudioElement.src, window.location.href).href : "";
         const newSongSrc = new URL(songToPlay.src, window.location.href).href;
         if (currentSrcOfPreferred !== newSongSrc) {
@@ -328,11 +331,13 @@ export interface Song {
         audioToUse = preferredAudioElement;
       } else if (currentAudio && currentSong?.id === songToPlay.id && !isPlaying) {
         audioToUse = currentAudio;
+        console.log('[DEBUGDEBUG][playSongAt] Using currentAudio:', { src: currentAudio.src });
       } else {
         audioToUse = new Audio(songToPlay.src);
         audioToUse.crossOrigin = "anonymous";
         audioToUse.preload = "auto";
         currentTime = 0; duration = 0; progress = 0; isPlaying = false;
+        console.log('[DEBUGDEBUG][playSongAt] Created new Audio:', { src: audioToUse.src });
       }
   
       if (previousAudioToStop) {
@@ -347,7 +352,12 @@ export interface Song {
           audioToUse.pause();
         }
       };
-  
+      console.log('[DEBUGDEBUG][playSongAt] Ready to play:', {
+        src: audioToUse.src,
+        readyState: audioToUse.readyState,
+        paused: audioToUse.paused,
+        currentTime: audioToUse.currentTime
+      });
       const playPromise = audioToUse.play();
   
       const cleanupTransition = () => {
