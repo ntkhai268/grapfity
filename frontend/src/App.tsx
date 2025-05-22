@@ -94,12 +94,11 @@ const App = () => {
         return allTrackData.map(mapTrackDataToSong);
       }
 
-      if (context.type === 'waveform') {
-        const rawSongs = localStorage.getItem("lastWaveformPlaylist");
-        if (!rawSongs) return null;
-        return JSON.parse(rawSongs) as Song[];
-      }
-
+    if (context.type === 'waveform') {
+      const rawSongs = localStorage.getItem(`waveformPlaylist_${context.id}`);
+      if (!rawSongs) return null;
+      return JSON.parse(rawSongs) as Song[];
+    }
       return null; // Không hỗ trợ context này
     } catch {
       return null;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 // Import hook và kiểu dữ liệu trả về của nó
 import useFooterAudioPlayer, { UseFooterAudioPlayerReturn } from "../hooks/FooterAudioPlayer"; 
 // Import kiểu Song nếu cần (hoặc dùng Song từ GlobalAudioManager)
@@ -7,6 +7,7 @@ import "../styles/Footer.css";
 import  { RepeatButton, ShuffleButton } from './modeControl';
 import { useNavigate } from "react-router-dom";
 import VolumeControl from "./VolumeControl";
+import { trackingListeningHistoryAPI } from "../services/listeningService";
 
 
 // Interface cho FooterLeft (có thể giữ nguyên hoặc điều chỉnh)
@@ -172,6 +173,21 @@ const Footer: React.FC = () => {
     setVolume  
   }: UseFooterAudioPlayerReturn = useFooterAudioPlayer();
   // -----------------------------------------
+  const lastTrackedId = useRef<number | string | undefined>(undefined);
+
+   useEffect(() => {
+    // Chỉ gọi tracking khi có bài hát mới được play (chuyển bài, hoặc lần đầu vào player)
+    if (
+      currentSong?.id &&
+      isPlaying &&
+      currentSong.id !== lastTrackedId.current
+    ) {
+      trackingListeningHistoryAPI(currentSong.id)
+        .catch(() => { /* ignore */ });
+      lastTrackedId.current = currentSong.id;
+    }
+    // Không reset lastTrackedId khi pause, chỉ reset khi đổi sang bài khác!
+  }, [currentSong?.id, isPlaying]);
   const navigate = useNavigate();
 
 const goToManagerSong = () => {

@@ -141,7 +141,7 @@ export const getAllPublicPlaylistsAPI = async (): Promise<PlaylistData[]> => {
             `${API_BASE_URL}/public`
         );
         const playlists = response.data.data.map(mapApiDataToPlaylistData);
-        console.log("✅ Fetched public playlists:", playlists);
+        // console.log("✅ Fetched public playlists:", playlists);
         return playlists;
     } catch (error) {
         console.error('❌ Error fetching all public playlists:', error);

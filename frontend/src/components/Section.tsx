@@ -10,29 +10,35 @@ import GlobalAudioManager, { Song, PlaylistContext } from "../hooks/GlobalAudioM
 import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
 import { PlaylistData } from "../components/Manager_Playlists/ManagerDataPlaylist";
 import { getAllPublicPlaylistsAPI } from "../services/playlistService"; 
+import { getTop10PopularTracksAPI } from "../services/listeningService";
+
 
 
 import "../styles/Section.css"; // Đảm bảo đường dẫn CSS đúng
-
+const BACKEND_URL = 'http://localhost:8080';
 // Hàm map tạm thời từ TrackData sang Song (bạn có thể đặt ở nơi khác)
-const mapTrackDataToSong = (track: TrackData): Song => ({
-    id: track.id, // Giả sử TrackData có id
-    src: track.src || '', // Giả sử TrackData có src
-    // Đảm bảo title là string hoặc undefined, nếu là null thì chuyển thành undefined
-    title: track.title === null ? undefined : track.title, 
-    // Đảm bảo artist là string hoặc undefined
-    artist: track.artist === null ? undefined : track.artist, 
-    // Đảm bảo cover là string hoặc undefined
-    cover: track.cover === null ? undefined : track.cover 
-});
+function normalizeUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url; // đã chuẩn URL
+  return `${BACKEND_URL}/${url.replace(/^\/+/, '')}`;
+}
 
+export const mapTrackDataToSong = (track: TrackData): Song => ({
+  id: track.id,
+  src: normalizeUrl(track.src) || '',   // chuẩn hóa URL nếu cần
+  title: track.title === null ? undefined : track.title,
+  artist: track.artist === null ? undefined : track.artist,
+  cover: normalizeUrl(track.cover),
+});
 const Section: React.FC = () => { // Thêm kiểu React.FC
     const navigate = useNavigate(); // Khởi tạo useNavigate
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
 
     // State lưu trữ mảng Song[] (đã sửa kiểu)
     const [allTracks, setAllTracks] = useState<Song[]>([]); 
-    const [isLoading, setIsLoading] = useState<boolean>(true);   
+    const [isLoading, setIsLoading] = useState<boolean>(true); 
+    const [topTracks, setTopTracks] = useState<Song[]>([]);
+    const [isLoadingTop, setIsLoadingTop] = useState<boolean>(true);  
     const [error, setError] = useState<string | null>(null);    
     const [currentPlayingId, setCurrentPlayingId] = useState<string | number | null>(null);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
@@ -64,10 +70,29 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
         fetchTracks();
     }, []); // Mảng rỗng đảm bảo chỉ chạy 1 lần
 
+    useEffect(() => {
+        setIsLoadingTop(true);
+        const fetchTopTracks = async () => {
+            try {
+                const topTracksRaw: TrackData[] = await getTop10PopularTracksAPI();
+                 console.log("check dữ liệu thô", topTracksRaw); // check dữ liệu thô
+                const topSongs: Song[] = topTracksRaw.map(mapTrackDataToSong);
+                 console.log("Mapped top songs:", topSongs);
+                setTopTracks(topSongs);
+            } catch (err) {
+                console.error("Failed to fetch top 10 tracks:", err);
+            } finally {
+                setIsLoadingTop(false);
+            }
+        };
+        fetchTopTracks();
+    }, []);
+
 
     // --- Chia nhỏ dữ liệu (sử dụng mảng Song[] đã map) ---
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
-    const recommendedTracks: Song[] = allTracks.slice(0, 3); 
+    const recommendedTracks: Song[] = topTracks
+    console.log("recommendedTracks:", recommendedTracks);
     const recentTracks: Song[] = allTracks.slice(3, 7);  
     const publicTracks: Song[] = allTracks; 
     const currentContext = GlobalAudioManager.getCurrentContext();
@@ -210,48 +235,57 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                 {/* Chỉ hiển thị nội dung khi không loading và không có lỗi */}
                 {!isLoading && !error && (
                     <>
-                        {/* --- SECTION 1: RECOMMENDED --- */}
-                        <h1>Recommended for today</h1>
+                        {/* --- SECTION 1: RECOMMENDED --- */}                        
+                       <h1>Recommended for today</h1>
                         <div className="song-list">
-                            {recommendedTracks.length > 0 ? (
-                                recommendedTracks.map((song, index) => (
-                                    // Truyền context type là 'queue' và id là 'recommended' (ví dụ)
-                                        <button
-                                            key={`rec-${song.id}-${index}`}
-                                            className="song-item-section"
-                                           onClick={() => handleClicktest(song, recommendedTracks, index, 'queue', 'recommended')}
+                        {isLoadingTop ? (
+                            <div>Đang tải top 10 bài hát phổ biến...</div>
+                        ) : recommendedTracks.length > 0 ? (
+                            recommendedTracks.map((song, index) => {
+                            console.log(`Song #${index + 1}:`);
+                            console.log("  Title:", song.title);
+                            console.log("  Artist:", song.artist);
+                            console.log("  Cover URL:", song.cover);
+                            console.log("  Audio src:", song.src);
 
-                                            >
-                                            <div className="song-image-wrapper">
-                                                <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
-                                                
-                                                <div
-                                                className="play-button-section"
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Ngăn chuyển trang
-                                                    handlePlayButtonClick(recommendedTracks, index, 'queue', 'recommended');
-                                                }}
-                                                >
-                                                <i
-                                                    className={
-                                                     currentPlayingId === song.id && isPlaying &&  currentContext?.type === 'queue' &&  currentContext?.id === 'recommended'
-                                                        ? "fas fa-pause"
-                                                        : "fas fa-play"
-                                                    }
-                                                    style={{ color: "black" }}
-                                                ></i>
-                                                </div>
-                                            </div>
-
-                                            <p className="title"title={song.title}>{song.title || 'Unknown Title'}</p>
-                                            <p className="artist">{song.artist || 'Unknown Artist'}</p>
-                                        </button>
-
-                                ))
-                            ) : (
-                                <p>Không có bài hát nào được đề xuất.</p>
-                            )}
+                            return (
+                                <button
+                                key={`rec-${song.id}-${index}`}
+                                className="song-item-section"
+                                onClick={() => handleClicktest(song, recommendedTracks, index, 'queue', 'recommended')}
+                                >
+                                <div className="song-image-wrapper">
+                                    <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />
+                                    <div
+                                    className="play-button-section"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePlayButtonClick(recommendedTracks, index, 'queue', 'recommended');
+                                    }}
+                                    >
+                                    <i
+                                        className={
+                                        currentPlayingId === song.id &&
+                                        isPlaying &&
+                                        currentContext?.type === 'queue' &&
+                                        currentContext?.id === 'recommended'
+                                            ? "fas fa-pause"
+                                            : "fas fa-play"
+                                        }
+                                        style={{ color: "black" }}
+                                    ></i>
+                                    </div>
+                                </div>
+                                <p className="title" title={song.title}>{song.title || 'Unknown Title'}</p>
+                                <p className="artist">{song.artist || 'Unknown Artist'}</p>
+                                </button>
+                            );
+                            })
+                        ) : (
+                            <p>Không có bài hát nào được đề xuất.</p>
+                        )}
                         </div>
+
 
                         {/* --- SECTION 2: RECENTLY RELEASED --- */}
                          <h1>Recently released</h1>
