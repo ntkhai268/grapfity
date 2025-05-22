@@ -36,8 +36,8 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
   const cover = relativeCover
     ? `${BACKEND_URL}/${relativeCover.replace(/^\/?/, '')}`
     : "";
-    console.log("🎤 User info:", playlistFromApi.User);
-    console.log("🎤 User name:", playlistFromApi.User?.Name);
+    // console.log("🎤 User info:", playlistFromApi.User);
+    // console.log("🎤 User name:", playlistFromApi.User?.Name);
   return {
     id: playlistFromApi.id,
     title: playlistFromApi.title || 'Untitled Playlist',
