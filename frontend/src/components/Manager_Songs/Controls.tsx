@@ -32,7 +32,7 @@ const Controls: React.FC<ControlsProps> = ({
   // ...destructure các props khác nếu có
 }) => {
   // --- Hooks & State ---
-  console.log('[DEBUG] Controls props:', {trackId, songUrl, currentTrackId, isPlaying});
+  // console.log('[DEBUG] Controls props:', {trackId, songUrl, currentTrackId, isPlaying});
 
   // Giả định có cách lấy trạng thái đăng nhập
   const isLoggedIn = true; // <<< !!! THAY THẾ BẰNG LOGIC LẤY TRẠNG THÁI ĐĂNG NHẬP THỰC TẾ !!!
