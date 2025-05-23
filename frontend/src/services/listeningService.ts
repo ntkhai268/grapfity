@@ -54,3 +54,9 @@ export const getTop5TracksOfUserAPI = async () => {
   
   return res.data;
 };
+
+export const getTop5TracksOfOwnerAPI = async () => {
+  const res = await axios.get('/popular-owner/top5');
+  
+  return res.data;
+};
