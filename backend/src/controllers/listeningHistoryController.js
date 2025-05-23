@@ -1,4 +1,4 @@
-import { getListeningHistoryOfUser, trackingListeningHistory,getTop10PopularTracks, getTop5TracksOfUser } from '../services/listeningHistory_service.js';
+import { getListeningHistoryOfUser, trackingListeningHistory,getTop10PopularTracks, getTop5TracksOfUser, getTop5TracksByOwner } from '../services/listeningHistory_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 
 const getListeningHistoryOfUserController = async (req, res) => {
@@ -56,10 +56,29 @@ const getTop5TracksOfUserController = async (req, res) => {
     }
 };
 
+const getTop5TracksByOwnerController = async (req, res) => {
+  try {
+    const JWT = req.cookies;
+    const data = verityJWT(JWT.jwt);
+    const userId = data.userId;
+
+    // Không trả dữ liệu nếu không có userId hợp lệ
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+
+    const results = await getTop5TracksByOwner(userId);
+     console.log("==>🧪🧪🧪 [RESPONSE] Top 5 tracks trả về cho FE:", results);
+    res.status(200).json(results);
+  } catch (err) {
+    console.error('Database connection failed:', err);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 
 export {
     getListeningHistoryOfUserController,
     trackingListeningHistoryController,
     getTop10PopularTracksController,
-    getTop5TracksOfUserController
+    getTop5TracksOfUserController,
+    getTop5TracksByOwnerController // LẤY 5 BÀI CỦA USER UPLOAD DC NGHE NHIỀU NHẤT ĐỂ HIỂN THỊ
 };
