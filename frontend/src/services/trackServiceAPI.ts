@@ -43,8 +43,7 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
 
   const title = trackFromApi.Metadatum?.trackname || 'Unknown Title';
   const lyrics = trackFromApi.Metadatum?.lyrics || null;
-  const durationMs = trackFromApi.Metadatum?.duration_ms;
-  const explicitContent = trackFromApi.Metadatum?.explicit;
+  
   const artist =
     uploaderInfo?.username ||
     trackFromApi.Metadatum?.artistName ||
@@ -74,8 +73,7 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     createdAt: trackFromApi.createdAt,
     updatedAt: trackFromApi.updatedAt,
     lyrics,
-    duration_ms: durationMs,
-    explicit: explicitContent,
+    
   };
 };
 
@@ -282,7 +280,8 @@ export const createTrackAPI = async (
   fileImage: File,
   title: string,
   privacy: string,
-  audioFeatures?: any // Đã bao gồm lyrics trong object này
+  lyrics: string,
+  releaseDate: string
 ): Promise<TrackData> => {
   try {
     const formData = new FormData();
@@ -290,10 +289,8 @@ export const createTrackAPI = async (
     formData.append('image', fileImage);
     formData.append('title', title);
     formData.append('privacy', privacy);
-
-
-    // 🎯 Chỉ gửi audioFeatures (đã bao gồm lyrics bên trong)
-    formData.append('audioFeatures', JSON.stringify(audioFeatures));
+    formData.append('lyrics', lyrics);              // 👈 mới
+    formData.append('releaseDate', releaseDate);    // 👈 mới
 
     // ✅ Gửi lên server
     const response = await fetch('http://localhost:8080/api/tracks/create-track', {

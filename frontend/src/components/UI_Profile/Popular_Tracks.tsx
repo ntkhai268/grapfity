@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { initWaveSurfer } from "../../hooks/WaveForm";
 import { Song } from "../../hooks/GlobalAudioManager";
 import {  TrackData } from "../../services/trackServiceAPI"; 
-import { getTop5TracksOfUserAPI } from "../../services/listeningService";
+import { getTop5TracksOfOwnerAPI } from "../../services/listeningService";
 import SongOptionOfUser from "./SongOptionOfUser";
 import UpdateSongBasicInfo from "../Manager_Songs/updateSongBasicInfo";
 
@@ -38,7 +38,7 @@ const PopularTrack: React.FC<SongProps> = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedTracksData: TrackData[] = await getTop5TracksOfUserAPI();
+        const fetchedTracksData: TrackData[] = await getTop5TracksOfOwnerAPI();
         console.log("🧪 Top 5 track list:", fetchedTracksData);
         const fetchedSongs: Song[] = fetchedTracksData.map(mapTrackDataToSong);
         setSongs(fetchedSongs);
@@ -117,7 +117,7 @@ const PopularTrack: React.FC<SongProps> = () => {
                   setEditingSongId(null);
                   // Có thể reload lại list nếu muốn cập nhật thông tin bài hát đã chỉnh sửa
                   try {
-                    const updatedTracks = await getTop5TracksOfUserAPI();
+                    const updatedTracks = await getTop5TracksOfOwnerAPI();
                     const mappedSongs = updatedTracks.map(mapTrackDataToSong);
                     setSongs(mappedSongs);
                   } catch (err) {
