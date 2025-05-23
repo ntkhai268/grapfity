@@ -183,57 +183,41 @@ const uploadTrackCoverController = async (req, res) => {
         return res.status(500).json({ error: 'Lỗi server khi upload ảnh track.' });
     }
 };
-
 const createTrackController = async (req, res) => {
-    const JWT = req.cookies;
-    const data = verityJWT(JWT.jwt);
-    const uploaderId = data.userId;
-    const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
-    const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
-    const privacy = req.body.privacy || 'public';
-    console.log(req.body.audioFeatures)
-    const metadata = JSON.parse(req.body.audioFeatures);
-    console.log('>>> Metadata sau parse:', metadata); 
-    
-
-    const metadataAudio = await mm.parseFile(req.files.audio[0].path);
-    //thêm các metadata có thể lấy tự động
-    metadata.trackname = req.body.title
-    metadata.track_id = null; // Hệ thống tự tạo (identity/autoincrement), KHÔNG nên gán
-
-    metadata.explicit = req.body.explicit === 'true' || false;
-    metadata.danceability = parseFloat(req.body.danceability) || 0;
-    metadata.energy = parseFloat(req.body.energy) || 0;
-    metadata.key = parseInt(req.body.key) || 0;
-    metadata.loudness = parseFloat(req.body.loudness) || 0;
-    metadata.mode = parseInt(req.body.mode) || 0;
-    metadata.speechiness = parseFloat(req.body.speechiness) || 0;
-    metadata.acousticness = parseFloat(req.body.acousticness) || 0;
-    metadata.instrumentalness = parseFloat(req.body.instrumentalness) || 0;
-    metadata.liveness = parseFloat(req.body.liveness) || 0;
-    metadata.valence = parseFloat(req.body.valence) || 0;
-    metadata.tempo = parseFloat(req.body.tempo) || 0;
-    metadata.duration_ms = Math.floor((metadataAudio.format.duration || 0) * 1000); // giữ nguyên như trước
-    metadata.time_signature = parseInt(req.body.time_signature) || 4;
-    metadata.year = parseInt(req.body.releaseDate?.slice(0, 4)) || new Date().getFullYear();
-    metadata.release_date = req.body.releaseDate || new Date().toISOString().split('T')[0];
-    metadata.createdAt = new Date();
-    metadata.updatedAt = new Date();
-    metadata.lyrics =metadata.lyrics || '';
-
-   
     try {
-         const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, privacy, metadata);
+        const JWT = req.cookies;
+        const data = verityJWT(JWT.jwt);
+        const uploaderId = data.userId;
+        const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
+        const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
+        const privacy = req.body.privacy || 'public';
+
+        // === Tạo object metadata trực tiếp từ req.body ===
+        const metadata = {
+            trackname: req.body.title,
+            track_id: null, // Để hệ thống tự tạo (autoincrement)
+            release_date: req.body.releaseDate || new Date().toISOString().split('T')[0],
+            createdAt: new Date(),
+            updatedAt: new Date(),
+            lyrics: req.body.lyrics || '',
+
+            // Nếu FE truyền thêm trường nào nữa (key, energy, danceability, v.v.) thì gán thêm ở đây.
+            // key: req.body.key,
+            // danceability: req.body.danceability,
+            // v.v.
+        };
+
+        const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, privacy, metadata);
         return res.status(200).json({
             message: 'Create track succeed!',
             data: newTrack
         });
     } catch (err) {
         console.error('Database connection failed:', err);
-        // res.status(500).send('Internal Server Error');
         res.status(500).json({ message: err.message || 'Internal Server Error' });
     }
 };
+
 
 const updateTrackController = async (req, res) => {
   const id = req.params.id; // ID nằm trong URL

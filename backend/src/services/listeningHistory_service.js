@@ -120,6 +120,63 @@ const getTop5TracksOfUser = async (userId) => {
 return tracks;
 };
 
+const getTop5TracksByOwner = async (uploaderId) => {
+  // console.log("===>🧪🧪🧪 getTop5TracksByOwner được gọi với uploaderId:", uploaderId);
+  const { Track, Metadata, User } = db;
+
+  const topTracks = await db.sequelize.query(
+    `
+    SELECT t.id as trackId, ISNULL(SUM(lh.listenCount), 0) AS totalListenCount
+    FROM Tracks t
+    LEFT JOIN listeningHistories lh ON t.id = lh.trackId
+    WHERE t.uploaderId = :uploaderId AND t.privacy = 'public'
+    GROUP BY t.id
+    ORDER BY totalListenCount DESC
+    OFFSET 0 ROWS FETCH NEXT 5 ROWS ONLY
+    `,
+    {
+      replacements: { uploaderId },
+      type: db.Sequelize.QueryTypes.SELECT
+    }
+  );
+  // console.log("===>🧪🧪🧪 topTracks:", topTracks);
+
+  if (!topTracks.length) {
+    console.log("[DEBUG] No topTracks found");
+    return [];
+  }
+
+  const trackIds = topTracks.map(t => t.trackId);
+
+  const tracks = await Track.findAll({
+    where: { id: trackIds},
+    include: [
+      { model: Metadata, attributes: ['trackname'] },
+      { model: User, attributes: ['Name'] }
+    ]
+  });
+
+  // Tạo tracksMap để merge theo đúng thứ tự, tránh find bị sai/thiếu
+  const tracksMap = {};
+  tracks.forEach(t => { tracksMap[String(t.id)] = t; });
+
+  return topTracks.map(t => {
+    const track = tracksMap[String(t.trackId)];
+    if (!track) {
+      console.log(`🛑 Không tìm thấy info cho trackId ${t.trackId}`);
+      return null;
+    }
+    return {
+      id: track.id,
+      src: track.trackUrl || "",
+      title: track.Metadatum?.trackname ?? undefined,
+      artist: track.User?.Name ?? undefined,
+      cover: track.imageUrl ?? undefined,
+      listenCount: t.totalListenCount || 0
+    };
+  }).filter(Boolean);
+};
+
 
 
 
@@ -127,5 +184,6 @@ export {
     getListeningHistoryOfUser,
     trackingListeningHistory,
     getTop10PopularTracks,
-    getTop5TracksOfUser
+    getTop5TracksOfUser,
+    getTop5TracksByOwner
 };
