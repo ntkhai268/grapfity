@@ -1,7 +1,7 @@
-import express from 'express';
-const router = express.Router();
-import { feature_extraction } from '../controllers/metadataController.js';
+// import express from 'express';
+// const router = express.Router();
+// import { feature_extraction } from '../controllers/metadataController.js';
 
-router.post('/metadata', feature_extraction)
+// router.post('/metadata', feature_extraction)
 
-export default router;
+// export default router;

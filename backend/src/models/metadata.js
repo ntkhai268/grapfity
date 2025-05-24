@@ -23,7 +23,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    explicit: DataTypes.BOOLEAN,
+    explicit: DataTypes.FLOAT,
     danceability: DataTypes.FLOAT,
     energy: DataTypes.FLOAT,
     key: DataTypes.INTEGER,
