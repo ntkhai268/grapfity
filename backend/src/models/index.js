@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-dotenv.config(); // Load biến môi trường từ .env
+dotenv.config();
 
 import Sequelize from 'sequelize';
 

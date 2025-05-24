@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "sa",
-    "password": "1234567",
-    "database": "DB_Graptify",
+    "password": "nhomnaymanhNhat1!",
+    "database": "GraptifyDB",
     "host": "127.0.0.1",
     "dialect": "mssql",
     "port": 1433

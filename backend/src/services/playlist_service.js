@@ -1,6 +1,4 @@
 import db from '../models/index.js';
-import { Op } from 'sequelize';
-
 const getAllPlaylistsByUserId = async (userId, currentUserId) => {
   try {
     const isOwner = Number(userId) === Number(currentUserId); // 👈 So sánh người dùng

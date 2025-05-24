@@ -1,5 +1,6 @@
 import { Sequelize, Transaction } from 'sequelize';
 import db from '../models/index.js';
+import { extractMetadata, checkMetadataSimilarity} from '../services/metadata_service.js';
 
 const getAllTracks = async () => {
     return await db.Track.findAll({
@@ -159,24 +160,63 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
 };
 
 
-const createTrack = async (trackUrl, imageUrl, uploaderId,privacy,  metadata) => {
-     const newTrack = await db.Track.create({ trackUrl, imageUrl, uploaderId, status: 'pending', privacy} );
-    metadata.track_id = newTrack.id   
-    const {
-        trackname, track_id, explicit, danceability,
-        energy, key, loudness, mode, speechiness,
-        acousticness, instrumentalness, liveness,
-        valence, tempo, duration_ms, time_signature, year, release_date, lyrics
-    } = metadata
-   
+const createTrack = async ({
+  trackUrl,
+  imageUrl,
+  uploaderId,
+  privacy,
+  absAudioPath,
+  trackname
+}) => {
+  const metadata = await extractMetadata(absAudioPath);
 
-    await db.Metadata.create({
-        trackname, track_id, explicit, danceability,
-        energy, key, loudness, mode, speechiness,
-        acousticness, instrumentalness, liveness,
-        valence, tempo, duration_ms, time_signature, year, release_date, lyrics
-    });
-    return newTrack;
+  metadata.trackname = trackname;
+  metadata.lyrics = '';
+
+  const approved = await checkMetadataSimilarity(metadata);
+  if (!approved){
+    throw new Error('Khong the them Track vi ly do ban quyen')
+  }
+
+  const newTrack = await db.Track.create({
+    trackUrl,
+    imageUrl,
+    uploaderId,
+    privacy,
+    status: 'approved'
+  });
+
+  metadata.track_id = newTrack.id;
+  
+  const {
+    track_id, explicit, danceability, energy, key, loudness, mode,
+    speechiness, acousticness, instrumentalness, liveness,
+    valence, tempo, duration_ms, time_signature, year, release_date, lyrics
+  } = metadata;
+
+  await db.Metadata.create({
+    trackname,
+    track_id,
+    explicit,
+    danceability,
+    energy,
+    key,
+    loudness,
+    mode,
+    speechiness,
+    acousticness,
+    instrumentalness,
+    liveness,
+    valence,
+    tempo,
+    duration_ms,
+    time_signature,
+    year,
+    release_date,
+    lyrics
+  });
+
+  return newTrack;
 };
 
 // chỉ cho phép user cập nhật bài hát mà họ quản lí, không cập nhật status được
