@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api_gateway
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mssql
+
+  recommender:
+    build: ./recommender
+    env_file: .env  
+    depends_on:
+      - postgres
+      - kafka
+
+  api_gateway:
+    image: expressgateway/express-gateway
+    volumes:
+      - ./api_gateway/gateway.config.yml:/var/lib/eg/gateway.config.yml
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+      - nginx
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - recommender
+
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - SA_PASSWORD=1234567
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+
+  postgres:
+    image: postgres:13
+    env_file: ./recommender/.env  
+    ports:
+      - "5432:5432"
+
+  kafka:
+    image: confluentinc/cp-kafka:6.2.0
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
