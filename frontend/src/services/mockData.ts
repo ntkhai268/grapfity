@@ -2,12 +2,12 @@
 
 import { SearchResultItem, Song, Artist } from "../components/SearchResult";
 import img1 from "../assets/images/bacphan.jpg";
-import img2 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/lactroi.jpg";
-import img3 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/dunglamtraitimanhdau.jpg"
-import img4 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/chungtacuahientai.jpg"
-import img5 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/châcidoseve.jpg"
-import img6 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/anhsairoi.jpg"
-import img7 from "/Users/dangkhoii/Desktop/grapfity/frontend/src/assets/images/sontung.jpeg"
+import img2 from "../assets//images/lactroi.jpg";
+import img3 from "../assets/images/dunglamtraitimanhdau.jpg"
+import img4 from "../assets/images/chungtacuahientai.jpg"
+import img5 from "../assets/images/châcidoseve.jpg"
+import img6 from "../assets/images/anhsairoi.jpg"
+import img7 from "../assets/images/sontung.jpeg"
 // ---- Dữ liệu mẫu chung cho tất cả songs ----
 const ALL_SONGS: Song[] = [
   {
