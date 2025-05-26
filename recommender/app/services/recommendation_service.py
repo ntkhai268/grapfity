@@ -1,7 +1,7 @@
 import numpy as np
-from app.models.user_behavior import UserBehavior
+from models.user_behavior import UserBehavior
 from sqlalchemy.orm import Session
-from app.database.db import SessionLocal
+from database.db import SessionLocal
 import json
 from confluent_kafka import KafkaError
 

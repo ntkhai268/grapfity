@@ -1,6 +1,6 @@
 import os
 from fastapi import FastAPI
-from app.api import recommendation, event_tracking
+from api import recommendation, event_tracking
 
 app = FastAPI()
 

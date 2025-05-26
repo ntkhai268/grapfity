@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
-from app.database.db import Base
+from database.db import Base
 
 class UserBehavior(Base):
     __tablename__ = "user_behavior"

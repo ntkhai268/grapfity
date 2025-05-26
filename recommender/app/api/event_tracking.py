@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks
 from pydantic import BaseModel
-from app.services.kafka_service import produce_event
+from services.kafka_service import produce_event
 
 router = APIRouter()
 

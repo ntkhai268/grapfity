@@ -1,0 +1,58 @@
+http:
+  port: 8080
+
+
+apiEndpoints:
+  recommendation:
+    host: 'localhost'
+    paths: '/api/v1/recommendation*'
+  event_tracking:
+    host: 'localhost'
+    paths: '/api/v1/event_tracking'
+  backend:
+    host: 'localhost'
+    paths: '/api/v1/*'
+
+serviceEndpoints:
+  recommender:
+    url: 'http://nginx:80'
+  backend:
+    url: 'http://backend:3000'
+
+policies:
+  - proxy
+  - request-transformer
+  - response-transformer
+  - recommendation-pipeline
+
+
+pipelines:
+  recommendation:
+    apiEndpoints:
+      - recommendation
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: recommender
+
+      - recommendation-pipeline:
+          - action:
+              recommenderService: http://nginx:80
+              backendService: http://backend:3000
+
+  event_tracking:
+    apiEndpoints:
+      - event_tracking
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: recommender
+
+  backend:
+    apiEndpoints:
+      - backend
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              preserveHost: true

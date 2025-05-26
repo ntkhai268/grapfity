@@ -1,36 +1,29 @@
 version: '3.8'
 
 services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - api_gateway
+  
 
-  backend:
-    build: ./backend
-    env_file:
-      - ./backend/.env
-    depends_on:
-      - mssql
+  postgres:
+    image: postgres:13
+    env_file: ./recommender/.env  
+    ports:
+      - "5432:5432"
 
   recommender:
     build: ./recommender
-    env_file: .env  
+    env_file: ./recommender/.env  
     depends_on:
       - postgres
       - kafka
-
-  api_gateway:
-    image: expressgateway/express-gateway
-    volumes:
-      - ./api_gateway/gateway.config.yml:/var/lib/eg/gateway.config.yml
     ports:
-      - "8080:8080"
-    depends_on:
-      - backend
-      - nginx
+      - "8000:8000"
+
+  
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
   nginx:
     image: nginx
@@ -42,17 +35,42 @@ services:
   mssql:
     image: mcr.microsoft.com/mssql/server:2019-latest
     environment:
-      - SA_PASSWORD=1234567
+      - SA_PASSWORD=StrongP@ssw0rd!
       - ACCEPT_EULA=Y
+      - DB_CONNECTION_TIMEOUT=30  # Timeout kết nối (giây)
+      - DB_RETRY_ATTEMPTS=3       # Số lần thử lại
     ports:
       - "1433:1433"
 
-  postgres:
-    image: postgres:13
-    env_file: ./recommender/.env  
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - mssql
+  
+  api_gateway:
+    build: ./api_gateway
     ports:
-      - "5432:5432"
+      - "8080:8080"
+    depends_on:
+      - backend
+      - nginx
+      - redis
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api_gateway
+
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
   kafka:
     image: confluentinc/cp-kafka:6.2.0
     environment:
@@ -63,8 +81,4 @@ services:
     depends_on:
       - zookeeper
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
-    environment:
-      - ZOOKEEPER_CLIENT_PORT=2181
-      - ZOOKEEPER_TICK_TIME=2000
+ 
