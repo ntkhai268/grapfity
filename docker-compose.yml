@@ -8,17 +8,9 @@ services:
     env_file: ./recommender/.env  
     ports:
       - "5432:5432"
-
-  recommender:
-    build: ./recommender
-    env_file: ./recommender/.env  
-    depends_on:
-      - postgres
-      - kafka
-    ports:
-      - "8000:8000"
-
-  
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/postgre/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
 
   redis:
     image: redis:alpine
@@ -33,21 +25,31 @@ services:
       - recommender
 
   mssql:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    build: ./database/mssql                   # Dùng Dockerfile để build image có sqlcmd
     environment:
-      - SA_PASSWORD=StrongP@ssw0rd!
-      - ACCEPT_EULA=Y
-      - DB_CONNECTION_TIMEOUT=30  # Timeout kết nối (giây)
-      - DB_RETRY_ATTEMPTS=3       # Số lần thử lại
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "StrongP@ssw0rd!"
+      MSSQL_PID: "Developer"
     ports:
       - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+      - ./database/mssql/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P 'StrongP@ssw0rd!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
     env_file:
       - ./backend/.env
+    ports:
+      - "33333:8001"
     depends_on:
-      - mssql
+      mssql:
+        condition: service_healthy
   
   api_gateway:
     build: ./api_gateway
@@ -80,5 +82,24 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
     depends_on:
       - zookeeper
+    ports:
+      - "9092:9092"
+    
+
+  recommender:
+    build: ./recommender
+    env_file: ./recommender/.env  
+    depends_on:
+      - postgres
+      - kafka
+    restart: always
+    ports:
+      - "8000:8000"
+
+volumes:
+  mssql_data:
+  postgres_data:
+
+  
 
  

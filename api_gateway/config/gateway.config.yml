@@ -5,25 +5,30 @@ http:
 apiEndpoints:
   recommendation:
     host: 'localhost'
-    paths: '/api/v1/recommendation*'
+    paths: '/api/recommendation*'
   event_tracking:
     host: 'localhost'
-    paths: '/api/v1/event_tracking'
+    paths: '/api/event_tracking'
+
+  test:
+    host: 'localhost'
+    paths: '/api/re-test'
+
   backend:
     host: 'localhost'
-    paths: '/api/v1/*'
+    paths: '/api/*'
 
 serviceEndpoints:
   recommender:
     url: 'http://nginx:80'
   backend:
-    url: 'http://backend:3000'
+    url: 'http://backend:8001'
 
 policies:
   - proxy
   - request-transformer
   - response-transformer
-  - recommendation-pipeline
+  - recommendation-pipeline-policy
 
 
 pipelines:
@@ -35,10 +40,10 @@ pipelines:
           - action:
               serviceEndpoint: recommender
 
-      - recommendation-pipeline:
+      - recommendation-pipeline-policy:
           - action:
               recommenderService: http://nginx:80
-              backendService: http://backend:3000
+              backendService: http://backend:8001
 
   event_tracking:
     apiEndpoints:
@@ -46,6 +51,13 @@ pipelines:
     policies:
       - proxy:
           - action:
+              serviceEndpoint: recommender
+  test:
+    apiEndpoints:
+      - test
+    policies:
+      - proxy:
+          - action: 
               serviceEndpoint: recommender
 
   backend:

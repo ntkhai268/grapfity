@@ -7,4 +7,4 @@ db:
 
 plugins:
   recommendation-pipeline:
-    package: '../plugins/recommendation-pipeline/manifest.js'
+    package: './plugins/recommendation-pipeline/manifest.js'
