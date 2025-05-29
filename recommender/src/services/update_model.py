@@ -74,8 +74,8 @@ def train_svd_and_save_matrices(df, k=10):
         trainset = data.build_full_trainset()
         
         logger.info(f"Training set: {trainset.n_users} users, {trainset.n_items} items, {trainset.n_ratings} ratings")
-        
-        svd = SVD(n_factors=k)
+        random_state = int(os.getenv("FASTAPI_RANDOM_STATE", 42))
+        svd = SVD(n_factors=k, random_state=random_state)
         svd.fit(trainset)
         logger.info("SVD model trained successfully")
 

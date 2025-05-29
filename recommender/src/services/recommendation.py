@@ -68,7 +68,8 @@ async def content_based_recommend(user_id: str, n: int = 10):
         
         if not events:
             logger.info(f"User {user_id} has no events, returning random tracks")
-            return track_metadata['track_id'].sample(n).tolist()
+            random_state = int(os.getenv("FASTAPI_RANDOM_STATE", 42))
+            return track_metadata['track_id'].sample(n,random_state =random_state).tolist()
         
         user_track_ids = list(set(event['track_id'] for event in events))
         logger.info(f"User {user_id} has interacted with {len(user_track_ids)} unique tracks")
@@ -77,7 +78,7 @@ async def content_based_recommend(user_id: str, n: int = 10):
         
         if not indices:
             logger.info(f"No matching tracks in metadata for user {user_id}, returning random tracks")
-            return track_metadata['track_id'].sample(n).tolist()
+            return track_metadata['track_id'].sample(n,random_state =random_state).tolist()
 
         user_vector = track_vectors[indices].mean(axis=0)
         logger.info("Computed user vector")
