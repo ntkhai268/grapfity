@@ -1,9 +1,8 @@
-youtube-search-python
-yt-dlp>=2023.7.6
-ffmpeg-python>=0.2.0
-httpx<0.24
-soundfile>=0.12.1
-essentia
+numpy==1.26.0
+tensorflow[and-cuda]>=2.13
 openl3
-tensorflow>=2.9.0
-numpy>=1.21.0
+essentia
+soundfile
+ffmpeg-python
+scikit-learn
+joblib

@@ -1,0 +1,37 @@
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    const transaction = await queryInterface.sequelize.transaction();
+
+    try {
+      // Bật IDENTITY_INSERT cho bảng Playlists
+      await queryInterface.sequelize.query(
+        `SET IDENTITY_INSERT Playlists ON;`,
+        { transaction }
+      );
+
+      // Chèn 1 bản ghi với id thủ công
+      await queryInterface.sequelize.query(
+        `INSERT INTO Playlists (id, userId, title, createDate, imageUrl, createdAt, updatedAt)
+         VALUES (1000, 1, N'Thủ công ID', GETDATE(), NULL, GETDATE(), GETDATE());`,
+        { transaction }
+      );
+
+      // Tắt lại IDENTITY_INSERT
+      await queryInterface.sequelize.query(
+        `SET IDENTITY_INSERT Playlists OFF;`,
+        { transaction }
+      );
+
+      await transaction.commit();
+    } catch (err) {
+      await transaction.rollback();
+      throw err;
+    }
+  },
+
+  async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete('Playlists', { id: 1000 });
+  }
+};
