@@ -11,4 +11,5 @@ RUN find src/migrations -type f -name "*.js" -exec sh -c 'mv "$1" "${1%.js}.cjs"
 
 EXPOSE 8001
 
-CMD ["sh", "-c", "cd src && npx sequelize-cli db:migrate  && node server.js"]
+# CMD ["sh", "-c", "cd src && npx sequelize-cli db:migrate  && node server.js"]
+CMD ["sh", "-c", "node src/server.js"]

@@ -13,6 +13,15 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 
+# Copy init script vào container
+COPY ./script.sql /usr/src/app/
+COPY ./entrypoint.sh /usr/src/app/
+
+# Cấp quyền thực thi
+RUN chmod +x /usr/src/app/entrypoint.sh
+
 USER mssql
 
+# Override entrypoint
+ENTRYPOINT ["/bin/bash", "/usr/src/app/entrypoint.sh"]
 
