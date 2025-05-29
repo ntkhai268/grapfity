@@ -78,29 +78,42 @@ FROM generate_series(1,100) AS gs(id);
 -- Chèn 500 bản ghi vào events, đảm bảo track_id từ tracks
 -- ------------------------
 INSERT INTO events (
-  event_id, event_type, track_id, user_id, timestamp
+  event_id,
+  event_type,
+  track_id,
+  user_id,
+  timestamp
 )
 SELECT
   uuid_generate_v4()::text AS event_id,
-  -- Random event type
-  CASE floor(random() * 3)::int
-    WHEN 0 THEN 'click'
-    WHEN 1 THEN 'play'
-    ELSE 'skip'
-  END AS event_type,
-  t.track_id AS track_id,
-  -- user_id từ 'user1' đến 'user50'
-  'user' || ((floor(random() * 50) + 1)::int)::text AS user_id,
-  -- timestamp random trong 90 ngày gần đây
+  combo.event_type,
+  combo.track_id,
+  combo.user_id,
+  -- Sinh timestamp ngẫu nhiên trong 90 ngày gần đây
   (NOW()
      - ((floor(random() * 90))::int || ' days')::interval
      - ((floor(random() * 86400))::int || ' seconds')::interval
   ) AS timestamp
-FROM generate_series(1,500) AS gs(id)
--- LATERAL join để lấy ngẫu nhiên 1 row từ tracks cho mỗi gs.id
-CROSS JOIN LATERAL (
-  SELECT track_id
-  FROM tracks
-  ORDER BY random()
-  LIMIT 1
-) AS t;
+FROM (
+  -- Tạo toàn bộ tổ hợp (track, user, event_type)
+  SELECT
+    t.track_id,
+    u.user_id,
+    e.event_type
+  FROM tracks t
+  CROSS JOIN (
+    SELECT 'click'   AS event_type
+    UNION ALL
+    SELECT 'play'
+    UNION ALL
+    SELECT 'skip'
+  ) AS e
+  CROSS JOIN (
+    -- Tạo user1..user50
+    SELECT 'user' || gs::text AS user_id
+    FROM generate_series(1,50) AS gs
+  ) AS u
+) AS combo
+-- Lấy ngẫu nhiên 500 tổ hợp duy nhất
+ORDER BY random()
+LIMIT 500;

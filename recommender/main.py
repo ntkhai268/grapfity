@@ -58,13 +58,24 @@ async def get_recommendation(user_id: str):
         logger.error(f"Recommendation failed for user {user_id}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+# @app.post("/api/update_model")
+# async def update_recommender_model(background_tasks: BackgroundTasks):
+#     logger.info("Model update request received")
+#     try:
+#         background_tasks.add_task(update_svd_model)
+#         logger.info("Model update task added to background")
+#         return {"status": "Model update has been triggered and is running in the background."}
+#     except Exception as e:
+#         logger.error(f"Model update trigger failed: {str(e)}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/api/update_model")
-async def update_recommender_model(background_tasks: BackgroundTasks):
+async def update_recommender_model():
     logger.info("Model update request received")
     try:
-        background_tasks.add_task(update_svd_model)
-        logger.info("Model update task added to background")
-        return {"status": "Model update has been triggered and is running in the background."}
+        await update_svd_model()
+        logger.info("Model update successfully!")
+        return {"status": "Model update successfully!"}
     except Exception as e:
         logger.error(f"Model update trigger failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))

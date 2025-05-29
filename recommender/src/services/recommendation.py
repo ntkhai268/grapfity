@@ -41,7 +41,7 @@ async def load_track_metadata():
             
         logger.info(f"Retrieved {len(data)} tracks from database")
 
-        logger.info(f"************************ {data[0]} ************************")
+       
         
         track_metadata = pd.DataFrame(data)
         track_metadata = track_metadata.reset_index(drop=True)
