@@ -1,4 +1,4 @@
-/* Sidebar.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
 
 /* Sidebar container */
 .sidebar {
@@ -121,9 +121,10 @@
 .song_side h1,
 .song_side h2 {
     font-size: 30px;
-    font-weight: bold;
+   font-weight: 700;
     color: white;
     margin-left: 20px;
+      font-family: "Circular Std", "Spotify Circular", Arial, Helvetica, sans-serif;
 }
 
 /* Danh sách bài hát */
@@ -215,6 +216,7 @@ position: relative;
   border: none;
 }
 .song-item-section .title {
+     font-family: 'Poppins', Arial, Helvetica, sans-serif;
     font-size: 18px;
     font-weight: bold;
      white-space: nowrap;        /* Không xuống dòng */
@@ -231,15 +233,19 @@ position: relative;
 /* Tên nghệ sĩ */
 .song-item-section .artist {
     margin-top: 10px;
-    font-size: 14px;
-    color: #ccc;
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;         /* hoặc 14px */
+    font-weight: 400;
+    color: #b3b3b3;
+    margin-top: 4px;
+    letter-spacing: 0;
 }
 
 /* Hover bài hát */
 .song-item-section:hover {
-    opacity: 0.85;
-    transform: scale(1.02);
-    transition: all 0.2s ease-in-out;
+   transform: scale(1.02);
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.30);
+    transition: all 0.2s cubic-bezier(.19,1,.22,1);
 }
 
 /* ==== Tabs Playlists / Artists ==== */
