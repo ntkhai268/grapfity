@@ -236,7 +236,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                 {!isLoading && !error && (
                     <>
                         {/* --- SECTION 1: RECOMMENDED --- */}                        
-                       <h1>Recommended for today</h1>
+                       <h1>Popular Tracks</h1>
                         <div className="song-list">
                         {isLoadingTop ? (
                             <div>Đang tải top 10 bài hát phổ biến...</div>
@@ -288,7 +288,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
 
 
                         {/* --- SECTION 2: RECENTLY RELEASED --- */}
-                         <h1>Recently released</h1>
+                         {/* <h1>Recently released</h1>
                         <div className="song-list song-list-circle">
                             {recentTracks.length > 0 ? (
                                 recentTracks.map((song, index) => (
@@ -300,7 +300,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                             ) : (
                                 <p>Chưa có bài hát mới.</p>
                             )}
-                        </div>
+                        </div> */}
 
                         {/* --- SECTION 3: POPULAR --- */}
                         <h1>Playlists</h1>
