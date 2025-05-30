@@ -87,12 +87,6 @@ const getTrackById = async (trackId) => {
             console.warn(`TrackService: Track with ID ${numericTrackId} not found.`);
             return null; // Trả về null nếu không tìm thấy track
         }
-        // console.log(`TrackService - getTrackById - Track ID ${numericTrackId} - Raw Metadatum:`, JSON.stringify(track.Metadatum, null, 2));
-        // console.log(`TrackService - getTrackById - Track ID ${numericTrackId} - Lyrics from Metadatum:`, track.Metadatum?.lyrics);
-
-        // Dữ liệu trả về từ Sequelize sẽ tự động là plain objects khi dùng với res.json()
-        // Hoặc bạn có thể gọi .get({ plain: true }) nếu muốn chắc chắn là POJO trước khi trả về từ service
-        // return track.get({ plain: true }); 
         return track;
 
     } catch (error) {
