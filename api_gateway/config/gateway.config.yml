@@ -36,14 +36,16 @@ pipelines:
     apiEndpoints:
       - recommendation
     policies:
-      - proxy:
-          - action:
-              serviceEndpoint: recommender
+      # - proxy:
+      #     - action:
+      #         serviceEndpoint: recommender
+      #         preserveHost: true
+      #         mapResponse: true 
 
       - recommendation-pipeline-policy:
           - action:
-              recommenderService: http://nginx:80
-              backendService: http://backend:8001
+              recommenderService: http://nginx:80/api/recommendation?user_id=
+              backendService: http://backend:8001/api/tracks/getTracksById
 
   event_tracking:
     apiEndpoints:

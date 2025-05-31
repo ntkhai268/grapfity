@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from src.models.user_behavior import Event
 from src.services.kafka.kafka_producer import send_event_to_kafka
 from src.services.kafka.kafka_consumer import consume_events
@@ -7,6 +8,8 @@ from src.services.update_model import update_svd_model
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
+from src.services.extract_track_features.extract import extract
+
 
 app = FastAPI()
 
@@ -28,14 +31,6 @@ async def startup_event():
     asyncio.create_task(consume_events())
     logger.info("Kafka consumer background task started")
 
-@app.get("/api/re-test")
-async def test():
-    logger.info("Test endpoint called")
-    try:
-        return {"status": "Event received and sent to Kafka !II test"}
-    except Exception as e:
-        logger.error(f"Test failed: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/event_tracking")
 async def track_event(event: Event):
@@ -79,3 +74,16 @@ async def update_recommender_model():
     except Exception as e:
         logger.error(f"Model update trigger failed: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+class TrackRequest(BaseModel):
+    track_file_name: str
+    track_id: str
+
+@app.post("/api/add_track")
+def add_track_feature(track_data: TrackRequest):
+
+    # res = extract(track_data.track_file_name)
+    track_file_name = track_data.track_file_name
+    track_id = track_data.track_id
+
+    return {"res": {track_file_name,track_id}}

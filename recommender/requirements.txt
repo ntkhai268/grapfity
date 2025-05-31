@@ -14,3 +14,12 @@ python-dotenv
 pandas 
 joblib 
 scikit-learn
+
+
+tensorflow[and-cuda]>=2.13
+openl3
+essentia
+soundfile
+ffmpeg-python
+
+

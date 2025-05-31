@@ -208,7 +208,27 @@ const deleteTrack = async (id, userId) => {
     })
 };
 
-export {
+const getTracksById = async (trackIds) => {
+    return await db.Track.findAll({
+        where: {
+            status: 'approved',
+            privacy: 'public',
+            id: {
+                [db.Sequelize.Op.in]: trackIds
+            }
+        },
+        include: [
+            {
+                model: db.Metadata
+            },
+            {
+                model: db.User,
+                attributes: ['id', 'Name']
+            }
+        ]
+    });
+};
+export {getTracksById,
     getAllTracks,
     getAllTracksForAdmin,
     getTrackById,

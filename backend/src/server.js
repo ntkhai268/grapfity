@@ -10,7 +10,7 @@ import cors from 'cors';
 
 const app = express();
 
-// Sửa toán tử || thay vì |
+
 const port = process.env.PORT || 8001;
 const hostname = process.env.HOSTNAME || "0.0.0.0";
 
@@ -18,7 +18,7 @@ const hostname = process.env.HOSTNAME || "0.0.0.0";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cấu hình CORS an toàn hơn
+// Cấu hình CORS an toàn
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Chỉ định domain cụ thể
   credentials: true
@@ -26,22 +26,22 @@ app.use(cors({
 
 // Middleware
 app.use(json());
+app.use(express.json());
 app.use(urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route test đã sửa
-app.use('/api/test', (req, res) => {
-  return res.send("test"); // Sửa thành res.send()
-});
 
-// Kết nối database (nên thêm try-catch)
+
+// Kết nối database 
 try {
   await db.connectToDB();
   console.log('Database connected');
 } catch (err) {
   console.error('Database connection failed:', err);
 }
+
+app.use('/api', router); // Định nghĩa các route API SAU middleware static
 
 // Xử lý lỗi 404
 app.use((req, res) => {

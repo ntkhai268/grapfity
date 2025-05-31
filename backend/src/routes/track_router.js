@@ -9,7 +9,8 @@ import {
     getTrackWithUploaderByIdController,
     getMyTracksController,
     getPublicTracksOfUserController,
-    downloadTrackController
+    downloadTrackController,
+    getTracksByIdController
 } from '../controllers/trackController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js';
 // import { uploadTrackImage} from "../middleware/uploadMiddleware.js";
@@ -20,6 +21,7 @@ const router = express.Router();
 
 
 router.get('/tracks', getAllTracksController);
+router.post('/tracks/getTracksById', getTracksByIdController)
 router.get('/tracks/getmytracks', authenticateUser, getMyTracksController);
 router.get('/tracks/user/:userId', getPublicTracksOfUserController);
 router.get('/tracks/:id', getTrackByIdController);

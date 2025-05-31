@@ -51,7 +51,7 @@ services:
     env_file:
       - ./backend/.env
     ports:
-      - "33333:8001"
+      - "8001:8001"
     depends_on:
       mssql:
         condition: service_healthy

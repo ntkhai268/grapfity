@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import {
+    getTracksById,
     getAllTracks,
     getTrackById,
     createTrack,
@@ -210,7 +211,10 @@ const createTrackController = async (req, res) => {
         const newTrack = await createTrack(trackUrl, imageUrl, uploaderId, privacy, metadata);
         return res.status(200).json({
             message: 'Create track succeed!',
-            data: newTrack
+            data: newTrack,
+            track_file_name: req.files.audio[0].filename,
+            track_id: newTrack.id
+
         });
     } catch (err) {
         console.error('Database connection failed:', err);
@@ -283,6 +287,7 @@ const deleteTrackController = async (req, res) => {
         await deleteTrack(trackId, userId);
         return res.status(200).json({
             message: 'Delete track succeed!',
+            track_id: trackId,
         });
     } catch (err){
         console.error('Database connection failed:', err);
@@ -313,7 +318,25 @@ const downloadTrackController = async (req, res) => {
   }
 };
 
+
+const getTracksByIdController = async (req, res) => {
+    try {
+        const trackIds = req.body.track_ids;
+        
+        if (!trackIds || !Array.isArray(trackIds)) {
+            return res.status(400).json({ error: 'Invalid track IDs' });
+        }
+
+        const tracks = await getTracksById(trackIds);
+        return res.status(200).json(tracks);
+    } catch (error) {
+        console.error('Error in getTracksByIdController:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export {
+    getTracksByIdController,
     getAllTracksController,
     getTrackByIdController,
     getTrackWithUploaderByIdController,
