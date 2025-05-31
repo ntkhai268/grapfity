@@ -251,7 +251,15 @@ export interface Song {
       playFnInput?: ((index: number) => void) | null,
       containerInput?: HTMLElement | null,
       onEndedInput?: () => void
+  
     ) {
+    
+     console.log("👈👈[GlobalAudioManager] setPlaylist called", {
+      playlistLength: newPlaylist.length,
+      context,
+      currentIndex,
+      isPlaying,
+    });
       if (!Array.isArray(newPlaylist) || !context) {
         console.error("[GlobalAudioManager] Invalid parameters for setPlaylist."); // Giữ lại lỗi quan trọng
         return;
@@ -268,6 +276,7 @@ export interface Song {
         if (newPlaylist.length > 0 && startIndex >= 0 && startIndex < newPlaylist.length) {
           // Chỉ chuẩn bị state, không tự động phát
           updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);// mới mới
+          
         } else {
           updateCurrentState(null, -1, context, currentAudio);
         }

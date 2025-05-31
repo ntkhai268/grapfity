@@ -178,7 +178,7 @@ function initWaveSurfer(): void {
         waveColor: '#808080',
         progressColor: '#fff',
         barWidth: 2,
-        height: 50,
+        height: 80,
         mediaControls: false,
         backend: "MediaElement",
         media: mediaElementForWaveSurfer,
@@ -302,8 +302,8 @@ function attachPlayButtonListenerAndSubscribe(
     }
   };
 
-  waveTrack.on('play', handleWaveSurferPlay);
-  waveTrack.on('pause', handleWaveSurferPause);
+  // waveTrack.on('play', handleWaveSurferPlay);
+  // waveTrack.on('pause', handleWaveSurferPause);
 
   waveTrackSubscriptions[key].push(() => waveTrack.un('play', handleWaveSurferPlay));
   waveTrackSubscriptions[key].push(() => waveTrack.un('pause', handleWaveSurferPause));
