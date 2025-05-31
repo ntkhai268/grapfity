@@ -25,7 +25,8 @@ export interface TrackData {
     lyrics?: string | null;
     duration_ms?: number;
     explicit?: boolean;
-    // Thêm các trường khác nếu cần (ví dụ: duration, genre,...)
+     privacy?: 'public' | 'private';
+    
 }
 
 // --- Hàm tiện ích ánh xạ dữ liệu ---
@@ -73,6 +74,7 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     createdAt: trackFromApi.createdAt,
     updatedAt: trackFromApi.updatedAt,
     lyrics,
+    privacy: trackFromApi.privacy,
     
   };
 };

@@ -44,7 +44,7 @@ const getTrackById = async (trackId) => {
                 status: 'approved' 
             },
             // Bạn có thể chọn các attributes cụ thể từ bảng Track nếu muốn
-            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'privacy'], 
             include: [
                 {
                     model: db.User, // Nếu bạn muốn lấy thông tin người upload

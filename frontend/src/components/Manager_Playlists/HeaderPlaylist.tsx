@@ -30,6 +30,7 @@ interface PlaylistData {
     cover: string | null;
     imageUrl?: string | null;
     tracks: TrackItem[];
+    privacy?: 'public' | 'private'; 
 }
 
 
@@ -113,78 +114,104 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
     };
 
     // Xử lý lưu thay đổi từ modal
-    const handleSaveChanges = async (playlistIdToSave: number, newTitle: string, newImageFile?: File) => {
-        if (!playlist) return;
+    const handleSaveChanges = async (
+  playlistIdToSave: number,
+  newTitle: string,
+  newImageFile?: File,
+  newPrivacy?: 'public' | 'private'
+) => {
+  if (!playlist) return;
 
-        const trimmedNewTitle = newTitle.trim();
-        if (trimmedNewTitle === '') {
-             alert("Lỗi: Tiêu đề playlist không được để trống.");
-             return;
-        }
+  const trimmedNewTitle = newTitle.trim();
+  if (trimmedNewTitle === '') {
+    alert("Lỗi: Tiêu đề playlist không được để trống.");
+    return;
+  }
 
-        const currentTitle = playlist.title ?? '';
-        const currentRelativeImageUrlFromState = playlist.cover ?? playlist.imageUrl ?? null;
-        const imageUrlBeforeSave = pendingImageUrl ?? currentRelativeImageUrlFromState;
+  const currentTitle = playlist.title ?? '';
+  const currentRelativeImageUrlFromState = playlist.cover ?? playlist.imageUrl ?? null;
+  const currentPrivacy = playlist.privacy ?? 'public';
 
-        let finalRelativeImageUrl = imageUrlBeforeSave;
-        let didUploadOccurThisTime = false;
+  let finalRelativeImageUrl = currentRelativeImageUrlFromState;
+  let didUploadOccurThisTime = false;
 
-        const titleHasChanged = trimmedNewTitle !== currentTitle;
-        const hasNewImageFile = !!newImageFile;
+  const titleHasChanged = trimmedNewTitle !== currentTitle;
+  const hasNewImageFile = !!newImageFile;
+  const privacyHasChanged = newPrivacy !== undefined && newPrivacy !== currentPrivacy;
 
-        if (!titleHasChanged && !hasNewImageFile && !pendingImageUrl) {
-            console.log("PlaylistHeader: No changes detected.");
-            handleCloseEditModal();
-            return;
-        }
+  // Nếu có ảnh pending (đã chọn thay đổi nhưng chưa upload) thì ưu tiên dùng ảnh đó
+  if (pendingImageUrl && pendingImageUrl !== currentRelativeImageUrlFromState) {
+    finalRelativeImageUrl = pendingImageUrl;
+  }
 
-        setIsSaving(true);
+  if (!titleHasChanged && !hasNewImageFile && !pendingImageUrl && !privacyHasChanged) {
+    console.log("PlaylistHeader: No changes detected.");
+    handleCloseEditModal();
+    return;
+  }
 
-        try {
-            // Upload ảnh mới nếu có
-            if (hasNewImageFile && newImageFile) {
-                try {
-                    const uploadedRelativeImageUrl = await uploadPlaylistImageAPI(playlistIdToSave, newImageFile);
-                    finalRelativeImageUrl = uploadedRelativeImageUrl;
-                    didUploadOccurThisTime = true;
-                    setPendingImageUrl(null);
-                } catch (uploadError: any) {
-                    alert(`Lỗi khi tải ảnh lên: ${uploadError.message || 'Vui lòng thử lại.'}`);
-                    setIsSaving(false); return;
-                }
-            } else if (pendingImageUrl && pendingImageUrl !== currentRelativeImageUrlFromState) {
-                 finalRelativeImageUrl = pendingImageUrl;
-            }
+  setIsSaving(true);
 
-            const effectiveImageUrlHasChanged = finalRelativeImageUrl !== currentRelativeImageUrlFromState;
-            if (!titleHasChanged && !effectiveImageUrlHasChanged) {
-                 console.log("PlaylistHeader: No effective changes after processing image. Closing modal.");
-                 handleCloseEditModal();
-                 setIsSaving(false);
-                 return;
-            }
+  try {
+    // Upload ảnh mới nếu có
+    if (hasNewImageFile && newImageFile) {
+      try {
+        const uploadedRelativeImageUrl = await uploadPlaylistImageAPI(playlistIdToSave, newImageFile);
+        finalRelativeImageUrl = uploadedRelativeImageUrl;
+        didUploadOccurThisTime = true;
+        setPendingImageUrl(null);
+      } catch (uploadError: any) {
+        alert(`Lỗi khi tải ảnh lên: ${uploadError.message || 'Vui lòng thử lại.'}`);
+        setIsSaving(false);
+        return;
+      }
+    }
 
-            // Gọi API cập nhật
-            const updatedPlaylistData = await updatePlaylistAPI(playlistIdToSave, trimmedNewTitle, finalRelativeImageUrl);
+    const effectiveImageUrlHasChanged = finalRelativeImageUrl !== currentRelativeImageUrlFromState;
 
-            if (updatedPlaylistData) {
-                setPlaylist(updatedPlaylistData as PlaylistData);
-                setPendingImageUrl(null);
-                // Cập nhật imageVersion KHI thành công để thay đổi key của ảnh
-                setImageVersion(Date.now());
-                alert("Cập nhật playlist thành công!");
-                handleCloseEditModal();
-            } else {
-                alert("Cập nhật playlist thất bại (phản hồi không hợp lệ).");
-                if (didUploadOccurThisTime) setPendingImageUrl(finalRelativeImageUrl);
-            }
-        } catch (updateError: any) {
-            alert(`Đã xảy ra lỗi khi cập nhật playlist: ${updateError.message || 'Vui lòng thử lại.'}`);
-            if (didUploadOccurThisTime) setPendingImageUrl(finalRelativeImageUrl);
-        } finally {
-            setIsSaving(false);
-        }
+    // Nếu không có thay đổi thực sự thì đóng modal
+    if (!titleHasChanged && !effectiveImageUrlHasChanged && !privacyHasChanged) {
+      console.log("PlaylistHeader: No effective changes after processing image. Closing modal.");
+      handleCloseEditModal();
+      setIsSaving(false);
+      return;
+    }
+
+    // Chuẩn bị dữ liệu cập nhật dưới dạng object, tránh truyền null ảnh không cần thiết
+    const updateData: {
+      title: string;
+      imageUrl?: string | null;
+      privacy?: 'public' | 'private';
+    } = {
+      title: trimmedNewTitle,
+      privacy: newPrivacy || currentPrivacy,
     };
+
+    if (effectiveImageUrlHasChanged) {
+      updateData.imageUrl = finalRelativeImageUrl;
+    }
+
+    // Gọi API cập nhật truyền 1 object duy nhất
+    const updatedPlaylistData = await updatePlaylistAPI(playlistIdToSave, updateData);
+
+    if (updatedPlaylistData) {
+      setPlaylist(updatedPlaylistData as PlaylistData);
+      setPendingImageUrl(null);
+      setImageVersion(Date.now());
+      alert("Cập nhật playlist thành công!");
+      handleCloseEditModal();
+    } else {
+      alert("Cập nhật playlist thất bại (phản hồi không hợp lệ).");
+      if (didUploadOccurThisTime) setPendingImageUrl(finalRelativeImageUrl);
+    }
+  } catch (updateError: any) {
+    alert(`Đã xảy ra lỗi khi cập nhật playlist: ${updateError.message || 'Vui lòng thử lại.'}`);
+    if (didUploadOccurThisTime) setPendingImageUrl(finalRelativeImageUrl);
+  } finally {
+    setIsSaving(false);
+  }
+};
+
 
     // Render UI
     if (isLoading) return <div className="playlist-header loading">Đang tải...</div>;
@@ -197,7 +224,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
     const coverUrlToDisplay = relativeCoverUrlToDisplay
         ? `${relativeCoverUrlForColor}?v=${imageVersion}` // <-- Thêm ?v=...
         : null;
-
+    console.log('Playlist passed to modal:', playlist);
     return (
         <>
             <div className="playlist-header">
@@ -257,7 +284,7 @@ const PlaylistHeader: React.FC<PlaylistHeaderProps> = ({ onColorExtract }) => {
             {showEditModal && (
                 <PlaylistEditModal
                     // Truyền dữ liệu playlist hiện tại, dùng URL tương đối để modal hiển thị đúng ảnh ban đầu
-                    playlist={playlist ? { ...playlist, cover:  `${relativeCoverUrlToDisplay}?` } : null}
+                    playlist={playlist ? { ...playlist, cover:  `${relativeCoverUrlToDisplay}?`, privacy: playlist.privacy || 'public' } : null}
                     onClose={handleCloseEditModal}
                     onSave={handleSaveChanges}
                     isSaving={isSaving}

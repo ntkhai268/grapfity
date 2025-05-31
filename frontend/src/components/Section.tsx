@@ -93,7 +93,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     // Kiểu dữ liệu của các mảng này giờ đã đúng là Song[]
     const recommendedTracks: Song[] = topTracks
     console.log("recommendedTracks:", recommendedTracks);
-    const recentTracks: Song[] = allTracks.slice(3, 7);  
+ 
     const publicTracks: Song[] = allTracks; 
     const currentContext = GlobalAudioManager.getCurrentContext();
 
@@ -113,39 +113,39 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
 
     // Hàm xử lý click, nhận danh sách Song[] và index
     // Thêm tham số 'type' và 'contextId' để xác định ngữ cảnh playlist
-    const handleClick = (list: Song[], index: number, type: PlaylistContext['type'], contextId: string | number = type) => {
-        if (!list || list.length === 0 || index < 0 || index >= list.length) {
-            console.error("Invalid list or index for handleClick");
-            return;
-        }
-        const song = list[index];
+    // const handleClick = (list: Song[], index: number, type: PlaylistContext['type'], contextId: string | number = type) => {
+    //     if (!list || list.length === 0 || index < 0 || index >= list.length) {
+    //         console.error("Invalid list or index for handleClick");
+    //         return;
+    //     }
+    //     const song = list[index];
         
-        // Tạo đối tượng context
-        const playlistContext: PlaylistContext = {
-            id: contextId, // Dùng type làm ID tạm thời hoặc một ID cụ thể hơn nếu có
-            type: type 
-        };
+    //     // Tạo đối tượng context
+    //     const playlistContext: PlaylistContext = {
+    //         id: contextId, // Dùng type làm ID tạm thời hoặc một ID cụ thể hơn nếu có
+    //         type: type 
+    //     };
 
-        // --- SỬA LỖI GỌI setPlaylist ---
-        // Gọi setPlaylist với đủ 3 tham số bắt buộc: list, index, context
-        GlobalAudioManager.setPlaylist(list, index, playlistContext); 
+    //     // --- SỬA LỖI GỌI setPlaylist ---
+    //     // Gọi setPlaylist với đủ 3 tham số bắt buộc: list, index, context
+    //     GlobalAudioManager.setPlaylist(list, index, playlistContext); 
         
-        // Gọi playSongAt để bắt đầu phát bài hát đã chọn
-        // (setPlaylist không tự động phát)
-        GlobalAudioManager.playSongAt(index);
+    //     // Gọi playSongAt để bắt đầu phát bài hát đã chọn
+    //     // (setPlaylist không tự động phát)
+    //     GlobalAudioManager.playSongAt(index);
 
-        // Chuyển hướng đến trang ManagerSong (nếu bạn vẫn muốn giữ lại)
-        navigate("/ManagerSong", {
-            state: {
-                // Gửi state nếu trang ManagerSong cần thông tin này ngay lập tức
-                songs: list, 
-                currentIndex: index,
-                currentSong: song,
-            },
-        });
-        // ---------------------------------------
+    //     // Chuyển hướng đến trang ManagerSong (nếu bạn vẫn muốn giữ lại)
+    //     navigate("/ManagerSong", {
+    //         state: {
+    //             // Gửi state nếu trang ManagerSong cần thông tin này ngay lập tức
+    //             songs: list, 
+    //             currentIndex: index,
+    //             currentSong: song,
+    //         },
+    //     });
+    //     // ---------------------------------------
 
-    };
+    // };
 
 
     const handleClicktest = (
@@ -242,11 +242,11 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                             <div>Đang tải top 10 bài hát phổ biến...</div>
                         ) : recommendedTracks.length > 0 ? (
                             recommendedTracks.map((song, index) => {
-                            console.log(`Song #${index + 1}:`);
-                            console.log("  Title:", song.title);
-                            console.log("  Artist:", song.artist);
-                            console.log("  Cover URL:", song.cover);
-                            console.log("  Audio src:", song.src);
+                            // console.log(`Song #${index + 1}:`);
+                            // console.log("  Title:", song.title);
+                            // console.log("  Artist:", song.artist);
+                            // console.log("  Cover URL:", song.cover);
+                            // console.log("  Audio src:", song.src);
 
                             return (
                                 <button

@@ -150,6 +150,7 @@ export interface PlaylistData {
   timeAgo: string;     // Sẽ được tính toán ở frontend từ createDate của API
   cover: string;       // Sẽ map với playlist.imageUrl từ API
   imageUrl?: string | null;
+   privacy?: 'public' | 'private';
   tracks: TrackItem[];   // Danh sách các track lấy từ API
   // Có thể thêm các trường khác mà API trả về, ví dụ:
   // createDate?: string | Date;
