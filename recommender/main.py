@@ -5,6 +5,7 @@ from src.services.kafka.kafka_producer import send_event_to_kafka
 from src.services.kafka.kafka_consumer import consume_events
 from src.services.recommendation import get_recommendations
 from src.services.update_model import update_svd_model
+from src.services.eventServices import delete_event_relative_track_id
 import asyncio
 import logging
 from logging.handlers import RotatingFileHandler
@@ -87,3 +88,23 @@ def add_track_feature(track_data: TrackRequest):
     track_id = track_data.track_id
 
     return {"res": {track_file_name,track_id}}
+
+@app.delete("/api/delete_track/{id}")
+async def delete_track_feature(id: int):
+    try:
+        logger.info(f"Received request to delete track with ID: {id}")
+
+        result = await delete_event_relative_track_id(id)
+
+        logger.info(f"Successfully deleted related data for track ID: {id}")
+        return {
+            "status": "success",
+            "track_id": id,
+            "message": result.get("message", "Track deleted successfully")
+        }
+
+    except Exception as e:
+        logger.error(f"Error deleting track with ID {id}: {str(e)}", exc_info=True)
+        return {
+            "status_code": 500, "detail":"Internal Server Error during track deletion"
+        }

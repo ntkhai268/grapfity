@@ -14,6 +14,10 @@ apiEndpoints:
     host: 'localhost'
     paths: '/api/tracks/:id'
 
+  createTrack:
+    host: 'localhost'
+    paths: '/api/tracks/create-track'
+
   backend:
     host: 'localhost'
     paths: '/api/*'
@@ -30,6 +34,7 @@ policies:
   - response-transformer
   - recommendation-pipeline-policy
   - deleteTrack-pipeline-policy
+  - createTrack-pipeline-policy
 
 
 pipelines:
@@ -62,8 +67,22 @@ pipelines:
     policies:
       - deleteTrack-pipeline-policy:
           - action:
-              recommenderService: http://nginx:80/api/delete_track/
-              backendService: http://backend:8001/api/tracks/
+              recommenderService: http://nginx:80/api/delete_track
+              backendService: http://backend:8001/api/tracks
+  createTrack:
+    apiEndpoints:
+      - createTrack
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              changeOrigin: true
+              stripPath: false
+              mapResponse: true
+      - createTrack-pipeline-policy:
+          - action:
+              recommenderUrl: http://nginx:80/api/add_track
+              
 
   backend:
     apiEndpoints:

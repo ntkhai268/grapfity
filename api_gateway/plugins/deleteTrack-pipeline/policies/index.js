@@ -20,55 +20,81 @@ module.exports = {
   "required": ["recommenderService", "backendService"]
 },
  policy:  (actionParams) => {
-     return async (req, res, next) => {
+    return async (req, res, next) => {
+      // 1. Lấy trackId từ URL (req.params.id)
+      const trackId = req.params.id;
+      if (!trackId) {
+        return res.status(400).json({ error: 'Missing trackId' });
+      }
+
+      // 2. Gọi Backend API: Xóa track trên backend
       try {
-       
-        const trackid =  req.params.id;
-
-        if (!trackid) {
-          return res.status(400).json({ error: 'Missing user_id' });
-        }
-
-        // Gọi backend API
-        const backendUrl = `${actionParams.backendService}${user_id}`;
-
+        const backendUrl = `${actionParams.backendService}/${trackId}`;
         const beRes = await axios.delete(backendUrl);
 
-        res.status(beRes.status).json(beRes)
+        // Trả luôn response từ Backend về client (đã xong phần delete ở backend)
+        // Chỉ lấy beRes.data hoặc beRes.status nếu cần, không gửi nguyên beRes object
+        res.status(beRes.status).json({
+          message: 'Backend delete result',
+          status: beRes.status,
+          data: beRes.data
+        });
 
-        if (beRes.status != 200){
-          return ;
+        // Nếu Backend trả lỗi (status != 200), dừng ở đây
+        if (beRes.status !== 200) {
+          return;
         }
-
-        let reTryCount = 3
-
-        try {
-          // Gọi recommender API
-          const recommenderUrl = `${actionParams.recommenderService}${trackid}`;
-          const rsRes = await axios.delete(recommenderUrl);
-          if(rsRes.status != 200 && reTryCount > 0){
-            // re try send 
-
-            reTryCount--
-          }
-        } catch (error) {
- 
-
-          if( reTryCount > 0){
-            // re try send 
-            console.error('Error in recommendation policy:', err.message);
-            reTryCount--
-          }
-        }
-
-
-        
-
-
-      } catch (err) {
-        console.error('Error in recommendation policy:', err.message);
-        return res.status(500).json({ error: 'Internal server error' });
+      } catch (backendError) {
+        console.error('[RecommendationPolicy] Error calling backend:', backendError.message);
+        // Trả luôn lỗi về client, dừng pipeline
+        return res.status(
+          backendError.response?.status || 500
+        ).json({
+          error: 'Backend delete failed',
+          details: backendError.response?.data || backendError.message
+        });
       }
+
+      // 3. Nếu xóa backend thành công, tiếp tục "ngầm" gọi Recommender với retry
+      const recommenderUrlBase = actionParams.recommenderService; // ví dụ: 'http://recommender:8000/api/deleteTrack/'
+      const fullRecommenderUrl = `${recommenderUrlBase}/${trackId}`;
+
+      const MAX_RETRY = 3;
+      let attempt = 0;
+      let success = false;
+
+      while (attempt < MAX_RETRY && !success) {
+        attempt++;
+        try {
+          const rsRes = await axios.delete(fullRecommenderUrl);
+          if (rsRes.status === 200) {
+            success = true;
+            console.log(`[RecommendationPolicy] Recommender delete succeeded on attempt ${attempt}`);
+          } else {
+            console.warn(
+              `[RecommendationPolicy] Recommender delete returned status ${rsRes.status} on attempt ${attempt}`
+            );
+          }
+        } catch (reError) {
+          console.error(
+            `[RecommendationPolicy] Attempt ${attempt} - Error calling Recommender:`,
+            reError.message
+          );
+        }
+
+        if (!success && attempt < MAX_RETRY) {
+          // Delay ngắn giữa các lần retry (ví dụ 500ms)
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
+      }
+
+      if (!success) {
+        console.error(
+          `[RecommendationPolicy] Failed to delete on Recommender after ${MAX_RETRY} attempts. TrackId=${trackId}`
+        );
+      }
+
+
     };
   }
 };

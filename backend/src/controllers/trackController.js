@@ -287,7 +287,6 @@ const deleteTrackController = async (req, res) => {
         await deleteTrack(trackId, userId);
         return res.status(200).json({
             message: 'Delete track succeed!',
-            track_id: trackId,
         });
     } catch (err){
         console.error('Database connection failed:', err);

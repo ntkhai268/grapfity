@@ -27,6 +27,8 @@ async def get_db_connection():
         logger.error(f"Database connection failed: {str(e)}")
         raise
 
+
+# events
 async def get_all_event_data():
     query = """
     SELECT user_id, track_id, event_type
@@ -65,6 +67,53 @@ async def get_user_events(user_id: str):
         await conn.close()
         logger.info("Database connection closed")
 
+async def del_events_of_track_id(track_id: int):
+    query = """
+    DELETE FROM events
+    WHERE track_id = $1
+    """
+    logger.info(f"Executing query to delete events with track_id: {track_id}")
+
+    conn = await get_db_connection()
+    try:
+        logger.info(f"Connecting as user: {POSTGRES_USER} to database: {POSTGRES_DB}")
+        result = await conn.execute(query, track_id)
+        logger.info(f"Deleted events of track_id: {track_id}, result: {result}")
+        return {"status": "success", "detail": result}
+    except Exception as e:
+        logger.error(f"Database query failed: {str(e)}", exc_info=True)
+        raise
+    finally:
+        await conn.close()
+        logger.info("Database connection closed")
+
+async def insert_event(event: dict):
+    logger.info(f"Inserting event: {event['event_id']}")
+    conn = await get_db_connection()
+    try:
+        await conn.execute(
+            """
+            INSERT INTO events (event_id, event_type, track_id, user_id, timestamp)
+            VALUES ($1, $2, $3, $4, $5)
+            ON CONFLICT (event_id) DO NOTHING
+            """,
+            event['event_id'],
+            event['event_type'],
+            event['track_id'],
+            event['user_id'],
+            event['timestamp']
+        )
+        logger.info(f"Event {event['event_id']} inserted successfully")
+    except Exception as e:
+        logger.error(f"Error inserting event {event['event_id']}: {str(e)}", exc_info=True)
+        raise
+    finally:
+        await conn.close()
+        logger.info("Database connection closed")
+
+
+# tracks
+
 async def get_track_metadata():
     query = """
     SELECT
@@ -98,25 +147,21 @@ async def get_track_metadata():
         await conn.close()
         logger.info("Database connection closed")
 
-async def insert_event(event: dict):
-    logger.info(f"Inserting event: {event['event_id']}")
+async def del_track_metadata(track_id: int):
+    query = """
+    DELETE FROM tracks
+    WHERE track_id = $1
+    """
+    logger.info(f"Executing query to delete track metadata with track_id: {track_id}")
+
     conn = await get_db_connection()
     try:
-        await conn.execute(
-            """
-            INSERT INTO events (event_id, event_type, track_id, user_id, timestamp)
-            VALUES ($1, $2, $3, $4, $5)
-            ON CONFLICT (event_id) DO NOTHING
-            """,
-            event['event_id'],
-            event['event_type'],
-            event['track_id'],
-            event['user_id'],
-            event['timestamp']
-        )
-        logger.info(f"Event {event['event_id']} inserted successfully")
+        logger.info(f"Connecting as user: {POSTGRES_USER} to database: {POSTGRES_DB}")
+        result = await conn.execute(query, track_id)
+        logger.info(f"Deleted track metadata of track_id: {track_id}, result: {result}")
+        return {"status": "success", "detail": result}
     except Exception as e:
-        logger.error(f"Error inserting event {event['event_id']}: {str(e)}", exc_info=True)
+        logger.error(f"Database query failed: {str(e)}", exc_info=True)
         raise
     finally:
         await conn.close()
