@@ -1,63 +1,57 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 
-interface ISong {
-  id: number;
-  src: string;
-  number: number;
-  cover: string;
-  title: string;
-  artist: string;
-  stats: string;
-  duration: string;
-}
+import { getTop10PopularTracksAPI } from "../../services/listeningService";
+import { mapTrackDataToSong } from "../Section"; // hoặc copy lại hàm nếu khác file
+import { TrackData } from "../../services/trackServiceAPI";
 
+interface ISong {
+  id: number | string;
+  src: string;
+  number?: number; // Tự động gán số thứ tự
+  cover?: string;
+  title?: string;
+  artist?: string;
+  stats?: string;
+  duration?: string;
+}
 const PopularSongs: React.FC = () => {
   const navigate = useNavigate();
+  const [songs, setSongs] = useState<ISong[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [expanded, setExpanded] = useState(false);
 
-  const songs: ISong[] = [
-    {
-      id: 1,
-      src: "/assets/BacPhanRapVersion-TuiHat-6184759.mp3",
-      number: 1,
-      cover: "/assets/anhmau.png",
-      title: "Bạc Phận",
-      artist: "K-ICM, Jack",
-      stats: "2,767,771",
-      duration: "4:09"
-    },
-    {
-      id: 2,
-      src: "/assets/CoThamKhongVe.mp3",
-      number: 2,
-      cover: "/assets/anhmau.png",
-      title: "Cô Thắm Không Về",
-      artist: "NoName",
-      stats: "2,261,921",
-      duration: "5:35"
-    },
-    {
-      id: 3,
-      src: "assets/CaoOc20.mp3",
-      number: 3,
-      cover: "assets/anhmau.png",
-      title: "Cao Ốc 20",
-      artist: "Bray, Dạt G",
-      stats: "3,863,396",
-      duration: "3:41"
-    }
-  ];
+  useEffect(() => {
+    const fetchSongs = async () => {
+      setLoading(true);
+      try {
+        const data: TrackData[] = await getTop10PopularTracksAPI();
+        // Map sang ISong, bổ sung số thứ tự (number)
+        const mappedSongs: ISong[] = data.map((track, idx) => ({
+          ...mapTrackDataToSong(track),
+          number: idx + 1,
+       
+        }));
+        setSongs(mappedSongs);
+      } catch (err) {
+        setSongs([]);
+        // Có thể hiện lỗi tùy ý
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSongs();
+  }, []);
 
   const handleClick = (index: number) => {
     const song = songs[index];
-
-    // ✅ Phát nhạc qua GlobalAudioManager
-    GlobalAudioManager.setPlaylist(songs, index);
+     const context = {
+      id: `managerSongpopular-${song.id}`,
+      type: "queue"
+    };
+    GlobalAudioManager.setPlaylist(songs, index, context);
     GlobalAudioManager.playSongAt(index);
-
-    // ✅ Điều hướng đến trang ManagerSong nếu cần
-    console.log("Navigating to /ManagerSong...");
     navigate("/ManagerSong", {
       state: {
         songs,
@@ -67,28 +61,43 @@ const PopularSongs: React.FC = () => {
     });
   };
 
-  return (
+  const displaySongs = expanded ? songs.slice(0, 10) : songs.slice(0, 4);
+return (
     <div className="popular-songs">
-      <h2>Các bản nhạc thịnh hành của</h2>
-      <h2>ICM</h2>
+      <h2>Các bản nhạc thịnh hành</h2>
       <div className="song-list-manager">
-        {songs.map((song, index) => (
-          <div
-            key={song.id}
-            className="song-item-manager"
-            onClick={() => handleClick(index)}
-          >
-            <div className="song-number">{song.number}</div>
-            <img src={song.cover} alt={song.title} className="rec-song-image" />
-            <div className="rec-song-info">
-              <div className="rec-song-title">{song.title}</div>
-              <div className="rec-song-artist">{song.artist}</div>
+        {loading ? (
+          <div>Đang tải...</div>
+        ) : displaySongs.length === 0 ? (
+          <div>Không có bài hát nào.</div>
+        ) : (
+          displaySongs.map((song, index) => (
+            <div
+              key={song.id}
+              className="song-item-manager"
+              onClick={() => handleClick(index)}
+            >
+              <div className="song-number">{song.number ?? index + 1}</div>
+              <img src={song.cover || '/assets/anhmau.png'} alt={song.title} className="rec-song-image" />
+              <div className="rec-song-info">
+                <div className="rec-song-title">{song.title}</div>
+                <div className="rec-song-artist">{song.artist}</div>
+              </div>
+              <div className="song-stats">{song.stats ?? ''}</div>
+              <div className="song-duration">{song.duration ?? ''}</div>
             </div>
-            <div className="song-stats">{song.stats}</div>
-            <div className="song-duration">{song.duration}</div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+      {/* Nút Xem thêm / Thu gọn */}
+      {songs.length > 4 && (
+        <button
+          style={{ margin: "10px auto", display: "block", background: "none", border: "none", color: "rgba(255,255,255,0.7)", cursor: "pointer", fontWeight: 600 }}
+          onClick={() => setExpanded((e) => !e)}
+        >
+          {expanded ? "Thu gọn" : "Xem thêm"}
+        </button>
+      )}
     </div>
   );
 };

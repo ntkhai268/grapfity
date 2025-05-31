@@ -172,6 +172,13 @@ const Footer: React.FC = () => {
     volume, 
     setVolume  
   }: UseFooterAudioPlayerReturn = useFooterAudioPlayer();
+
+  // console.log("👈👈👈👈[Footer] render", {
+  //   currentSong,
+  //   isPlaying,
+  //   repeatMode,
+  //   isShuffle
+  // });
   // -----------------------------------------
   const lastTrackedId = useRef<number | string | undefined>(undefined);
 

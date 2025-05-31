@@ -68,13 +68,13 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
         console.log(`[Manager_Playlist] New waveform created and mapped for ${audio.src}`);
 
         // Lắng nghe sự kiện 'seeking' từ WaveSurfer (khi người dùng tương tác)
-       waveSurfer.on("seeking", (progress: number) => {
-            if (!isNaN(progress) && progress >= 0 && progress <= 1) {
-                const percent = progress * 100;
-                console.log(`[Waveform] Seek event by user: progress = ${progress}, percent = ${percent}`);
-                GlobalAudioManager.seekTo(percent);
-            }
-        });
+    //    waveSurfer.on("seeking", (progress: number) => {
+    //         if (!isNaN(progress) && progress >= 0 && progress <= 1) {
+    //             const percent = progress * 100;
+    //             console.log(`[Waveform] Seek event by user: progress = ${progress}, percent = ${percent}`);
+    //             GlobalAudioManager.seekTo(percent);
+    //         }
+    //     });
         
         // Lắng nghe lỗi từ WaveSurfer
         waveSurfer.on('error', (err) => {
@@ -90,104 +90,172 @@ const renderWaveform = (audio: HTMLAudioElement, container: HTMLDivElement) => {
  * Hàm chính xử lý khi người dùng click vào một bài hát trong danh sách playlist UI.
  * Cập nhật GlobalAudioManager và yêu cầu phát nhạc.
  */
+
 const handlePlayTrack = (
   trackToPlay: TrackItem,
-  currentPlaylistData: PlaylistData, // Đổi tên để rõ ràng hơn
-  playlistContainerElement?: HTMLDivElement | null, // DOM element của container playlist (tùy chọn)
-    contextOverride?: PlaylistContext
-
+  currentPlaylistData: PlaylistData,
+  playlistContainerElement?: HTMLDivElement | null,
+  contextOverride?: PlaylistContext
 ) => {
-    const newPlaylistContext: PlaylistContext = contextOverride || {
+  // Đưa khai báo newPlaylistContext lên đầu hàm để dùng ở log
+  const newPlaylistContext: PlaylistContext = contextOverride || {
     id: currentPlaylistData.id,
     type: "playlist"
   };
-  console.log("==> handlePlayTrack START <==", { trackId: trackToPlay.id, playlistId: currentPlaylistData.id }); 
 
-  // Kiểm tra dữ liệu đầu vào
-  if (!trackToPlay || !trackToPlay.src || !currentPlaylistData || !currentPlaylistData.tracks || currentPlaylistData.tracks.length === 0) {
-      console.error("handlePlayTrack: Invalid track or playlist data provided.");
-      return;
+  console.log("⛔⛔⛔⛔⛔[handlePlayTrack] START", {
+    trackToPlayId: trackToPlay.id,
+    playlistId: currentPlaylistData.id,
+    playlistLength: currentPlaylistData.tracks.length,
+    newPlaylistContext,
+    currentGlobalSong: GlobalAudioManager.getCurrentSong(),
+    currentGlobalContext: GlobalAudioManager.getCurrentContext?.(),
+  });
+
+  // Dọn các waveform ở container khác
+  if (playlistContainerElement) {
+    const allContainers = document.querySelectorAll(".player-container");
+    allContainers.forEach(container => {
+      if (container !== playlistContainerElement) {
+        const waveformDiv = container.querySelector(".waveform .audio-playlist") as HTMLDivElement | null;
+        if (waveformDiv && waveformMap.has(waveformDiv)) {
+          try { waveformMap.get(waveformDiv)?.waveSurfer.destroy(); } catch (e) {}
+          waveformMap.delete(waveformDiv);
+        }
+      }
+    });
   }
 
-  // Tìm index của bài hát được click
-  const currentTrackIndex = currentPlaylistData.tracks.findIndex( (track) => track.id === trackToPlay.id );
-  console.log("[handlePlayTrack] Found track index:", currentTrackIndex); 
+  // Kiểm tra đầu vào
+  if (!trackToPlay || !trackToPlay.src || !currentPlaylistData || !currentPlaylistData.tracks || currentPlaylistData.tracks.length === 0) {
+    console.error("handlePlayTrack: Invalid track or playlist data provided.");
+    return;
+  }
+
+  // Tìm index track
+  const currentTrackIndex = currentPlaylistData.tracks.findIndex(track => track.id === trackToPlay.id);
+  console.log("[handlePlayTrack] Found track index:", currentTrackIndex);
 
   if (currentTrackIndex === -1) {
-      console.error("handlePlayTrack: Clicked track not found in the provided playlist data.");
-      return; 
+    console.error("handlePlayTrack: Clicked track not found in the provided playlist data.");
+    return;
   }
 
-  // Map danh sách TrackItem[] sang dạng Song[]
-  const songs: Song[] = currentPlaylistData.tracks.map((track: TrackItem): Song => ({ 
-      id: track.id,
-      src: track.src || '', 
-      title: track.title === null ? undefined : track.title,
-      artist: track.artist === null ? undefined : track.artist,
-      cover: track.cover === null ? undefined : track.cover,
+  // Map TrackItem[] sang Song[]
+  const songs: Song[] = currentPlaylistData.tracks.map((track: TrackItem): Song => ({
+    id: track.id,
+    src: track.src || '',
+    title: track.title === null ? undefined : track.title,
+    artist: track.artist === null ? undefined : track.artist,
+    cover: track.cover === null ? undefined : track.cover,
   }));
-  console.log("[handlePlayTrack] Mapped songs for GlobalAudioManager:", songs.length); 
+  console.log("[handlePlayTrack] Mapped songs for GlobalAudioManager:", songs.length);
 
   const currentGlobalSong = GlobalAudioManager.getCurrentSong();
   const currentGlobalIsPlaying = GlobalAudioManager.getIsPlaying();
+  const currentGlobalContext = GlobalAudioManager.getCurrentContext?.();
 
-  // Xử lý Play/Pause/Play New bằng cách gọi hàm của GlobalAudioManager
-  if (currentGlobalSong?.id === trackToPlay.id && currentGlobalIsPlaying) {
-      console.log("[handlePlayTrack] Requesting pausePlayback."); 
-      GlobalAudioManager.pausePlayback(); 
-  } else if (currentGlobalSong?.id === trackToPlay.id && !currentGlobalIsPlaying) {
-       console.log("[handlePlayTrack] Requesting resume via playSongAt.");
-       GlobalAudioManager.playSongAt(currentTrackIndex); 
-  } else {
-      // Bài hát mới hoặc playlist mới
-      console.log(`[handlePlayTrack] Setting playlist and playing new track at index: ${currentTrackIndex}`); 
-      
-      // Tạo context cho playlist này
-      
-      
-      // Set playlist và context mới cho GlobalAudioManager
-      // Truyền undefined cho các callback không dùng đến
-      GlobalAudioManager.setPlaylist( 
-          songs,
-          currentTrackIndex, // Index của bài hát sẽ phát
-          newPlaylistContext, 
-          undefined, // playFn
-          playlistContainerElement, // Lưu container nếu cần cho handleSongChanged
-          undefined  // onEnded
-      );
-      
-      // Yêu cầu GlobalAudioManager phát bài hát tại index đã chọn
+  // So sánh context playlist hiện tại
+  const isSamePlaylist =
+    currentGlobalContext?.id === newPlaylistContext.id &&
+    currentGlobalContext?.type === newPlaylistContext.type;
+
+  if (isSamePlaylist) {
+    // Đang ở cùng playlist, xử lý play/pause như cũ
+    if (currentGlobalSong?.id === trackToPlay.id && currentGlobalIsPlaying) {
+      console.log("[handlePlayTrack] Requesting pausePlayback.");
+      GlobalAudioManager.pausePlayback();
+    } else if (currentGlobalSong?.id === trackToPlay.id && !currentGlobalIsPlaying) {
+      console.log("[handlePlayTrack] Requesting resume via playSongAt.");
       GlobalAudioManager.playSongAt(currentTrackIndex);
+    } else {
+      console.log("[handlePlayTrack] Play khác track trong cùng playlist.");
+      GlobalAudioManager.playSongAt(currentTrackIndex);
+    }
+  } else {
+    // Khác playlist, phải setPlaylist mới!
+    console.log(`[handlePlayTrack] Setting NEW playlist and playing track at index: ${currentTrackIndex}`);
+    GlobalAudioManager.setPlaylist(
+      [...songs],                           // ép tạo mảng mới
+      currentTrackIndex,
+      { ...newPlaylistContext },            // ép tạo object mới
+      undefined,
+      playlistContainerElement,
+      undefined
+    );
+    GlobalAudioManager.playSongAt(currentTrackIndex);
   }
-  console.log("==> handlePlayTrack END <=="); 
+
+  console.log("==> handlePlayTrack END <==");
 };
+
+
 
 // Export hàm chính để component React sử dụng
 export default handlePlayTrack; 
 
 // --- Hàm xử lý sự kiện khi bài hát thay đổi trong GlobalAudioManager ---
 // Hàm này cập nhật waveform tương ứng với bài hát đang phát
-const handleSongChanged = () => {
+let prevPlaylistContextId: any = null;
+
+// Utility: Xóa toàn bộ waveform trong Map (an toàn khi chuyển playlist)
+function clearAllWaveforms() {
+    waveformMap.forEach(({ waveSurfer }) => {
+        try { waveSurfer.destroy(); } catch (e) {}
+    });
+    waveformMap.clear();
+}
+
+function waitForElement(selector: string, container: HTMLElement, timeout = 500): Promise<HTMLElement> {
+    return new Promise((resolve, reject) => {
+        let elapsed = 0;
+        function check() {
+            const el = container.querySelector(selector);
+            if (el) return resolve(el as HTMLElement);
+            elapsed += 20;
+            if (elapsed > timeout) return reject(`Timeout: Not found ${selector}`);
+            setTimeout(check, 20);
+        }
+        check();
+    });
+}
+
+const handleSongChanged = async () => {
     console.log("🎧 [Manager_Playlist] songchanged event fired!");
-    // Lấy container từ GlobalAudioManager (được set bởi handlePlayTrack)
-    const container = GlobalAudioManager.getPlaylistContainer(); 
-    if (!container) {
-        // console.log("⛔ [Manager_Playlist] No playlist container found. Cannot update waveform.");
-        return; 
+
+    // Lấy context id hiện tại (playlist hoặc tab)
+    const playlistContext = GlobalAudioManager.getCurrentContext();
+    const currentContextId = playlistContext?.id;
+
+    // Nếu contextId đổi (playlist khác), clear tất cả waveformMap (fix waveform cũ đứng hình)
+    if (prevPlaylistContextId !== null && prevPlaylistContextId !== currentContextId) {
+        console.log("[Manager_Playlist] Playlist context changed, clearing all waveforms.");
+        clearAllWaveforms();
     }
+    prevPlaylistContextId = currentContextId;
 
-    // Tìm đúng vị trí để render waveform bên trong container đó
-    const waveformContainer = container.querySelector(".waveform .audio-playlist") as HTMLDivElement | null; 
-    const audio = GlobalAudioManager.getCurrentAudio(); // Lấy audio element hiện tại
-    const song = GlobalAudioManager.getCurrentSong();   // Lấy thông tin bài hát hiện tại
-
-    if (!waveformContainer) {
-        console.log("⛔ [Manager_Playlist] Waveform container (.waveform .audio-playlist) not found inside playlist container.");
+    // Lấy container của playlist hiện tại
+    const container = GlobalAudioManager.getPlaylistContainer?.();
+    if (!container) {
+        console.log("⛔ [Manager_Playlist] No playlist container found. Cannot update waveform.");
         return;
     }
+
+    // Chờ DOM có waveformContainer (audio-playlist)
+    let waveformContainer: HTMLDivElement | null = null;
+    try {
+        waveformContainer = (await waitForElement(".waveform .audio-playlist", container)) as HTMLDivElement;
+    } catch (e) {
+        console.log("[Manager_Playlist] waveform container not found:", e);
+        return;
+    }
+
+    const audio = GlobalAudioManager.getCurrentAudio?.();
+    const song = GlobalAudioManager.getCurrentSong?.();
+
+    // Không có audio hoặc bài hát => clear sóng nếu có
     if (!audio || !song) {
         console.log("⛔ [Manager_Playlist] No current audio or song. Clearing waveform if exists.");
-        // Nếu không có audio/song, xóa waveform cũ nếu có
         const existing = waveformMap.get(waveformContainer);
         if (existing) {
             try { existing.waveSurfer.destroy(); } catch(e) {}
@@ -198,33 +266,29 @@ const handleSongChanged = () => {
 
     console.log(`[Manager_Playlist] handleSongChanged - Preparing to render/update waveform for: ${song.title || song.src}`);
 
-    // Render hoặc cập nhật waveform
-    // Đảm bảo audio metadata đã load trước khi render
-    if (audio.readyState >= 1) { // HAVE_METADATA or higher
-        renderWaveform(audio, waveformContainer);
+    // Render/cập nhật waveform
+    if (audio.readyState >= 1) {
+        // Nếu metadata sẵn sàng, render ngay
+        setTimeout(() => {
+            renderWaveform(audio, waveformContainer);
+        }, 0);
     } else {
-        console.log("[Manager_Playlist] Audio metadata not ready, adding event listener for:", song.title || song.src);
-        
-        // Hàm xử lý lỗi audio cục bộ
-        const handleAudioErrorLocal = (event: Event) => { 
+        // Nếu chưa, chờ metadata load xong rồi render
+        const handleAudioErrorLocal = (event: Event) => {
             console.error("[Manager_Playlist] Error loading audio metadata in handleSongChanged for", song.src, event);
-            audio.removeEventListener("loadedmetadata", handleMetadataOnce); // Quan trọng: Xóa listener nếu lỗi
+            audio.removeEventListener("loadedmetadata", handleMetadataOnce);
         };
-        // Hàm xử lý khi metadata load xong
         const handleMetadataOnce = () => {
-             console.log("[Manager_Playlist] Metadata loaded via listener, rendering waveform for:", song.title || song.src);
-             renderWaveform(audio, waveformContainer);
-             // Xóa listener lỗi sau khi thành công (không bắt buộc nhưng tốt)
-             audio.removeEventListener("error", handleAudioErrorLocal); 
+            console.log("[Manager_Playlist] Metadata loaded via listener, rendering waveform for:", song.title || song.src);
+            setTimeout(() => {
+                renderWaveform(audio, waveformContainer);
+            }, 0);
+            audio.removeEventListener("error", handleAudioErrorLocal);
         };
-        
-        // Xóa listener cũ phòng trường hợp lỗi trước đó
-        audio.removeEventListener("loadedmetadata", handleMetadataOnce); 
-        audio.removeEventListener("error", handleAudioErrorLocal); 
-
-        // Gắn listener mới
+        audio.removeEventListener("loadedmetadata", handleMetadataOnce);
+        audio.removeEventListener("error", handleAudioErrorLocal);
         audio.addEventListener("loadedmetadata", handleMetadataOnce, { once: true });
-        audio.addEventListener("error", handleAudioErrorLocal , { once: true }); 
+        audio.addEventListener("error", handleAudioErrorLocal, { once: true });
     }
 };
 
