@@ -54,8 +54,16 @@
 
 .playlist-edit-modal__body {
     display: flex;
-    gap: 20px; /* Khoảng cách giữa ảnh và text */
-    margin-bottom: 25px;
+    gap: 28px;
+    margin-bottom: 22px;
+    align-items: flex-start;
+}
+.playlist-edit-modal__info-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    flex: 1;
+    justify-content: center;
 }
 
 .playlist-edit-modal__image-section {
@@ -153,6 +161,34 @@
      resize: vertical; /* Cho phép thay đổi chiều cao textarea */
      min-height: 80px; /* Chiều cao tối thiểu */
  }
+.playlist-edit-modal__privacy-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* khoảng cách giữa label và radio group */
+    margin-top: 0.5em;
+    align-items: flex-start;
+}
+
+.playlist-edit-modal__privacy-label {
+    font-size: 15px;
+    color: #b3b3b3;
+    font-weight: 500;
+    margin-bottom: 0px;
+}
+.playlist-edit-modal__privacy-radio-group {
+    display: flex;
+    flex-direction: row;   /* hoặc column nếu muốn radio dọc */
+    gap: 22px;
+    align-items: center;
+    margin-left: 8px;      /* nhẹ nhàng thụt vào cho đẹp */
+}
+.playlist-edit-modal__privacy-radio-group label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
 .playlist-edit-modal__footer {
     display: flex;
