@@ -10,9 +10,9 @@ apiEndpoints:
     host: 'localhost'
     paths: '/api/event_tracking'
 
-  test:
+  deleteTrack:
     host: 'localhost'
-    paths: '/api/re-test'
+    paths: '/api/tracks/:id'
 
   backend:
     host: 'localhost'
@@ -29,6 +29,7 @@ policies:
   - request-transformer
   - response-transformer
   - recommendation-pipeline-policy
+  - deleteTrack-pipeline-policy
 
 
 pipelines:
@@ -54,13 +55,15 @@ pipelines:
       - proxy:
           - action:
               serviceEndpoint: recommender
-  test:
+              
+  deleteTrack:
     apiEndpoints:
-      - test
+      - deleteTrack
     policies:
-      - proxy:
-          - action: 
-              serviceEndpoint: recommender
+      - deleteTrack-pipeline-policy:
+          - action:
+              recommenderService: http://nginx:80/api/delete_track/
+              backendService: http://backend:8001/api/tracks/
 
   backend:
     apiEndpoints:

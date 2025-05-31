@@ -8,3 +8,11 @@ db:
 plugins:
   recommendation-pipeline:
     package: './plugins/recommendation-pipeline/manifest.js'
+  deleteTrack-pipeline:
+    package: './plugins/deleteTrack-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'

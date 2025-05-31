@@ -1,2 +1,3 @@
 **/node_modules/
 .vscode
+recommender/static/matrix/extractor_model.pkl
