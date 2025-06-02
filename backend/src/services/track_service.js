@@ -278,42 +278,43 @@ const getTracksByUserId = async (userId) => {
   });
 };
 
-  const updateTrackStatus = async (id, status) => {
-    const track = await db.Track.findByPk(id);
-    if (!track) throw new Error('Track not found');
-    return await track.update({ status });
-  };
-  const getJoinedTracks = async () => {
-    return await db.Track.findAll({
-      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
-      include: [
-        {
-          model: db.Metadata,
-          attributes: ['trackname'],
-          required: false
-        },
-        {
-          model: db.User,
-          attributes: [['name', 'UploaderName']],
-          required: false
-        },
-        {
-          model: db.listeningHistory,
-          as: 'listeningHistories',
-          attributes: ['listenCount', 'createdAt'],
-          required: false,
-          include: [
-            {
-              model: db.User,
-              as: 'listener',
-              attributes: [['name', 'Name']],
-              required: false
-            }
-          ]
-        }
-      ]
-    });
-  };
+const updateTrackStatus = async (id, status) => {
+  const track = await db.Track.findByPk(id);
+  if (!track) throw new Error('Track not found');
+  return await track.update({ status });
+};
+
+const getJoinedTracks = async () => {
+  return await db.Track.findAll({
+    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+    include: [
+      {
+        model: db.Metadata,
+        attributes: ['trackname'],
+        required: false
+      },
+      {
+        model: db.User,
+        attributes: [['name', 'UploaderName']],
+        required: false
+      },
+      {
+        model: db.listeningHistory,
+        as: 'listeningHistories',
+        attributes: ['listenCount', 'createdAt'],
+        required: false,
+        include: [
+          {
+            model: db.User,
+            as: 'listener',
+            attributes: [['name', 'Name']],
+            required: false
+          }
+        ]
+      }
+    ]
+  });
+};
 export {
     getAllTracks,
     getAllTracksForAdmin,

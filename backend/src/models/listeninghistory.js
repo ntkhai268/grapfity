@@ -29,7 +29,6 @@ export default (sequelize, DataTypes) => {
   listeningHistory.init({
     userId:      DataTypes.INTEGER,
     trackId:     DataTypes.INTEGER,
-
     listenCount: DataTypes.INTEGER,
   }, {
     sequelize,
