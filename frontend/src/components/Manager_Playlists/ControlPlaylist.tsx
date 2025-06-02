@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import useSongManager from "../../hooks/Manager_Song_Play";
-import EditPlaylistForm from "../../components/Manager_Playlists/Edit_Playlist_Form";
-// import PlaylistEditModal from './PlaylistEditModal';
-// --- 1. Import hàm deletePlaylistAPI ---
-// !!! Đảm bảo đường dẫn này đúng với vị trí file service của bạn !!!
-import { deletePlaylistAPI } from "../../services/playlistService"; // Hoặc tên file service tương ứng
+
+import { deletePlaylistAPI } from "../../services/playlistService";
 import GlobalAudioManager, { Song } from "../../hooks/GlobalAudioManager";
 
 interface ISongManagerOutput {
@@ -14,63 +11,54 @@ interface ISongManagerOutput {
   togglePlay: () => void;
 }
 
-// --- 2. Sửa props cho component ---
 interface ControlPlaylistProps {
-  playlistId: string | number; // <-- Sửa: Chỉ chấp nhận string hoặc number, không chấp nhận undefined/null
-   tracks: Song[];
-  onDeleteSuccess?: () => void; // Hàm callback để xử lý khi xóa thành công (tùy chọn)
+  playlistId: string | number;
+  tracks: Song[];
+  onDeleteSuccess?: () => void;
 }
 
-const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId,tracks, onDeleteSuccess }) => { // <-- Nhận props
+const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId, tracks, onDeleteSuccess }) => {
   const { audioRef, songUrl, isPlaying, togglePlay }: ISongManagerOutput = useSongManager();
-  const [isEditing, setIsEditing] = useState(false); // popup state
-  const [isDeleting, setIsDeleting] = useState(false); // Trạng thái đang xóa (để vô hiệu hóa nút)
-  const [deleteError, setDeleteError] = useState<string | null>(null); // Lưu trữ lỗi xóa
 
-  // --- 3. Hàm xử lý xóa playlist ---
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  // Xử lý xóa playlist
   const handleDeletePlaylist = async () => {
-    // --- XÓA KIỂM TRA KHÔNG CẦN THIẾT ---
-    // Prop playlistId giờ đây được đảm bảo là string hoặc number theo kiểu dữ liệu
-    // Không cần kiểm tra !playlistId nữa
-    // ---------------------------------
-
-    // --- 4. Hỏi xác nhận ---
     if (!window.confirm(`Bạn có chắc chắn muốn xóa playlist này không? Hành động này không thể hoàn tác.`)) {
-      return; // Người dùng hủy
+      return;
     }
-
-    setIsDeleting(true); // Bắt đầu xóa, vô hiệu hóa nút
-    setDeleteError(null); // Xóa lỗi cũ
-
+    setIsDeleting(true);
+    setDeleteError(null);
     try {
-      // --- 5. Gọi API xóa ---
-      // playlistId giờ đây chắc chắn là string hoặc number
       await deletePlaylistAPI(playlistId);
-
-      // --- 6. Xử lý thành công ---
-      alert("Đã xóa playlist thành công!"); // Thông báo đơn giản
-      // Gọi callback nếu có để component cha xử lý (ví dụ: điều hướng, làm mới danh sách)
+      alert("Đã xóa playlist thành công!");
       if (onDeleteSuccess) {
         onDeleteSuccess();
       }
-
     } catch (error: any) {
-      // --- 7. Xử lý lỗi ---
-      console.error("Lỗi khi xóa playlist:", error);
-      // Lấy message lỗi từ Error object (hàm API đã ném ra)
       const errorMessage = error.message || "Đã xảy ra lỗi không xác định khi xóa playlist.";
-      setDeleteError(errorMessage); // Lưu lỗi để hiển thị (nếu muốn)
-      alert(`Lỗi khi xóa playlist: ${errorMessage}`); // Hiển thị lỗi cho người dùng
-
+      setDeleteError(errorMessage);
+      alert(`Lỗi khi xóa playlist: ${errorMessage}`);
     } finally {
-      setIsDeleting(false); // Kết thúc xóa, kích hoạt lại nút
+      setIsDeleting(false);
     }
   };
-  useEffect(() => {
-  if (tracks.length > 0 && !GlobalAudioManager.getCurrentSong()) {
-    GlobalAudioManager.setPlaylist(tracks, 0, { id: playlistId, type: 'playlist' });
-  }
-}, [tracks, playlistId]);
+
+  // Hàm xử lý khi nhấn nút play
+  const handlePlay = () => {
+    const currentSong = GlobalAudioManager.getCurrentSong();
+    const isSamePlaylist = GlobalAudioManager.getCurrentContext()?.id === playlistId;
+
+    if (!currentSong || !isSamePlaylist) {
+      // Nếu chưa phát hoặc context khác, set playlist rồi play từ đầu
+      GlobalAudioManager.setPlaylist(tracks, 0, { id: playlistId, type: 'playlist' });
+      GlobalAudioManager.playSongAt(0);
+    } else {
+      // Đúng playlist, chỉ toggle play/pause
+      togglePlay();
+    }
+  };
 
   return (
     <>
@@ -80,24 +68,12 @@ const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId,tracks, on
         {/* Nút Play hình tròn màu xanh */}
         <button
           className="play-button-circle"
-          onClick={() => {
-            const currentSong = GlobalAudioManager.getCurrentSong();
-            const isSamePlaylist = GlobalAudioManager.getCurrentContext()?.id === playlistId;
-
-            if (!currentSong || !isSamePlaylist) {
-              // ⚠️ Reset playlist và phát từ đầu nếu chưa có gì đang phát hoặc khác playlist
-              GlobalAudioManager.setPlaylist(tracks, 0, { id: playlistId, type: 'playlist' });
-              GlobalAudioManager.playSongAt(0);
-            } else {
-              // ✅ Nếu đúng bài, chỉ toggle Play/Pause
-              togglePlay();
-            }
-          }}
+          onClick={handlePlay}
           disabled={isDeleting}
         >
           <i className={isPlaying && GlobalAudioManager.getCurrentContext()?.id === playlistId
-              ? "fas fa-pause"
-              : "fas fa-play"}>
+            ? "fas fa-pause"
+            : "fas fa-play"}>
           </i>
         </button>
 
@@ -109,42 +85,21 @@ const ControlPlaylist: React.FC<ControlPlaylistProps> = ({ playlistId,tracks, on
           <button className="control-button" title="Add All to Queue" disabled={isDeleting}>
             <i className="fas fa-plus"></i>
           </button>
-          {/* <button
-            className="control-button"
-            title="Edit Playlist"
-            onClick={() => setIsEditing(true)}
-            disabled={isDeleting} // Chỉ cần kiểm tra isDeleting vì playlistId luôn hợp lệ
-          >
-            <i className="fas fa-pen"></i>
-          </button> */}
-          {/* --- 8. Gắn handler vào nút xóa --- */}
           <button
             className="control-button"
             title="Delete Playlist"
-            onClick={handleDeletePlaylist} // Gọi hàm xử lý khi nhấn
-            disabled={isDeleting} // Chỉ cần kiểm tra isDeleting vì playlistId luôn hợp lệ
+            onClick={handleDeletePlaylist}
+            disabled={isDeleting}
           >
-            {/* Hiển thị icon loading nếu đang xóa (tùy chọn) */}
             {isDeleting ? <i className="fas fa-spinner fa-spin"></i> : <i className="fas fa-trash-alt"></i>}
           </button>
         </div>
-        {/* Hiển thị thông báo lỗi (tùy chọn) */}
+
+        {/* Hiển thị thông báo lỗi (nếu có) */}
         {deleteError && <p style={{ color: 'red', marginTop: '10px' }}>{deleteError}</p>}
       </div>
 
-      {/* Popup Form */}
-      {isEditing && (
-        <div className="popup-backdrop">
-          <div className="popup-content">
-            {/* Cần truyền playlistId vào EditPlaylistForm nếu nó cần */}
-            <EditPlaylistForm onCancel={() => setIsEditing(false)} /* playlistId={playlistId} */ />
-            <button className="popup-close-btn" onClick={() => setIsEditing(false)}>
-              &times;
-            </button>
-          </div>
-        </div>
-      )}
-
+      
     </>
   );
 };

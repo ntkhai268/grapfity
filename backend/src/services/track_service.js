@@ -14,7 +14,7 @@ const getAllTracks = async () => {
                 model: db.Metadata
             },
             {
-                model: db.User, // ✅ KHÔNG dùng `as`
+                model: db.User,
                 attributes: ['id', 'Name']
             }
         ]
@@ -45,20 +45,14 @@ const getTrackById = async (trackId) => {
                 status: 'approved' 
             },
             // Bạn có thể chọn các attributes cụ thể từ bảng Track nếu muốn
-            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+            attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'privacy'], 
             include: [
                 {
                     model: db.User, // Nếu bạn muốn lấy thông tin người upload
-                    as: 'User',     // Đảm bảo alias 'User' khớp với định nghĩa trong model Track
-                                    // Ví dụ: Track.belongsTo(models.User, { as: 'User', ...})
-                                    // Bỏ 'as' nếu không đặt alias cụ thể trong association.
                     attributes: ['id', 'Name']
                 },
                 {
                     model: db.Metadata,
-                    as: 'Metadatum', // QUAN TRỌNG: Sử dụng alias 'Metadatum' (số ít, viết hoa M)
-                                     // nếu Track.hasOne(models.Metadata) không có 'as' trong định nghĩa model.
-                                     // Hoặc dùng alias bạn đã đặt trong Track.hasOne(models.Metadata, { as: 'yourAlias' })
                     attributes: [ // Liệt kê các trường bạn muốn lấy từ Metadatum
                         'trackname',
                         'duration_ms',
@@ -117,6 +111,7 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
     console.error(`TrackService: Invalid user ID received in getTracksByUploaderId: ${userId}`);
     throw new Error("User ID không hợp lệ.");
   }
+  console.log(">>🧪 userId:", numericUserId, "currentUserId:", numericCurrentUserId);
 
   const isOwner = numericUserId === numericCurrentUserId;
 
@@ -133,12 +128,10 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
       include: [
         {
           model: db.User,
-          as: 'User',
           attributes: ['id', 'Name']
         },
         {
           model: db.Metadata,
-          as: 'Metadatum',
           attributes: ['trackname', 'duration_ms', 'lyrics']
         }
       ],
@@ -263,13 +256,11 @@ const getTracksByUserId = async (userId) => {
       },
       {
         model: db.listeningHistory,
-        as: 'listeningHistories',
         attributes: ['listenCount', 'createdAt'],
         include: [
           // 3) Lấy thông tin listener, dùng alias 'listener'
           {
             model: db.User,
-            as: 'listener',
             attributes: ['id', 'Name']
           }
         ]
@@ -300,13 +291,11 @@ const getJoinedTracks = async () => {
       },
       {
         model: db.listeningHistory,
-        as: 'listeningHistories',
         attributes: ['listenCount', 'createdAt'],
         required: false,
         include: [
           {
             model: db.User,
-            as: 'listener',
             attributes: [['name', 'Name']],
             required: false
           }

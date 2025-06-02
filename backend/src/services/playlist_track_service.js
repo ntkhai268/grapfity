@@ -165,7 +165,7 @@ const getPlaylistDetailsById = async (playlistId) => {
     try {
         const playlist = await db.Playlist.findByPk(numericPlaylistId, {
             // Chọn các trường cần thiết từ bảng Playlist
-            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId'], 
+            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId', 'privacy'], 
             include: [
                 {
                     model: db.User, // User tạo Playlist
@@ -187,7 +187,6 @@ const getPlaylistDetailsById = async (playlistId) => {
                         },
                         {
                             model: db.Metadata,
-                            as: 'Metadatum', // <<< Đảm bảo alias khớp với Track.hasOne(Metadata, { as: '...' })
                             attributes: [    // <<< Lấy các trường cần từ Metadata
                                 'trackname', 
                                 'duration_ms', 
@@ -241,7 +240,7 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
 
     try {
         const playlist = await db.Playlist.findByPk(numericPlaylistId, {
-            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId'], 
+            attributes: ['id', 'title', 'imageUrl', 'createDate', 'userId', 'privacy'], 
             include: [
                 {
                     model: db.User, // Người tạo playlist
@@ -267,7 +266,6 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
                         },
                         {
                             model: db.Metadata,
-                            as: 'Metadatum',
                             attributes: ['trackname', 'duration_ms', 'lyrics'],
                             required: false
                         }

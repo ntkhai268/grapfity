@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       Track.belongsTo(models.User, {
         foreignKey: 'uploaderId',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       });
 
       Track.belongsToMany(models.Playlist, {
@@ -23,13 +23,12 @@ export default (sequelize, DataTypes) => {
 
       Track.hasMany(models.listeningHistory, {
         foreignKey: 'trackId',
-        as: 'listeningHistories'
       });
 
       Track.hasOne(models.Metadata, {
         foreignKey: 'track_id',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       });
     }
   }

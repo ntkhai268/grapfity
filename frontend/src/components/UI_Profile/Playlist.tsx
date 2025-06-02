@@ -8,7 +8,7 @@ import handlePlayTrack, { initFirstWaveforms } from "../../hooks/Manager_Playlis
 import { getMyPlaylistsAPI,getPublicPlaylistsByUserIdAPI } from "../../services/playlistService";
 // Import kiểu dữ liệu
 // Định nghĩa kiểu TrackItem (giữ nguyên)
-interface TrackItem {
+export interface TrackItem {
     id: number | string;
     title: string;
     src: string;
@@ -17,7 +17,7 @@ interface TrackItem {
     imageUrl?: string | null;
 }
 // Định nghĩa kiểu PlaylistData (giữ nguyên)
-interface PlaylistData {
+export interface PlaylistData {
     id: number;
     title: string;
     artist: string;
@@ -52,12 +52,7 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
     const [imageErrorMap, setImageErrorMap] = useState<Record<number, boolean>>({});
     const [hoveringIconMap, setHoveringIconMap] = useState<Record<number, boolean>>({});
 
-    // Hàm fetch playlists (Giữ nguyên)
 
-    // useEffect fetch lần đầu (Giữ nguyên)
-    // useEffect(() => {
-    //     fetchPlaylists();
-    // }, [fetchPlaylists]);
 
     // useEffect khởi tạo waveform (Giữ nguyên)
     useEffect(() => {
@@ -190,7 +185,11 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
                                                 key={track.id || trackIndex}
                                                 onClick={() => {
                                                     const containerElement = playlistContainerRefs.current[playlistIndex];
-                                                    handlePlayTrack(track, playlist, containerElement);
+                                                    handlePlayTrack(track, playlist, containerElement, {
+                                                        id: `playlist_profile_${playlist.id}`,
+                                                        type: "playlist"
+                                                    });
+
                                                 }}
                                                 title={`Play: ${track.title}`}
                                             >

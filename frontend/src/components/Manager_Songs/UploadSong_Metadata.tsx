@@ -2,9 +2,8 @@
 
 import React, { useState, useRef, useEffect, ChangeEvent, MouseEvent } from 'react';
 // Import component Metadata (Đảm bảo đường dẫn đúng)
-import Metadata from '../Manager_Songs/MetaData'; // <<< Đảm bảo đúng đường dẫn
-// Import/Định nghĩa interface AudioFeaturesData (quan trọng)
-import { AudioFeaturesData } from '../Manager_Songs/MetaData';
+
+
 import { createTrackAPI } from '../../services/trackServiceAPI';
 
 import '../../styles/UploadSongMeta.css'; // Đường dẫn tới file CSS của bạn
@@ -22,22 +21,23 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
   // --- State Variables ---
   const [title, setTitle] = useState('');
   const [permalink, setPermalink] = useState('');
-  const [playlistType, setPlaylistType] = useState('Playlist');
-  const [genre, setGenre] = useState('None');
-  const [tags, setTags] = useState('');
+
+ 
+
   // --- BỎ STATE metaSongValue ĐI ---
   // const [metaSongValue, setMetaSongValue] = useState('');
-  const [description, setDescription] = useState('');
+
   // --- State cho ô textarea riêng biệt ---
-  const [notes, setNotes] = useState(''); // Dùng cho textarea Notes
+ 
   const [privacy, setPrivacy] = useState('public');
   const [releaseDate, setReleaseDate] = useState(''); // String format YYYY-MM-DD
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [selectedAudioFile, setSelectedAudioFile] = useState<File | null>(null);
+  const [lyrics, setLyrics] = useState('');
   const [activeTab, setActiveTab] = useState<ActiveTab>('basic');
   // State lưu dữ liệu object gốc từ Metadata tab
-  const [audioFeatures, setAudioFeatures] = useState<AudioFeaturesData | null>(null);
+ 
 
   // --- Refs ---
   const imageInputRef = useRef<HTMLInputElement>(null);
@@ -82,12 +82,7 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
     if (event.target) { event.target.value = ''; }
   };
 
-  // Hàm nhận dữ liệu khi nhấn OK từ Metadata component
-  const handleMetadataOk = (data: AudioFeaturesData) => {
-      console.log("Received metadata:", data);
-      setAudioFeatures(data); // Chỉ cập nhật state này
-      setActiveTab('basic');   // Quay về tab basic
-  };
+
 
   // Hàm Save Changes (Gửi Notes và AudioFeatures, không gửi MetaSong nữa)
   const handleSaveChanges = async () => {
@@ -99,50 +94,31 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
     if (!title.trim()) { alert("Vui lòng nhập Title."); return; }
     if (!selectedAudioFile) { alert("Vui lòng chọn file nhạc (MP3)."); return; }
     if (!selectedImageFile) { alert("Vui lòng chọn ảnh."); return; }
-    if (!audioFeatures) {
-      alert("Vui lòng nhập hoặc xác nhận dữ liệu ở tab Metadata (MetaDataSong).");
-      // Optionally, switch to the metadata tab automatically
-      // setActiveTab('metadata');
-      return; // Dừng lại nếu chưa có dữ liệu metadata
-    }
+    
 
-    // Tạo FormData
-    // const formData = new FormData();
-    // formData.append('title', title.trim());
-    // formData.append('permalink', permalink);
-    // formData.append('playlistType', playlistType);
-    // formData.append('genre', genre);
-    // formData.append('tags', tags.trim());
-    // formData.append('description', description.trim());
-    // // --- Gửi giá trị từ ô TEXTAREA NOTES ---
-    // // formData.append('notes', notes.trim());
-    // // formData.append('privacy', privacy);
-    // formData.append('releaseDate', releaseDate);
-    // if (selectedImageFile) { formData.append('image', selectedImageFile, selectedImageFile.name); }
-    // if (selectedAudioFile) { formData.append('audio', selectedAudioFile, selectedAudioFile.name); }
-    // // --- Gửi cả object audioFeatures (JSON string) ---
-    // if (audioFeatures) {
-    //     formData.append('audioFeatures', JSON.stringify(audioFeatures));
-    // }
+   
 
     // Gửi request
     try {
     // console.log("Gửi tới createTrackAPI:", { title, audioFeatures, lyrics: audioFeatures.lyrics });
-    console.log("Form to backend:", audioFeatures);
+    console.log("Form to backend:");
     const result = await createTrackAPI(
       selectedAudioFile,
       selectedImageFile,
       title,
-      privacy,
-      audioFeatures // hoặc bạn filter các field cần thiết
+      privacy ,// hoặc bạn filter các field cần thiết
+      lyrics,
+      releaseDate
     );
 
     console.log("✅ Lưu thành công:", result);
     alert("Lưu thông tin và file thành công!");
+    alert("Nhạc đang được kiểm duyệt, xin vui lòng chờ.");
     onCancel();
   } catch (error: any) {
     console.error("❌ Lỗi khi tạo track:", error);
     alert(error.message || "Đã xảy ra lỗi khi tạo track.");
+    
   }
   };
 
@@ -151,7 +127,7 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
   const renderTabs = () => (
     <div className="meta-tabs-container">
       <button className={`meta-tab-button ${activeTab === 'basic' ? 'meta-active' : ''}`} onClick={() => setActiveTab('basic')}> Basic info </button>
-      <button className={`meta-tab-button ${activeTab === 'metadata' ? 'meta-active' : ''}`} onClick={() => setActiveTab('metadata')}> Metadata </button>
+     
     </div>
   );
 
@@ -192,7 +168,7 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
       {/* Grid Layout */}
       <div className="meta-form-grid">
         {/* Playlist type */}
-        <label className="meta-form-label">
+        {/* <label className="meta-form-label">
           <div className="meta-label-content">Playlist type</div>
           <div className="meta-select-wrapper">
             <select value={playlistType} onChange={(e) => setPlaylistType(e.target.value)} className="meta-form-select" aria-label="Playlist type selection">
@@ -200,74 +176,23 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
             </select>
             <span className="meta-select-arrow" aria-hidden="true">▼</span>
           </div>
-        </label>
+        </label> */}
         {/* Release date */}
         <label className="meta-form-label">
           <div className="meta-label-content">Release date</div>
           <input type="date" value={releaseDate} onChange={(e) => setReleaseDate(e.target.value)} className="meta-form-input" aria-label="Release date"/>
         </label>
       </div>
-      {/* Genre */}
+      
+
+
+      
+      {/* Lyrics */}
       <label className="meta-form-label">
-        <div className="meta-label-content">Genre</div>
-        <div className="meta-select-wrapper">
-          <select value={genre} onChange={(e) => setGenre(e.target.value)} className="meta-form-select" aria-label="Genre selection">
-            <option value="None">None</option> <option value="Electronic">Electronic</option> <option value="Rock">Rock</option> <option value="Pop">Pop</option>
-          </select>
-           <span className="meta-select-arrow" aria-hidden="true">▼</span>
-        </div>
+        <div className="meta-label-content">Lyrics</div>
+        <textarea rows={3} value={lyrics} onChange={(e) => setLyrics(e.target.value)} placeholder="Nhập lời bài hát tại đây" className="meta-form-textarea" aria-label="Lyrics"></textarea>
       </label>
 
-      {/* --- Ô INPUT METASONG (HIỂN THỊ DỮ LIỆU TỪ TAB METADATA, READONLY) --- */}
-      <label className="meta-form-label">
-          <div className="meta-label-content">MetaDataSong (Collected)  <span className="meta-required-indicator">*</span></div> {/* Đổi label cho rõ */}
-          <div className="meta-input-button-wrapper"> {/* Wrapper vẫn giữ nguyên */}
-              <input
-                  type="text"
-                  className="meta-form-input"
-                  value={audioFeatures ? JSON.stringify(audioFeatures) : ''}
-                  readOnly
-                  placeholder="Data from Metadata tab appears here"
-                  aria-label="Collected data from Metadata tab"
-              />
-              {/* Đổi className của button này */}
-              <button
-                  type="button"
-                  className="meta-choose-file-button" // <<< THAY ĐỔI Ở ĐÂY: Dùng class giống nút Permalink
-                  onClick={() => setActiveTab('metadata')}
-                  title="Go to Metadata tab to edit/view"
-              >
-                  Edit/View
-              </button>
-          </div>
-          
-      </label>
-      {/* --- KẾT THÚC Ô METASONG --- */}
-
-      {/* Additional tags */}
-      <label className="meta-form-label">
-        <div className="meta-label-content">Additional tags</div>
-        <input type="text" value={tags} onChange={(e) => setTags(e.target.value)} placeholder="Separate tags with commas" className="meta-form-input" aria-label="Additional tags" />
-      </label>
-      {/* Description */}
-      <label className="meta-form-label">
-        <div className="meta-label-content">Description</div>
-        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your track or playlist" className="meta-form-textarea" aria-label="Description"></textarea>
-      </label>
-
-      {/* --- TEXTAREA ĐỂ NGƯỜI DÙNG NHẬP LIỆU RIÊNG --- */}
-      <label className="meta-form-label">
-          <div className="meta-label-content">Notes</div> {/* Label mới */}
-          <textarea
-              className="meta-form-textarea" // Dùng class textarea
-              rows={4} // Số dòng tùy chỉnh
-              value={notes} // Kết nối state notes
-              onChange={(e) => setNotes(e.target.value)} // Cho phép nhập liệu
-              placeholder="Enter any additional notes here..." // Placeholder
-              aria-label="Additional Notes"
-          />
-      </label>
-      {/* --- KẾT THÚC TEXTAREA --- */}
 
       {/* Privacy */}
       <fieldset className="meta-form-group">
@@ -330,9 +255,7 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
           {renderFormFields()}
         </div>
       )}
-      {activeTab === 'metadata' && (
-         <Metadata onCancel={onCancel} onOk={handleMetadataOk} />
-      )}
+      
       {/* --- Chỉ render Footer khi tab 'basic' đang active --- */}
      {activeTab === 'basic' && renderFooter()}
      {/* --- Footer sẽ không hiển thị khi activeTab là 'metadata' --- */}
