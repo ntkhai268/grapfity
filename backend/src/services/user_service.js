@@ -5,80 +5,68 @@ import { createJWT, verityJWT } from '../middleware/JWTActions.js';
 const getAllUsers = async () => {
     return db.User.findAll(); // Lấy tất cả dữ liệu trong bảng User
 };
-//dùng để 2 user coi profile của nhau
-const getUserByIdPublic = async (id) => {
+
+const getUserById = async (id, isSelf = false) => {
   try {
-    return await db.User.findByPk(id, {
-      attributes: ['id', 'userName', 'Name', 'Avatar', 'createdAt']
-    });
+    const attributes = isSelf
+      ? [ 'id', 'userName', 'Name', 'Avatar', 'email', 'Birthday', 'Address', 'PhoneNumber', 'password' ]
+      : [ 'id', 'userName', 'Name', 'Avatar', 'createdAt' ];
+
+    const user = await db.User.findByPk(id, { attributes });
+
+    if (user && isSelf) {
+      const { password, refreshToken, ...safeUser } = user.dataValues;
+      return safeUser;
+    }
+
+    return user;
   } catch (error) {
-    console.error(`Lỗi khi tìm user (public) với id ${id}:`, error);
-    throw new Error('Không thể truy cập dữ liệu người dùng công khai');
-  }
-};
-// dùng để uer coi profile của chính mình
-const getUserByIdProfile = async (id) => {
-  try {
-    return await db.User.findByPk(id, {
-      attributes: [
-        'id', 'userName', 'Name', 'Avatar', 'email',
-        'Birthday', 'Address', 'PhoneNumber', 'password'
-      ]
-    });
-  } catch (error) {
-    console.error(`Lỗi khi tìm user (full) với id ${id}:`, error);
-    throw new Error('Không thể truy cập dữ liệu đầy đủ của người dùng');
+    console.error(`Lỗi khi tìm user với id ${id}:`, error);
+    throw new Error('Không thể truy cập dữ liệu người dùng');
   }
 };
 
-// của khôi
-const getUserById = async (id) => {
-    try {
-        const user = await db.User.findByPk(id);
-        return user;
-    } catch (error) {
-        console.error(`Lỗi khi tìm user với id ${id}:`, error);
-        throw new Error('Không thể truy cập dữ liệu người dùng');
+
+
+const createUserService = async (payload) => {
+  try {
+    // 1. Kiểm tra email đã tồn tại chưa
+    const existingEmail = await db.User.findOne({ where: { email: payload.email } });
+    if (existingEmail) {
+      return { message: 'Email already exists' };
     }
+
+    // 2. Kiểm tra userName đã tồn tại chưa
+    const existingUserName = await db.User.findOne({ where: { userName: payload.userName } });
+    if (existingUserName) {
+      return { message: 'Username already exists' };
+    }
+
+    // 3. Hash password
+    const hashedPassword = await bcrypt.hash(payload.password, 10);
+
+    // 4. Tạo record mới
+    const newUser = await db.User.create({
+      userName: payload.userName,
+      email: payload.email,
+      password: hashedPassword,
+      roleId: payload.roleId,
+      Name: payload.Name || null,
+      Birthday: payload.Birthday ? new Date(payload.Birthday) : null,
+      Address: payload.Address || null,
+      PhoneNumber: payload.PhoneNumber || null
+    });
+
+    return {
+      message: 'Register successful',
+      user: newUser
+    };
+  } catch (err) {
+    console.error('Error in createUserService:', err);
+    throw new Error('Error creating user');
+  }
 };
 
-
-
-const createUser = async (userName, email, password, roleId) => {
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        password = hashedPassword;
-    } catch (err) {
-        console.error('Error hashing password:', err);
-        throw new Error('Error hashing password');
-    }
-
-    try {
-        const user = await db.User.findOne({ where: { email } });
-        if (user) {
-            return { message: 'Email already exists' };
-        }
-    } catch (err) {
-        console.error('Error checking email:', err);
-        throw new Error('Error checking email');
-    }
-
-    try {
-        const userNameExists = await db.User.findOne({ where: { userName } });
-        if (userNameExists) {
-            return { message: 'Username already exists' };
-        }
-    } catch (err) {
-        console.error('Error checking username:', err);
-        throw new Error('Error checking username');
-    }
-
-    const newUser = await db.User.create({ email, password, userName, roleId });
-    const payload = { userId: newUser.id };
-    const token = createJWT(payload);
-    return { message: 'Register successful', token: token };
-
-};
 
 const handleUserLogin = async (username, password) => {
     try {
@@ -102,8 +90,6 @@ const handleUserLogin = async (username, password) => {
         throw new Error('Error checking username');
     }
 };
-
-
 
 const updateUser = async (id, {
     userName,
@@ -162,15 +148,29 @@ const updateUser = async (id, {
 };
 
 const deleteUser = async (userId) => {
-    return await db.User.destroy({ where: { id: userId }, individualHooks: true})
-}
+  return await db.sequelize.transaction(async (t) => {
+    const user = await db.User.findByPk(userId, { transaction: t });
+    if (!user) throw new Error('User not found');
+
+    // Ví dụ: xóa playlist, tracks liên quan (nếu cần)
+    await db.Track.destroy({ where: { userId }, transaction: t });
+    await db.Playlist.destroy({ where: { userId }, transaction: t });
+
+    await db.User.destroy({
+      where: { id: userId },
+      transaction: t,
+      individualHooks: true,
+    });
+
+    return true;
+  });
+};
+
 
 export {
     getAllUsers,
-    getUserByIdPublic,
-    getUserByIdProfile,
     getUserById,
-    createUser,
+    createUserService,
     handleUserLogin,
     updateUser,
     deleteUser

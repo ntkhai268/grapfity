@@ -26,7 +26,7 @@ app.use(cors({
 
 app.use(json()); // Parse dữ liệu từ request body với định dạng json
 app.use(urlencoded({ extended: true })); // Parse dữ liệu từ request body với định dạng urlencoded
-
+app.use(express.json());    
 app.use(cookieParser());
 
 // --- PHỤC VỤ FILE TĨNH TỪ THƯ MỤC 'public' ---

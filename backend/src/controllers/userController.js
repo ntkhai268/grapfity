@@ -2,122 +2,128 @@ import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import {
     getAllUsers,
-    getUserByIdPublic,
-    getUserByIdProfile,
-    getUserById,
-    createUser,
+    createUserService ,
+    getUserById,      
     handleUserLogin,
     updateUser,
     deleteUser
-} from '../services/user_service.js';
+  } from '../services/user_service.js';
+  
 import { verityJWT } from '../middleware/JWTActions.js';
 
-
 const getAllUsersController = async (req, res) => {
-    try {
-        const data = await getAllUsers();
-        return res.status(200).json({
-            message: 'ok',
-            data: data
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+  try {
+    // 1. Lấy token từ cookie
+    const token = req.cookies.jwt;
+    let userId = null;
+    if (token) {
+      const decoded = verityJWT(token);
+      userId = decoded.userId;
     }
-};
-// coi profile người khác thì dùng cái này
-const getUserByIdforuser = async (req, res) => {
-    try {
-        const { id } = req.params;
 
-        // --- VALIDATION ---
-        if (!id || isNaN(Number(id))) {
-            return res.status(400).json({ error: 'Bad Request: ID người dùng không hợp lệ.' });
-        }
+    // 2. Lấy danh sách users
+    const data = await getAllUsers();
 
-        // --- SERVICE CALL ---
-        const user = await getUserByIdPublic(Number(id));
-        if (!user) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-        }
-
-        // --- RESPONSE ---
-        return res.status(200).json({
-            message: 'Lấy thông tin người dùng thành công!',
-            data: user
-        });
-
-    } catch (error) {
-        console.error(`Lỗi trong getUserByIdController với id ${req.params?.id}:`, error);
-        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
-    }
+    // 3. Trả về response kèm userId
+    return res.status(200).json({
+      message: 'ok',
+      userId,    // đây là userId lấy từ cookie
+      data       // mảng users
+    });
+  } catch (err) {
+    console.error('getAllUsersController error:', err);
+    // nếu token không hợp lệ cũng coi như unauthorized
+    return res.status(401).json({ message: 'Invalid or missing token' });
+  }
 };
 
-// com tự coi profile của mình thì dùng cái này:
-const getMyProfileController = async (req, res) => {
-    try {
-        const userId = req.userId; // từ middleware gắn sau khi decode JWT
+const getUserProfileController = async (req, res) => {
+  try {
+    const userIdParam = req.params.id;
+    console.log("userIdParam: ", userIdParam)
+    const currentUserId = req.userId;                
 
-        if (!userId) {
-            return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
-        }
-
-        const user = await getUserByIdProfile(userId); 
-        if (!user) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-        }
-
-        const { password, refreshToken, ...safeUserData } = user.dataValues;
-
-        return res.status(200).json({
-            message: 'Lấy thông tin cá nhân thành công!',
-            data: safeUserData
-        });
-
-    } catch (error) {
-        console.error(`Lỗi trong getMyProfileController:`, error);
-        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
+    if (!userIdParam && !currentUserId) {
+      return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
     }
+
+    const isSelf = !userIdParam || Number(userIdParam) === currentUserId;
+    const targetId = userIdParam ? Number(userIdParam) : currentUserId;
+
+    if (isNaN(targetId)) {
+      return res.status(400).json({ error: 'ID người dùng không hợp lệ.' });
+    }
+
+    const user = await getUserById(targetId, isSelf);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
+    }
+
+    return res.status(200).json({
+      message: 'Lấy thông tin người dùng thành công!',
+      data: user
+    });
+
+  } catch (error) {
+    console.error(`Lỗi trong getUserProfileController:`, error);
+    return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
+  }
 };
 
-// mai kkhôi sửa thay vào
-const getUserByIdController = async (req, res) => {
-    try {
-        const { id } = req.params;
 
-        // --- VALIDATION ---
-        if (!id || isNaN(Number(id))) {
-            return res.status(400).json({ error: 'Bad Request: ID người dùng không hợp lệ.' });
-        }
+const registerController = async (req, res) => {
+  try {
+    const {
+      userName,
+      email,
+      password,
+      roleId,       // Bắt buộc cung cấp
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    } = req.body;
 
-        // --- SERVICE CALL ---
-        const user = await getUserById(Number(id));
-        if (!user) {
-            return res.status(404).json({ error: 'Không tìm thấy người dùng.' });
-        }
-
-        // --- RESPONSE ---
-        return res.status(200).json({
-            message: 'Lấy thông tin người dùng thành công!',
-            data: user
-        });
-
-    } catch (error) {
-        console.error(`Lỗi trong getUserByIdController với id ${req.params?.id}:`, error);
-        return res.status(500).json({ error: 'Lỗi server khi lấy thông tin người dùng.' });
+    // Validate các trường bắt buộc
+    if (!userName || !email || !password || roleId === undefined) {
+      return res
+        .status(400)
+        .json({ message: 'userName, email, password và roleId là bắt buộc' });
     }
+
+    // Gọi service tạo user
+    const result = await createUserService({
+      userName,
+      email,
+      password,
+      roleId,
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    });
+
+    // Nếu service trả về thông báo lỗi
+    if (result.message === 'Email already exists') {
+      return res.status(409).json({ message: 'Email đã tồn tại' });
+    }
+    if (result.message === 'Username already exists') {
+      return res.status(409).json({ message: 'Username đã tồn tại' });
+    }
+
+    // Ngược lại, tạo thành công
+    return res.status(201).json({
+      message: 'Đăng ký thành công',
+      data: result
+    });
+  } catch (err) {
+    console.error('registerController error:', err);
+    return res.status(500).json({ message: 'Lỗi máy chủ' });
+  }
 };
 
-const createUserController = async (req, res) => {
-    try {
-        const { username, password, email, roleid } = req.body;
-        const data = await createUser(username, email, password, roleid);
-        return res.status(200).json(data);
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
-    }
-};
+
 
 const handleUserLoginController = async (req, res) => {
     console.log(req.cookies);
@@ -126,8 +132,6 @@ const handleUserLoginController = async (req, res) => {
     res.cookie('jwt', data.token, { httpOnly: true, maxAge: 60 * 60 * 1000 });
     return res.status(200).json(data);
 };
-
-
 
 const updateUserController = async (req, res) => {
     try {
@@ -166,26 +170,48 @@ const updateUserController = async (req, res) => {
         console.error('Lỗi khi cập nhật thông tin:', err.message, err.stack);
         return res.status(500).json({ message: 'Lỗi server.' });
     }
-};
-
-
-
-const deleteUserController = async(req, res) => {
-    const JWT = req.cookies;
-    const data = verityJWT(JWT.jwt);
-    const userId = data.userId;
-    console.log(userId)
-    try{
-        await deleteUser(userId);
-        res.cookie('jwt', '');
-        return res.status(200).json({
-            message: 'Delete user succeed!',
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
-    }
 }
+
+const deleteUserController = async (req, res) => {
+  try {
+    const paramId = req.params.id;         // từ URL (nếu có)
+    const currentUserId = req.userId;      // từ JWT middleware
+
+    let targetId;
+
+    // 1. Nếu không có id truyền vào, thì xóa chính mình
+    if (!paramId) {
+      if (!currentUserId) {
+        return res.status(401).json({ message: 'Unauthorized: No token' });
+      }
+      targetId = currentUserId;
+    } else {
+      targetId = parseInt(paramId, 10);
+      if (isNaN(targetId)) {
+        return res.status(400).json({ message: 'Invalid user id' });
+      }
+    }
+
+    // 2. Kiểm tra: có phải đang xóa người khác không?
+    const isSelf = targetId === currentUserId;
+
+    // 3. Thực hiện xóa
+    await deleteUser(targetId);
+
+    // 4. Nếu là chính mình thì xóa cookie luôn
+    if (isSelf) {
+      res.clearCookie('jwt');
+    }
+
+    return res.status(200).json({
+      message: 'User deleted successfully!',
+    });
+
+  } catch (err) {
+    console.error('deleteUserController error:', err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
 
 
 const logoutController = (req, res) => {
@@ -220,10 +246,8 @@ const verifyPasswordController = async (req, res) => {
 };
 export {
     getAllUsersController,
-    getUserByIdforuser,
-    getMyProfileController,
-    getUserByIdController,
-    createUserController,
+    getUserProfileController,
+    registerController,
     handleUserLoginController,
     updateUserController,
     deleteUserController,

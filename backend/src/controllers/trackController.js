@@ -13,16 +13,16 @@ import path from 'path';
 
 
 const getAllTracksController = async (req, res) => {
-    try {
-        const tracks = await getAllTracks();
-        return res.status(200).json({
-            message: 'Get all tracks succeed!',
-            data: tracks
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
-    }
+  try {
+    const tracks = await getAllTracks();
+    return res.status(200).json({
+      message: 'Get all tracks succeed!',
+      data: tracks
+    });
+  } catch (err) {
+    console.error('Database connection failed:', err);
+    res.status(500).send('Internal Server Error');
+  }
 };
 
 const getTrackByIdController = async (req, res) => {
@@ -43,21 +43,20 @@ const getTrackByIdController = async (req, res) => {
 };
 
 const getTrackWithUploaderByIdController = async (req, res) => {
-    try {
-        const track = await getTrackWithUploaderById(req.params.id);
-        if (!track) {
-            return res.status(404).json({ message: 'Track not found' });
-        }
-        return res.status(200).json({
-            message: 'Get track succeed!',
-            data: track
-        });
-    } catch (err) {
-        console.error('Database connection failed:', err);
-        res.status(500).send('Internal Server Error');
+  try {
+    const track = await getTrackWithUploaderById(req.params.id);
+    if (!track) {
+      return res.status(404).json({ message: 'Track not found' });
     }
+    return res.status(200).json({
+      message: 'Get track succeed!',
+      data: track
+    });
+  } catch (err) {
+    console.error('Database connection failed:', err);
+    res.status(500).send('Internal Server Error');
+  }
 };
-
 // danh cho chính chủ, có thể xem cả public và private trong chính profile của mình
 const getMyTracksController  = async (req, res) => {
     // --- THÊM LOG ĐỂ KIỂM TRA ---
@@ -177,18 +176,15 @@ const uploadTrackCoverController = async (req, res) => {
 
 const createTrackController = async (req, res) => {
   try {
-    // Xác thực người dùng
     const jwtData = verityJWT(req.cookies.jwt);
     const uploaderId = jwtData.userId;
 
-    // Lấy đường dẫn file
     const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
     const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
     const absAudioPath = path.resolve(`src/public/${trackUrl}`);
     const privacy = req.body.privacy || 'public';
     const trackname = req.body.title || 'Untitled';
 
-    // Gọi service
     const newTrack = await createTrack({
       trackUrl,
       imageUrl,
@@ -203,7 +199,7 @@ const createTrackController = async (req, res) => {
       data: newTrack
     });
   } catch (err) {
-    console.error('❌ Track creation failed:', err);
+    console.error('Track creation failed:', err);
     return res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
@@ -290,5 +286,4 @@ export {
     deleteTrackController,
     getMyTracksController ,
     getPublicTracksOfUserController
-
 };

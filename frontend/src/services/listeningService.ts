@@ -5,33 +5,35 @@ import axios from 'axios';
 axios.defaults.baseURL = 'http://localhost:8080';
 axios.defaults.withCredentials = true;
 
-export interface HistoryRecord {
-  id: number;
-  userId: number;
-  trackId: number;
+export interface ListeningHistoryRecord {
   listenCount: number;
   createdAt: string;
-}
-
-export interface TrackRecord {
-  id: number;
-  trackUrl: string;
-  imageUrl: string;   // ví dụ: '/assets/images/bacphan.jpg'
-  uploaderId: number;
+  metadata: {
+    trackname: string | null;
+  } | null;
+  track: {
+    id: number;
+    trackUrl: string;
+    imageUrl: string;
+    uploaderId: number;
+    status: string;
+    createdAt: string;
+    User: {
+      id: number;
+      UploaderName: string;
+    };
+  };
+  listener: {
+    id: number;
+    Name: string;
+  };
 }
 
 /**
- * Lấy về mảng lịch sử nghe của user
+ * Lấy lịch sử nghe với đầy đủ thông tin track, metadata, và người nghe
  */
-export async function fetchListeningHistory(): Promise<HistoryRecord[]> {
-  const res = await axios.get<{ histories: HistoryRecord[] }>('/api/listening-history');
-  return res.data.histories;
-}
-
-/**
- * Lấy về danh sách tất cả tracks
- */
-export async function fetchAllTracks(): Promise<TrackRecord[]> {
-  const res = await axios.get<{ data: TrackRecord[] }>('/api/tracks');
+export async function fetchListeningHistory(): Promise<ListeningHistoryRecord[]> {
+  const res = await axios.get<{ data: ListeningHistoryRecord[] }>('/api/listening-history');
   return res.data.data;
 }
+
