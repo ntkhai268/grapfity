@@ -2,11 +2,15 @@ import db from '../models/index.js';
 import {
     getAllTracks,
     getTrackById,
+    getTrackWithUploaderById,
+    getTracksByUploaderId,
     createTrack,
     updateTrack,
     deleteTrack,
-    getTrackWithUploaderById,
-    getTracksByUploaderId
+    getAllTracksForAdmin,
+    getTracksByUserId,
+    getJoinedTracks,
+    updateTrackStatus
 } from '../services/track_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 import path from 'path';
@@ -276,6 +280,31 @@ const deleteTrackController = async (req, res) => {
     }
 };
 
+const getJoinedTracksController = async (req, res) => {
+  try {
+    const data = await getJoinedTracks();
+    // Loại bỏ trường 'track' trong từng listeningHistories nếu có
+    const cleaned = data.map(t => {
+      const tJSON = t.toJSON();
+      if (Array.isArray(tJSON.listeningHistories)) {
+        tJSON.listeningHistories = tJSON.listeningHistories.map(hist => {
+          const { track, ...rest } = hist; // xoá trường 'track'
+          return rest;
+        });
+      }
+      return tJSON;
+    });
+
+    return res.status(200).json({
+      message: 'Get joined tracks succeed!',
+      data: cleaned,
+    });
+  } catch (err) {
+    console.error('Error fetching joined tracks:', err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
 export {
     getAllTracksController,
     getTrackByIdController,
@@ -285,5 +314,6 @@ export {
     updateTrackController,
     deleteTrackController,
     getMyTracksController ,
-    getPublicTracksOfUserController
+    getPublicTracksOfUserController,
+    getJoinedTracksController
 };
