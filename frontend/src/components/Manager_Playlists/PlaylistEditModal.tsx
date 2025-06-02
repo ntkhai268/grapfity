@@ -7,6 +7,7 @@ interface PlaylistData {
     id: number;
     title: string;
     cover: string | null; // Hoặc imageUrl tùy thuộc vào tên bạn thống nhất
+    privacy?: 'public' | 'private';
 }
 
 // Định nghĩa kiểu Props cho component (Sửa lại onSave)
@@ -14,7 +15,7 @@ interface PlaylistEditModalProps {
     playlist: PlaylistData | null;
     onClose: () => void;
     // Quay lại: onSave nhận newImageFile (File object)
-    onSave: (playlistId: number, newTitle: string, newImageFile?: File) => void;
+    onSave: (playlistId: number, newTitle: string, newImageFile?: File, privacy?: 'public' | 'private') => void;
     isSaving?: boolean;
 }
 
@@ -32,6 +33,7 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
     const [imagePreview, setImagePreview] = useState<string | null>(null); // Xem trước ảnh mới
     const [imageFile, setImageFile] = useState<File | null>(null); // <-- Thêm lại state lưu File ảnh mới
     const [isHoveringImage, setIsHoveringImage] = useState(false); // <-- Thêm lại state hover ảnh
+    const [privacy, setPrivacy] = useState<'public' | 'private'>('public');
 
     // Ref cho input file ẩn
     const fileInputRef = useRef<HTMLInputElement>(null); // <-- Thêm lại ref
@@ -42,12 +44,12 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
             setTitle(playlist.title);
             // Hiển thị ảnh hiện tại ban đầu
             setImagePreview(playlist.cover); // Sử dụng cover hoặc imageUrl tùy state cha
-            // setDescription(playlist.description || '');
+            setPrivacy(playlist.privacy || 'public');
         } else {
             // Reset state
             setTitle('');
-            // setDescription('');
             setImagePreview(null);
+            setPrivacy('public'); 
         }
         // Reset các state liên quan đến file khi modal mở/đóng hoặc playlist thay đổi
         setImageFile(null);
@@ -82,7 +84,7 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
     const handleSaveChanges = () => {
         if (playlist) {
             // Gọi hàm onSave từ props, truyền ID, title mới và imageFile (hoặc undefined)
-            onSave(playlist.id, title, imageFile || undefined); // <-- Truyền imageFile
+            onSave(playlist.id, title, imageFile || undefined, privacy); // <-- Truyền imageFile
         }
     };
 
@@ -96,92 +98,114 @@ const PlaylistEditModal: React.FC<PlaylistEditModalProps> = ({ playlist, onClose
     const showDefaultIcon = !displayImage;
 
     return (
-        <div className="playlist-edit-modal__overlay" onClick={onClose}>
-            <div className="playlist-edit-modal__container" onClick={(e) => e.stopPropagation()}>
-                {/* Header (giữ nguyên) */}
-                <div className="playlist-edit-modal__header">
-                    <h2>Sửa thông tin chi tiết</h2>
-                    <button className="playlist-edit-modal__close-btn" onClick={onClose} aria-label="Đóng">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="20" height="20">
-                            <path d="M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z"></path>
-                        </svg>
-                    </button>
-                </div>
+    <div className="playlist-edit-modal__overlay" onClick={onClose}>
+        <div className="playlist-edit-modal__container" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="playlist-edit-modal__header">
+                <h2>Sửa thông tin chi tiết</h2>
+                <button className="playlist-edit-modal__close-btn" onClick={onClose} aria-label="Đóng">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" width="20" height="20">
+                        <path d="M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z"></path>
+                    </svg>
+                </button>
+            </div>
 
-                {/* Body của modal */}
-                <div className="playlist-edit-modal__body">
-                    {/* Phần ảnh bìa (Thêm lại onClick và hover) */}
-                    <div
-                        className="playlist-edit-modal__image-section" // <-- Thêm lại class nếu cần style hover
-                        onClick={handleImageClick} // <-- Thêm lại onClick
-                        onMouseEnter={() => setIsHoveringImage(true)} // <-- Thêm lại hover
-                        onMouseLeave={() => setIsHoveringImage(false)} // <-- Thêm lại hover
-                    >
-                        {/* Hiển thị ảnh hoặc icon mặc định */}
-                        {showDefaultIcon ? (
-                            <div className="playlist-edit-modal__default-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#b3b3b3" width="80" height="80">
-                                    {/* Hiển thị icon edit khi hover hoặc icon nhạc mặc định */}
-                                    <path d={isHoveringImage ? svgIconEdit : svgIconMusicNote}></path>
-                                </svg>
-                                {isHoveringImage && <span className="playlist-edit-modal__edit-label">Chọn ảnh</span>}
-                            </div>
-                        ) : (
-                            <>
-                            {console.log("[Modal Render] Rendering img tag with src:", displayImage ? displayImage.substring(0, 50) + "..." : displayImage)}
+            {/* Body */}
+            <div className="playlist-edit-modal__body">
+                {/* Ảnh bìa */}
+                <div
+                    className="playlist-edit-modal__image-section"
+                    onClick={handleImageClick}
+                    onMouseEnter={() => setIsHoveringImage(true)}
+                    onMouseLeave={() => setIsHoveringImage(false)}
+                >
+                    {showDefaultIcon ? (
+                        <div className="playlist-edit-modal__default-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#b3b3b3" width="80" height="80">
+                                <path d={isHoveringImage ? svgIconEdit : svgIconMusicNote}></path>
+                            </svg>
+                            {isHoveringImage && <span className="playlist-edit-modal__edit-label">Chọn ảnh</span>}
+                        </div>
+                    ) : (
+                        <>
                             <img
-                                src={displayImage ?? ''} // Sử dụng ảnh preview hoặc ảnh gốc
+                                src={displayImage ?? ''}
                                 alt="Playlist cover"
                                 className="playlist-edit-modal__cover-image"
-                              
                             />
-                            </>
-                        )}
-                        {/* Lớp phủ và icon edit khi hover ảnh thật */}
-                        {displayImage && isHoveringImage && ( // <-- Thêm lại lớp phủ khi hover ảnh
-                            <div className="playlist-edit-modal__image-overlay">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" width="60" height="60">
-                                    <path d={svgIconEdit}></path>
-                                </svg>
-                                <span className="playlist-edit-modal__edit-label">Chọn ảnh</span>
-                            </div>
-                        )}
-                        {/* Input file ẩn */}
-                        <input // <-- Thêm lại input file
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleImageChange}
-                            accept="image/jpeg, image/png, image/gif"
-                            style={{ display: 'none' }}
-                        />
-                    </div>
-
-                    {/* Phần thông tin text */}
-                    <div className="playlist-edit-modal__info-section">
-                        <input
-                            type="text"
-                            className="playlist-edit-modal__title-input"
-                            value={title}
-                            onChange={handleTitleChange}
-                            placeholder="Nhập tên playlist"
-                            maxLength={100}
-                        />
-                        {/* Bỏ ô nhập URL ảnh */}
-                        {/* <input type="text" ... /> */}
-                        {/* Bỏ textarea mô tả nếu không dùng */}
-                        {/* <textarea ... /> */}
-                    </div>
+                        </>
+                    )}
+                    {displayImage && isHoveringImage && (
+                        <div className="playlist-edit-modal__image-overlay">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ffffff" width="60" height="60">
+                                <path d={svgIconEdit}></path>
+                            </svg>
+                            <span className="playlist-edit-modal__edit-label">Chọn ảnh</span>
+                        </div>
+                    )}
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        accept="image/jpeg, image/png, image/gif"
+                        style={{ display: 'none' }}
+                    />
                 </div>
 
-                {/* Footer của modal (giữ nguyên) */}
-                <div className="playlist-edit-modal__footer">
-                    <button className="playlist-edit-modal__save-btn" onClick={handleSaveChanges} disabled={isSaving}>
-                        {isSaving ? 'Đang lưu...' : 'Lưu'}
-                    </button>
+                {/* Thông tin (Title + Privacy) */}
+                <div className="playlist-edit-modal__info-wrap">
+                    <input
+                        type="text"
+                        className="playlist-edit-modal__title-input"
+                        value={title}
+                        onChange={handleTitleChange}
+                        placeholder="Nhập tên playlist"
+                        maxLength={100}
+                    />
+                    <div className="playlist-edit-modal__privacy-section">
+                        <label className="playlist-edit-modal__privacy-label" style={{ marginBottom: 6, fontWeight: 500 }}>
+                            Privacy:
+                        </label>
+                        <div className="playlist-edit-modal__privacy-radio-group">
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="privacy"
+                                    value="public"
+                                    checked={privacy === 'public'}
+                                    onChange={() => setPrivacy('public')}
+                                />
+                                Public
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="privacy"
+                                    value="private"
+                                    checked={privacy === 'private'}
+                                    onChange={() => setPrivacy('private')}
+                                />
+                                Private
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Footer */}
+            <div className="playlist-edit-modal__footer">
+                <button
+                    className="playlist-edit-modal__save-btn"
+                    onClick={handleSaveChanges}
+                    disabled={isSaving}
+                >
+                    {isSaving ? 'Đang lưu...' : 'Lưu'}
+                </button>
+            </div>
         </div>
-    );
+    </div>
+);
+
 };
 
 export default PlaylistEditModal;

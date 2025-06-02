@@ -1,9 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/admin.css";
-import anhbietroi from '../assets/images/anhbietroi.jpg'; // đường dẫn tương đối từ file hiện tại
-
-
 
 type ProfileData = {
   name: string;
@@ -14,6 +11,7 @@ type ProfileData = {
   username: string;
   password: string;
   confirmPassword: string;
+  avatar?: string;
 };
 
 const Header_admin: React.FC = () => {
@@ -26,6 +24,7 @@ const Header_admin: React.FC = () => {
     username: "",
     password: "",
     confirmPassword: "",
+    avatar: "",
   });
   const [userId, setUserId] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<keyof ProfileData | "">("");
@@ -58,7 +57,8 @@ const Header_admin: React.FC = () => {
           credentials: "include",
         });
         const json = await res.json();
-        if (json.message === "ok" && json.data) {
+
+        if (json.data) {
           const data = json.data;
           setUserId(data.id);
           setProfile({
@@ -66,16 +66,17 @@ const Header_admin: React.FC = () => {
             birthYear: data.Birthday ? formatBirth(data.Birthday) : "",
             address: data.Address || "",
             phone: data.PhoneNumber || "",
-            email: data.email,
-            username: data.userName,
+            email: data.email || "",
+            username: data.userName || "",
             password: "",
             confirmPassword: "",
+            avatar: data.Avatar || "",
           });
         } else {
-          console.error("Fetch profile error:", json);
+          console.error("Lỗi: Không có dữ liệu người dùng trong phản hồi", json);
         }
       } catch (err) {
-        console.error(err);
+        console.error("Lỗi fetchProfile:", err);
       }
     };
     fetchProfile();
@@ -109,15 +110,12 @@ const Header_admin: React.FC = () => {
         payload.password = profile.password;
       }
 
-      const res = await fetch(
-        `http://localhost:8080/api/users/${userId}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
+      const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       const json = await res.json();
       if (res.ok) {
         setModalOpen(false);
@@ -165,14 +163,10 @@ const Header_admin: React.FC = () => {
         <span className="profile_value_admin">
           {field === "password" || field === "confirmPassword"
             ? "••••••••••"
-            : profile[field]
-          }
+            : profile[field]}
         </span>
       )}
-      <button
-        className="icon_edit_admin"
-        onClick={() => startEditing(field)}
-      >
+      <button className="icon_edit_admin" onClick={() => startEditing(field)}>
         ✎
       </button>
     </div>
@@ -180,7 +174,6 @@ const Header_admin: React.FC = () => {
 
   return (
     <>
-      {/* HEADER */}
       <header className="header_admin">
         <div className="logo_admin">
           <span className="logo_icon_admin">
@@ -196,14 +189,17 @@ const Header_admin: React.FC = () => {
         <div className="header_actions_admin">
           <div className="user_profile_admin">
             <img
-              src="/placeholder.svg?height=32&width=32"
+              src={
+                profile.avatar
+                  ? `http://localhost:8080${profile.avatar}`
+                  : "/placeholder.svg"
+              }
               alt="avatar"
               className="user_avatar_admin"
             />
           </div>
           <div className="settings_wrapper_admin" ref={dropdownRef}>
             <button onClick={toggleDropdown} className="settings_button_admin">
-              {/* settings SVG */}
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33A1.65 1.65 0 0 0 14 19.4V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4c-.49.2-1.04.1-1.43-.29l-.06-.06a2 2 0 0 1 0-2.83l.06-.06c.39-.39.49-.94.29-1.43A1.65 1.65 0 0 0 9 14h.09A1.65 1.65 0 0 0 9.6 9.6 1.65 1.65 0 0 0 8.27 7.8l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06c.39.39.94.49 1.43.29A1.65 1.65 0 0 0 14 4h.09A1.65 1.65 0 0 0 15.6 4.6 1.65 1.65 0 0 0 17.8 8.27l.06.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 14 1.65 1.65 0 0 0 19 15.6V15z"/>
@@ -233,7 +229,15 @@ const Header_admin: React.FC = () => {
             <h5>Profile</h5>
             <div className="modal_body_admin">
               <div className="profile_left_admin">
-              <img src={anhbietroi} alt="Profile" className="profile_image_admin" />
+                <img
+                  src={
+                    profile.avatar
+                      ? `http://localhost:8080${profile.avatar}`
+                      : "/placeholder.svg"
+                  }
+                  alt="Profile"
+                  className="profile_image_admin"
+                />
                 <button className="btn_change_avatar_admin">CHANGE</button>
               </div>
               <div className="profile_right_admin">

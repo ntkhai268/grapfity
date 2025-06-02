@@ -1,4 +1,11 @@
 import db from '../models/index.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { verityJWT } from '../middleware/JWTActions.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import {
     getAllTracks,
     getTrackById,
@@ -12,8 +19,6 @@ import {
     getJoinedTracks,
     updateTrackStatus
 } from '../services/track_service.js';
-import { verityJWT } from '../middleware/JWTActions.js';
-import path from 'path';
 
 
 const getAllTracksController = async (req, res) => {
@@ -68,7 +73,7 @@ const getMyTracksController  = async (req, res) => {
     // ---------------------------
     try {
         // 1. Lấy userId từ request (do middleware xác thực gắn vào)
-        const userId = req.userId; // Hoặc req.user?.id
+        const userId = req.userId; 
 
         // 2. Kiểm tra xem userId có tồn tại không
         if (!userId) {
@@ -79,7 +84,7 @@ const getMyTracksController  = async (req, res) => {
         console.log(`Controller: Đang lấy các bài hát đã upload cho user ID: ${userId}`);
 
         // 3. Gọi hàm service để lấy tracks theo uploaderId
-        const tracks = await getTracksByUploaderId(userId);
+        const tracks = await getTracksByUploaderId(userId, userId);
 
         // 4. Trả về kết quả
         return res.status(200).json({
@@ -177,7 +182,6 @@ const uploadTrackCoverController = async (req, res) => {
         return res.status(500).json({ error: 'Lỗi server khi upload ảnh track.' });
     }
 };
-
 const createTrackController = async (req, res) => {
   try {
     const jwtData = verityJWT(req.cookies.jwt);
@@ -303,7 +307,92 @@ const getJoinedTracksController = async (req, res) => {
     console.error('Error fetching joined tracks:', err);
     return res.status(500).json({ message: 'Internal Server Error' });
   }
+}
+
+const downloadTrackController = async (req, res) => {
+  try {
+    const trackId = req.params.trackId;
+    const track = await getTrackById(trackId);
+
+    if (!track.trackUrl) {
+      return res.status(404).json({ error: 'Không có đường dẫn âm thanh.' });
+    }
+
+    const filePath = path.join(__dirname, '..', 'public', track.trackUrl.replace(/^\/?/, ''));
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File không tồn tại trên server.' });
+    }
+
+    res.setHeader('Content-Disposition', `attachment; filename="track-${trackId}${path.extname(filePath)}"`);
+    return res.download(filePath);
+  } catch (err) {
+    console.error('Download error:', err);
+    res.status(500).json({ error: 'Không thể tải bài hát.' });
+  }
 };
+
+//dangkhoii them
+const getTracksByUserController = async (req, res) => {
+  try {
+    const { jwt } = req.cookies;
+    const { userId } = verityJWT(jwt);
+
+    // 1. Lấy toàn bộ tracks kèm listeningHistories
+    const tracks = await getTracksByUserId(userId);
+
+    // 2. Chuyển về plain object và chỉ giữ listenCount + listener
+    const filtered = tracks.map(track => {
+      // toJSON() để có object thuần
+      const t = track.toJSON();
+      return {
+        ...t,
+        listeningHistories: (t.listeningHistories || []).map(hist => ({
+        metadata: hist.metadata,
+          listenCount: hist.listenCount,
+          listener: hist.listener
+        }))
+      };
+    });
+    return res.status(200).json({
+      message: 'Get user tracks succeed!',
+      data: filtered
+    });
+  } catch (err) {
+    console.error('Error fetching user tracks:', err);
+    return res.status(500).send('Internal Server Error');
+  }
+};
+  const updateTrackStatusController = async (req, res) => {
+    // 1. Parse và validate id
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid track id' });
+    }
+  
+    // 2. Validate status
+    const { status } = req.body;
+    if (!status || typeof status !== 'string') {
+      return res.status(400).json({ message: 'Missing or invalid status' });
+    }
+  
+    try {
+      // 3. Cập nhật
+      const updatedTrack = await updateTrackStatus(id, status);
+  
+      // 4. Trả về kết quả
+      return res.status(200).json({
+        message: 'Update track status succeed!',
+        data: updatedTrack
+      });
+    } catch (err) {
+      console.error('Error updating track status:', err);
+      if (err.message === 'Track not found') {
+        return res.status(404).json({ message: 'Track not found' });
+      }
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
 
 export {
     getAllTracksController,
@@ -315,5 +404,8 @@ export {
     deleteTrackController,
     getMyTracksController ,
     getPublicTracksOfUserController,
-    getJoinedTracksController
+    getJoinedTracksController,
+    downloadTrackController,
+    updateTrackStatusController,
+    getTracksByUserController
 };

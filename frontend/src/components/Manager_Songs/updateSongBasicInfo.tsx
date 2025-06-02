@@ -29,6 +29,7 @@ const UpdateSongBasicInfo: React.FC<EditSongProps> = ({ trackId, onCancel, onSav
           setTitle(track.title || '');
           setLyrics(track.lyrics || '');
           setPreviewImage(track.cover || ''); // hoặc track.imageUrl nếu bạn dùng field đó
+           setPrivacy(track.privacy || 'public'); 
         }
       } catch (err: any) {
         console.error('Lỗi khi lấy thông tin bài hát:', err);

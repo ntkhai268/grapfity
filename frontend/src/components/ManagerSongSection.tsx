@@ -10,7 +10,11 @@ import Sidebar from "./Sidebar";
 // Import hook useSongManager và kiểu dữ liệu của nó
 // Đảm bảo đường dẫn này chính xác đến file hook của bạn
 import useSongManager from "../hooks/Manager_Song_Play"; 
-import { Song } from "../hooks/GlobalAudioManager";
+import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager";
+// console.log('[DEBUG] GlobalAudioManager - Current Song:', GlobalAudioManager.getCurrentSong());
+// console.log('[DEBUG] GlobalAudioManager - Current Context:', GlobalAudioManager.getCurrentContext());
+
+
 
 // Định nghĩa (hoặc import) kiểu dữ liệu trả về của hook useSongManager
 // Kiểu này cần khớp với những gì hook useSongManager thực sự trả về
@@ -33,10 +37,7 @@ const ManagerSongSection: React.FC = () => {
   const playlistFromState = location.state?.songs;
   const indexFromState = location.state?.currentIndex;
   const [, setPlaylist] = useState<Song[]>(playlistFromState || []);
-  // const [playlist, setPlaylist] = useState<Song[]>(playlistFromState || []);
-  // const [playlistIndex, setPlaylistIndex] = useState<number>(
-  //   indexFromState !== undefined ? indexFromState : 0
-  // );
+  
    const [, setPlaylistIndex] = useState<number>(
     indexFromState !== undefined ? indexFromState : 0
   );
@@ -59,6 +60,23 @@ const ManagerSongSection: React.FC = () => {
     // console.log("ManagerSongSection - currentTrackId from hook:", currentTrackId);
     // console.log("ManagerSongSection - isPlaying from hook:", isPlaying);
   }, [currentTrackId, isPlaying]);
+  useEffect(() => {
+    // Ưu tiên lấy từ location.state nếu có
+    let playlist = location.state?.songs;
+    let index = location.state?.currentIndex;
+    let song = location.state?.currentSong;
+    let context = location.state?.context;
+
+    // Nếu GlobalAudioManager chưa có gì, thì set lại
+    if (!GlobalAudioManager.getCurrentSong() && playlist && song && typeof index === 'number') {
+      GlobalAudioManager.setPlaylist(playlist, index, context);
+      setTimeout(() => {
+      console.log('[DEBUG] Global after set:', GlobalAudioManager.getCurrentSong());
+      console.log('[DEBUG] Global playlist after set:', GlobalAudioManager.getPlaylist());
+    }, 100);
+      // Controls sẽ có đủ songUrl ngay sau đó!
+    }
+  }, [location.state]);
 
   useEffect(() => {
     if (!songFromState) {
@@ -70,6 +88,11 @@ const ManagerSongSection: React.FC = () => {
       if (songStr) setViewSong(JSON.parse(songStr));
       if (listStr) setPlaylist(JSON.parse(listStr));
       if (indexStr) setPlaylistIndex(parseInt(indexStr));
+      console.log('[DEBUG] Lấy từ localStorage:', {
+        song: songStr,
+        playlist: listStr,
+        index: indexStr
+      });
     } catch (e) {
       console.error("Lỗi parse từ localStorage:", e);
     }
@@ -86,6 +109,8 @@ const ManagerSongSection: React.FC = () => {
 //     GlobalAudioManager.setPlaylist(playlist, playlistIndex, context);
 //   }
 // }, [playlist, playlistIndex, viewSong]);
+
+
 
 
 useEffect(() => {

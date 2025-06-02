@@ -1,7 +1,6 @@
-// src/components/TopListening.tsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "../styles/TopUpload.css"; // Dùng chung CSS của TopUpload
+import "../styles/TopUpload.css";
 
 import {
   fetchListeningHistory,
@@ -22,12 +21,13 @@ Object.entries(imageModules).forEach(([fullPath, url]) => {
 
 interface StatsItem {
   id: number | string;
-  title: string;
+  title: string | null;
   plays: number;
   coverUrl?: string;
 }
 
-function getInitials(name: string): string {
+function getInitials(name?: string | null): string {
+  if (!name || name.trim() === "") return "??";
   return name
     .split(" ")
     .map(part => part[0])
@@ -46,7 +46,6 @@ const TopListening: React.FC = () => {
       try {
         const history = await fetchListeningHistory();
 
-        // Tổng plays theo track
         const trackMap = new Map<number, { record: ListeningHistoryRecord; count: number }>();
         history.forEach(item => {
           const id = item.track.id;
@@ -55,19 +54,17 @@ const TopListening: React.FC = () => {
           else trackMap.set(id, { record: item, count: item.listenCount });
         });
 
-        // Tổng plays theo listener (artist ở đây coi như người nghe)
         const listenerMap = new Map<string, { sample: ListeningHistoryRecord; count: number }>();
         history.forEach(item => {
-          const name = item.track.User.UploaderName;
+          const name = item.track.User.UploaderName ?? "Unknown";
           const prev = listenerMap.get(name);
           if (prev) prev.count += item.listenCount;
           else listenerMap.set(name, { sample: item, count: item.listenCount });
         });
 
-        // Chuẩn bị mảng top tracks
         const tracksArray: StatsItem[] = Array.from(trackMap.entries()).map(
           ([id, { record, count }]) => {
-            const fname = record.track.imageUrl.split("/").pop()!;
+            const fname = record.track.imageUrl?.split("/").pop() ?? "";
             return {
               id,
               title: record.metadata?.trackname ?? `Track ${id}`,
@@ -77,7 +74,6 @@ const TopListening: React.FC = () => {
           }
         );
 
-        // Chuẩn bị mảng top listeners
         const listenersArray: StatsItem[] = Array.from(listenerMap.entries()).map(
           ([name, { count }]) => ({
             id: name,
@@ -109,11 +105,6 @@ const TopListening: React.FC = () => {
         </Link>
       </div>
 
-      {mode === "tracks" && (
-        <div className="section-header">
-        </div>
-      )}
-
       <div className={mode === "tracks" ? "tracks-list" : ""}>
         {isLoading ? (
           <div>Đang tải…</div>
@@ -125,7 +116,7 @@ const TopListening: React.FC = () => {
               <div key={item.id} className="track-item">
                 <div className="track-icon">
                   {item.coverUrl ? (
-                    <img src={item.coverUrl} alt={item.title} className="track-cover" />
+                    <img src={item.coverUrl} alt={item.title ?? "track"} className="track-cover" />
                   ) : (
                     <div className="placeholder-cover">No image</div>
                   )}
@@ -149,12 +140,6 @@ const TopListening: React.FC = () => {
           )
         )}
       </div>
-
-      {mode === "listeners" && (
-        <div className="pro-message">
-          
-        </div>
-      )}
     </div>
   );
 

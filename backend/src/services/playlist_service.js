@@ -23,7 +23,6 @@ const getAllPlaylistsByUserId = async (userId, currentUserId) => {
             },
             {
               model: db.Metadata,
-              as: 'Metadatum',
               attributes: ['trackname', 'duration_ms']
             }
           ],
@@ -55,7 +54,6 @@ const getAllPublicPlaylists = async () => {
           },
           {
             model: db.Metadata,
-            as: 'Metadatum',
             attributes: ['trackname', 'duration_ms']
           }
         ]
@@ -122,88 +120,91 @@ const createPlaylist = async (userId, trackId) => {
  * @returns {Promise<object>} Object playlist đã được cập nhật.
  * @throws {Error} Ném lỗi với statusCode (404, 403, 400, 500) nếu có lỗi.
  */
-const updatePlaylist = async (playlistId, userId, title, imageUrl) => { // <-- Thêm lại userId
-    // Validate input cơ bản
+const updatePlaylist = async (playlistId, userId, title, imageUrl, privacy) => {
     const numericPlaylistId = Number(playlistId);
-    // Thêm lại kiểm tra userId
+
+    // Validate playlistId và userId
     if (isNaN(numericPlaylistId) || !userId) {
-        const error = new Error("Dữ liệu không hợp lệ (playlistId hoặc userId)."); // <-- Sửa lại thông báo lỗi
+        const error = new Error("Dữ liệu không hợp lệ (playlistId hoặc userId).");
         error.statusCode = 400;
         throw error;
     }
-    // Validation cho title
+
+    // Validate title
     if (typeof title !== 'string' || title.trim() === '') {
-         const error = new Error("Tiêu đề playlist không được để trống.");
-         error.statusCode = 400;
-         throw error;
-    }
-     // Validation cho imageUrl
-    if (imageUrl !== null && typeof imageUrl !== 'string') {
-         const error = new Error("Định dạng imageUrl không hợp lệ.");
-         error.statusCode = 400;
-         throw error;
+        const error = new Error("Tiêu đề playlist không được để trống.");
+        error.statusCode = 400;
+        throw error;
     }
 
+    // Validate imageUrl (nếu không undefined)
+    if (imageUrl !== undefined && imageUrl !== null && typeof imageUrl !== 'string') {
+        const error = new Error("Định dạng imageUrl không hợp lệ.");
+        error.statusCode = 400;
+        throw error;
+    }
+
+    // Validate privacy
+    if (privacy !== undefined && privacy !== 'public' && privacy !== 'private') {
+        const error = new Error("Giá trị privacy không hợp lệ.");
+        error.statusCode = 400;
+        throw error;
+    }
 
     try {
-        // --- BƯỚC 1: Tìm playlist và kiểm tra quyền sở hữu ---
-        // Sử dụng findOne với cả id và userId
         console.log(`[Service] Finding playlist ${numericPlaylistId} for update by user ${userId}`);
-        const playlistToUpdate = await db.Playlist.findOne({ // <-- Dùng findOne
+        const playlistToUpdate = await db.Playlist.findOne({
             where: {
                 id: numericPlaylistId,
-                userId: userId // <-- Thêm lại kiểm tra userId (sử dụng đúng tên cột 'userId')
+                userId: userId
             }
         });
 
-        // --- BƯỚC 2: Xử lý nếu không tìm thấy hoặc không có quyền ---
         if (!playlistToUpdate) {
-            // Kiểm tra xem playlist có tồn tại nhưng không thuộc user này không
-            console.log(`[Service] Playlist ${numericPlaylistId} not found or user ${userId} does not own it. Checking existence with findByPk...`); // Log trước khi kiểm tra
-            
-            console.log(`[Service] About to execute findByPk(${numericPlaylistId})`);
-
             const exists = await db.Playlist.findByPk(numericPlaylistId);
-            // --- THÊM LOG KẾT QUẢ findByPk ---
-            console.log(`[Service] Result of findByPk(${numericPlaylistId}):`, exists ? `Found (ID: ${exists.id})` : 'Not Found (null)');
-            // ---------------------------------
             if (exists) {
-                // Playlist tồn tại nhưng userId không khớp -> Lỗi quyền
-                console.warn(`[Service] Permission denied for user ${userId} to update playlist ${numericPlaylistId}`);
-                const error = new Error('Permission denied'); // Không có quyền
-                error.statusCode = 403; // <-- Trả về lỗi 403
+                const error = new Error('Permission denied');
+                error.statusCode = 403;
                 throw error;
             } else {
-                // Playlist không tồn tại (findByPk trả về null)
-                console.warn(`[Service] Playlist ${numericPlaylistId} not found for update (confirmed by findByPk).`); // Log rõ hơn
-                const error = new Error('Playlist not found'); // Không tìm thấy
-                error.statusCode = 404; // <-- Trả về lỗi 404
+                const error = new Error('Playlist not found');
+                error.statusCode = 404;
                 throw error;
             }
         }
 
-        // --- BƯỚC 3: Thực hiện cập nhật ---
-        console.log(`[Service] Updating playlist ${numericPlaylistId} with title: "${title}", imageUrl: "${imageUrl}"`);
-        // Chỉ cập nhật các trường được phép
-        await playlistToUpdate.update({
-             title: title,
-             imageUrl: imageUrl // Cập nhật imageUrl (có thể là null)
-        });
+        // Chuẩn bị dữ liệu cập nhật
+        const updateData = {
+            title: title.trim()
+        };
 
-        // --- BƯỚC 4: Trả về playlist đã cập nhật ---
-        // playlistToUpdate đã được cập nhật tại chỗ bởi lệnh update()
+        // Chỉ cập nhật imageUrl nếu truyền rõ (undefined = không cập nhật, null = xóa ảnh)
+        if (imageUrl !== undefined) {
+            updateData.imageUrl = imageUrl; 
+        }
+
+        // Cập nhật privacy nếu có
+        if (privacy !== undefined) {
+            updateData.privacy = privacy;
+        }
+
+        console.log(`[Service] Updating playlist ${numericPlaylistId} with data:`, updateData);
+
+        // Thực hiện cập nhật
+        await playlistToUpdate.update(updateData);
+
         console.log(`[Service] Playlist ${numericPlaylistId} updated successfully by user ${userId}.`);
-        return playlistToUpdate; // Trả về đối tượng đã cập nhật
+        return playlistToUpdate;
 
     } catch (error) {
-        // Bắt các lỗi khác (ví dụ: lỗi database khi update)
-        console.error(`[Service] Error updating playlist ${playlistId} by user ${userId}:`, error); // Thêm userId vào log lỗi
+        console.error(`[Service] Error updating playlist ${playlistId} by user ${userId}:`, error);
         if (!error.statusCode) {
-            error.statusCode = 500; // Lỗi server mặc định
+            error.statusCode = 500;
         }
-        throw error; // Ném lại lỗi để controller xử lý
+        throw error;
     }
 };
+
 
 
 const deletePlaylist = async (playlistId, userId) => {

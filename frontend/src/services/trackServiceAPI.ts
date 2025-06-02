@@ -25,7 +25,8 @@ export interface TrackData {
     lyrics?: string | null;
     duration_ms?: number;
     explicit?: boolean;
-    // Thêm các trường khác nếu cần (ví dụ: duration, genre,...)
+     privacy?: 'public' | 'private';
+    
 }
 
 // --- Hàm tiện ích ánh xạ dữ liệu ---
@@ -43,8 +44,7 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
 
   const title = trackFromApi.Metadatum?.trackname || 'Unknown Title';
   const lyrics = trackFromApi.Metadatum?.lyrics || null;
-  const durationMs = trackFromApi.Metadatum?.duration_ms;
-  const explicitContent = trackFromApi.Metadatum?.explicit;
+  
   const artist =
     uploaderInfo?.username ||
     trackFromApi.Metadatum?.artistName ||
@@ -74,8 +74,8 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     createdAt: trackFromApi.createdAt,
     updatedAt: trackFromApi.updatedAt,
     lyrics,
-    duration_ms: durationMs,
-    explicit: explicitContent,
+    privacy: trackFromApi.privacy,
+    
   };
 };
 
@@ -251,7 +251,10 @@ export const getPublicTracksOfUserAPI = async (userId: string | number): Promise
   
   try {
     const response = await axios.get<{ message: string; data: any[] }>(
-      `http://localhost:8080/api/tracks/user/${userId}`
+      `http://localhost:8080/api/tracks/user/${userId}`,
+      {
+        withCredentials: true
+      }
     );
 
     const rawTracks = response.data?.data || [];
@@ -279,7 +282,8 @@ export const createTrackAPI = async (
   fileImage: File,
   title: string,
   privacy: string,
-  audioFeatures?: any // Đã bao gồm lyrics trong object này
+  lyrics: string,
+  releaseDate: string
 ): Promise<TrackData> => {
   try {
     const formData = new FormData();
@@ -287,10 +291,8 @@ export const createTrackAPI = async (
     formData.append('image', fileImage);
     formData.append('title', title);
     formData.append('privacy', privacy);
-
-
-    // 🎯 Chỉ gửi audioFeatures (đã bao gồm lyrics bên trong)
-    formData.append('audioFeatures', JSON.stringify(audioFeatures));
+    formData.append('lyrics', lyrics);              // 👈 mới
+    formData.append('releaseDate', releaseDate);    // 👈 mới
 
     // ✅ Gửi lên server
     const response = await fetch('http://localhost:8080/api/tracks/create-track', {
@@ -399,5 +401,25 @@ export const deleteTrackAPI = async (id: string | number): Promise<{ success: bo
 };
 
 
+/**
+ * Tải bài hát bằng trackId thông qua API /api/tracks/download/:trackId
+ * Hàm này sẽ tự động mở hộp thoại "Lưu file" trong trình duyệt.
+ * @param trackId ID của bài hát cần tải
+ */
+export const downloadTrackByIdAPI = (trackId: string | number) => {
+  if (!trackId) {
+    console.error("downloadTrackByIdAPI: trackId không hợp lệ.");
+    return;
+  }
+
+  const downloadUrl = `${API_BASE_URL}/download/${trackId}`;
+
+  const a = document.createElement("a");
+  a.href = downloadUrl;
+  a.setAttribute("download", ""); // Gợi ý trình duyệt hiển thị hộp thoại lưu
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 // --- Các hàm API khác liên quan đến Track (nếu có) ---
 // Ví dụ: tìm kiếm track, lấy track theo artist,...

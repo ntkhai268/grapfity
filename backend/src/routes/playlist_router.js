@@ -24,7 +24,7 @@ const router = express.Router();
 
 // GET / -> Lấy playlist của người dùng đã đăng nhập
 router.get('/', authenticateUser, getMyPlaylistsController);
-router.get('/user/:userId', authenticateUser, getPublicPlaylistsController);
+router.get('/user/:userId', getPublicPlaylistsController);
 router.get('/public', getAllPublicPlaylistsController); // GET /api/playlists/public
 
 // POST / -> Tạo playlist mới

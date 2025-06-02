@@ -16,6 +16,7 @@ router.get('/users/:id', getUserProfileController);
 router.put('/users/me', authenticateUser,uploadUserImage, updateUserController);
 router.delete('/delete-user/', deleteUserController) //sử dụng hàm getAllUsers để xử lý request cho route /users
 router.post('/verify-password', authenticateUser, verifyPasswordController);
+router.put('/users/:id',authenticateUser, updateUserController);
 
 
 export default router; //export router để sử dụng ở file khác

@@ -278,9 +278,6 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
-.content {
-    display: none;
-}
 
 .content.active {
     display: block;
@@ -362,9 +359,12 @@ body.profile-page {
     /* padding-top: 20px; */
 }
 .song_left {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+      display: flex;
+    align-items: flex-start;    /* Căn top thay vì giữa */
+    gap: 0px;
+    /* margin-right: 2px; */
+    height: 120px;              /* vẫn giữ cho layout ổn định */
+    position: relative;
 }
 .album_cover {
     width: 80px;
@@ -388,7 +388,7 @@ body.profile-page {
     align-items: flex-start;
     gap: 8px;
     color: white;
-    margin-top: -5px;
+    margin-top: -40px;
     flex-wrap: wrap; /* Cho phép artist tự động xuống dòng */    
 }
 /* .more_options {
@@ -407,17 +407,17 @@ body.profile-page {
 
 /* Nút Play */
 .play_button {
-    background: none;
+    margin: 0 0 0 12px;
+    background: #232323;
     border: none;
-    cursor: pointer;
-    width: 30px;
-    height: 30px;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease-in-out;
-    flex-shrink: 0; /* Giữ nút Play cố định */
-    margin-top: -75px;
+    transition: background 0.2s, transform 0.16s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.13);
     
 }
 .play_button img {
@@ -660,6 +660,7 @@ body.profile-page {
     display: flex;
     gap: 20px;
     height: calc(100% - 40px); /* Account for action buttons height */
+    
   }
   
   .album-art {
@@ -712,6 +713,7 @@ body.profile-page {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 0;
+    
   }
   
   .artist-name {
@@ -1054,4 +1056,107 @@ body.profile-page {
 .play-button-like-profile i {
   font-size: 16px;
   color: white;
+}
+
+
+/* ------------------------ */
+.all-tracks-list .song {
+    display: flex;
+    align-items: center;    /* hoặc flex-start nếu muốn info trên cùng */
+    background: #333;
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+    color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    min-height: 180px;      /* bằng với .album_cover */
+    transition: background 0.15s;
+    position: relative;
+    height: auto;
+}
+.all-tracks-list .song_left {
+    display: flex;
+    align-items: center;    /* căn giữa nút play với ảnh */
+    gap: 0px;
+    /* không cần height ở đây */
+    position: relative;
+}
+.all-tracks-list .album_cover {
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0,0,0,0.12);
+    background: #232323;
+}
+
+.all-tracks-list .play_button {
+     margin: -100px 0 0 12px;
+    background: #232323;
+    border: none;
+    border-radius: 50%;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.16s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.13);
+
+}
+.all-tracks-list .play_button:hover {
+    background: #222c22;
+    transform: scale(1.16);
+}
+.all-tracks-list .play_button img {
+    width: 22px;
+    height: 22px;
+}
+
+.all-tracks-list .song_info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    color: white;
+    min-width: 0;
+}
+
+.all-tracks-list .song_title {
+    font-size: 22px;
+    color: white;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.all-tracks-list .artist {
+    font-size: 15px;
+    color: #b3b3b3;
+    margin-bottom: 0;
+}
+
+.all-tracks-list .audio {
+    min-height: 38px;
+    width: 90%;
+    margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 800px) {
+    .all-tracks-list .song {
+        flex-direction: column;
+        align-items: flex-start;
+        min-height: unset;
+        padding: 12px;
+    }
+    .all-tracks-list .album_cover {
+        margin-bottom: 10px;
+        margin-right: 0;
+        width: 90px;
+        height: 90px;
+    }
+    
 }
