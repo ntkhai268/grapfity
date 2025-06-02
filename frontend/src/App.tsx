@@ -12,7 +12,6 @@ import ManagerPlaylistLayout from "./layouts/ManagerPlaylistLayout";
 import SeeMoreLayouts from "./layouts/SeeMoreLayouts";
 import TopArtistsLisPage from "./container/TopArtistsLisPage";
 import TopTracksLisPage from "./container/TopTracksLisPage";
-import TopGenresLisPage from "./container/TopGenresLisPage";
 import TopTracksPage from "./container/TopTracksPage";
 
 import UploadLayouts from "./layouts/UploadLayouts";
@@ -42,6 +41,12 @@ const mapTrackDataToSong = (track: any): Song => ({
     cover: track.cover === null ? undefined : track.cover,
 });
 
+
+import AdminLayout from "./layouts/adminlayouts"
+import Section_admin from "./components/section_admin"
+import Section_admin_tracks from "./components/section_admin_tracks"
+import Section_admin_users from "./components/section_admin_users"
+import Section_admin_profile from "./components/section_admin_statistical"
 
 const App = () => {
 
@@ -91,6 +96,16 @@ const App = () => {
           </LoginLayout>
         }
       />
+
+      {/* Trang đăng nhập với Login Layout */}
+      <Route
+        path="/login"
+        element={
+          <LoginLayout>
+            <LoginForm /> {/* Trang đăng nhập */}
+          </LoginLayout>
+        }
+      />
       <Route
         path="/mainpage"
         element={
@@ -108,9 +123,54 @@ const App = () => {
       <Route path="/listening/*" element={<ListeningLayouts />} />
       <Route path="/top-artists" element={<SeeMoreLayouts><TopArtistsLisPage /></SeeMoreLayouts>} />
       <Route path="/top-tracks" element={<SeeMoreLayouts><TopTracksLisPage /></SeeMoreLayouts>} />
-      <Route path="/top-genres" element={<SeeMoreLayouts><TopGenresLisPage /></SeeMoreLayouts>} />
+      {/* <Route path="/top-genres" element={<SeeMoreLayouts><TopGenresLisPage /></SeeMoreLayouts>} /> */}
       <Route path="/top-tracks-page" element={<SeeMoreLayouts><TopTracksPage /></SeeMoreLayouts>} />
       <Route path="/search" element={<SearchPage />} />
+
+      {/* Trang upload với Upload Layout */}
+      <Route path="/upload/*" element={<UploadLayouts />} />
+
+      {/* Trang listening với Listening Layout */}
+      <Route path="/listening/*" element={<ListeningLayouts />} />
+      {/* Các route bọc trong SeeMoreLayouts để sử dụng chung Nav */}
+      <Route path="/top-artists" element={<SeeMoreLayouts><TopArtistsLisPage /></SeeMoreLayouts>} />
+      <Route path="/top-tracks" element={<SeeMoreLayouts><TopTracksLisPage /></SeeMoreLayouts>} />
+      <Route path="/top-tracks-page" element={<SeeMoreLayouts><TopTracksPage /></SeeMoreLayouts>} />
+      <Route path="/search" element={<SearchPage />} />
+
+      <Route
+        path="/admin"
+        element={
+          <AdminLayout>
+            <Section_admin_profile />              {/* Trang mặc định */}
+          </AdminLayout>
+        }
+      /> 
+      <Route
+        path="/admin/lis_tracks"
+        element={
+          <AdminLayout>
+            <Section_admin />              {/* Trang mặc định */}
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/tracks"
+        element={
+          <AdminLayout>
+            <Section_admin_tracks />       {/* Trang Bài hát chờ duyệt */}
+          </AdminLayout>
+        }
+      />
+      <Route
+        path="/admin/users"
+        element={
+          <AdminLayout>
+            <Section_admin_users />        {/* Trang Quản lý người dùng */}
+          </AdminLayout>
+        }
+      />
+
     </Routes>
   );
 };

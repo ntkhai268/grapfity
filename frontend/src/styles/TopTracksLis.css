@@ -1,160 +1,195 @@
-/* Main container */
-.listening-container_tracklis {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    max-width: 2000px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: white;
-    color: #000;
-  }
+/* TopTracksLis.css */
+
+/* Wrapper chung */
+.listening-page {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  max-width: 2000px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  color: #000;
   
-  /* Main title */
-  .listening-title_tracklis {
-    font-size: 48px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 30px;
-  }
-  
-  /* Top section with back button, title and filter */
-  .top-section_tracklis {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .back-button_tracklis {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0;
-    margin-right: 10px;
-  }
-  
-  .section-title_tracklis {
-    font-size: 24px;
-    font-weight: bold;
-    flex-grow: 1;
-    margin: 0;
-  }
-  
-  .filter-dropdown_tracklis {
-    background-color: #f0f0f0;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .dropdown-arrow_tracklis {
-    margin-left: 5px;
-  }
-  
-  /* Stats bar */
-  .stats-bar_tracklis {
-    display: flex;
-    margin-bottom: 30px;
-  }
-  
-  .stat-item_tracklis {
-    display: flex;
-    align-items: center;
-    margin-right: 15px;
-    font-size: 14px;
-    color: #666;
-  }
-  
-  .play-stat_tracklis {
-    background-color: #000;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-  }
-  
-  .play-icon_tracklis,
-  .heart-icon_tracklis,
-  .comment-icon_tracklis,
-  .repost-icon_tracklis,
-  .download-icon_tracklis {
-    margin-right: 5px;
-  }
-  
-  /* Tracks table */
-  .tracks-table_tracklis {
-    width: 100%;
-  }
-  
-  .table-header_tracklis {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    color: #666;
-    font-size: 14px;
-  }
-  
-  .header-cell_tracklis {
-    padding: 0 10px;
-  }
-  
-  .time-period_tracklis {
-    flex-grow: 1;
-  }
-  
-  .plays-header_tracklis {
-    width: 80px;
-    text-align: right;
-  }
-  
-  /* Tracks list */
-  .tracks-list_tracklis {
-    display: flex;
+}
+
+/* Tiêu đề trang */
+.page-title {
+  font-size: 48px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* Chia content thành 2 cột ngang */
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+}
+
+/* Sidebar (20%) */
+.sidebar_listening {
+  flex: 0 0 20%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #fafafa;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+/* Nút quay lại */
+.back-button {
+  background: none;
+  border: none;
+  font-size: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+/* Ô tìm kiếm */
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: white !important;
+  color: #000 !important;
+}
+
+/* Dropdown filter */
+.select-filter {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
+/* Main content (80%) */
+.main-content {
+  flex: 1 1 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: -1px;
+}
+
+/* Chỉ số tổng plays */
+.plays-summary {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  gap: 8px;
+}
+
+.play-icon {
+  background: black;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+/* Bộ chứa bảng */
+.tracks-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Bảng chính */
+.tracks-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: inherit;
+}
+
+/* Tiêu đề cột */
+.tracks-table th {
+  padding: 12px 10px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid #eee;
+  background: #f5f5f5;
+  color: #666;
+}
+
+/* Đặt độ rộng các cột */
+.tracks-table th:nth-child(1) { width: 20%; }
+.tracks-table th:nth-child(2) { width: 20%; }
+.tracks-table th:nth-child(3) { width: 15%; }
+.tracks-table th:nth-child(4) { width: 15%; text-align: right; }
+
+/* Ô dữ liệu */
+.tracks-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Cell track: ảnh + chi tiết */
+.cell-track .track-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cell-track img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Chi tiết trong cell track */
+.track-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.track-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #000;
+}
+
+.track-artist {
+  font-size: 14px;
+  color: #555;
+  margin-top: 4px;
+}
+
+.track-date {
+  font-size: 13px;
+  color: #777;
+  margin-top: 4px;
+}
+
+/* Cell played */
+.cell-played {
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Hover hàng */
+.tracks-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* Responsive: xếp dọc khi màn nhỏ */
+@media (max-width: 768px) {
+  .content-wrapper {
     flex-direction: column;
+
   }
-  
-  .track-item_tracklis {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 15px 10px;
-    border-bottom: 1px solid #eee;
+  .sidebar_listening {
+    order: 2;
   }
-  
-  .track-info_tracklis {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
+  .main-content {
+    order: 1;
   }
-  
-  .track-image_tracklis {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
-    overflow: hidden;
-  }
-  
-  .track-image_tracklis img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  
-  .track-details_tracklis {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .track-name_tracklis {
-    font-size: 16px;
-    font-weight: 500;
-  }
-  
-  .track-plays_tracklis {
-    width: 80px;
-    text-align: right;
-    font-size: 16px;
-  }
-  
+}

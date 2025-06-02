@@ -88,17 +88,11 @@ const getTrackById = async (trackId) => {
             console.warn(`TrackService: Track with ID ${numericTrackId} not found.`);
             return null; // Trả về null nếu không tìm thấy track
         }
-        // console.log(`TrackService - getTrackById - Track ID ${numericTrackId} - Raw Metadatum:`, JSON.stringify(track.Metadatum, null, 2));
-        // console.log(`TrackService - getTrackById - Track ID ${numericTrackId} - Lyrics from Metadatum:`, track.Metadatum?.lyrics);
-
-        // Dữ liệu trả về từ Sequelize sẽ tự động là plain objects khi dùng với res.json()
-        // Hoặc bạn có thể gọi .get({ plain: true }) nếu muốn chắc chắn là POJO trước khi trả về từ service
-        // return track.get({ plain: true }); 
         return track;
 
     } catch (error) {
         console.error(`TrackService: Error fetching track with ID ${numericTrackId}:`, error);
-        throw error; // Ném lỗi để controller xử lý
+        throw error;
     }
 };
 
@@ -241,18 +235,85 @@ const updateTrack = async (id, updateData, userId) => {
     return track;
 };
 
-const deleteTrack = async (id, userId) => {
-    const track = await db.Track.findByPk(id);
-    console.log("track.uploaderId: ", track.uploaderId )
-    if (!track|| track.uploaderId !== userId) {
-        throw new Error("Unauthorized: You can only delete your own tracks.");
-    }
-    return await db.sequelize.transaction(async (t) => {
-        await db.PlaylistTrack.destroy({ where: { trackId: id }, transaction: t });
-        await db.Track.destroy({ where: { id }, individualHooks: true, transaction: t });
-    })
+const deleteTrack = async (trackId) => {
+  await db.sequelize.transaction(async (t) => {
+    await db.PlaylistTrack.destroy({ where: { trackId }, transaction: t });
+
+    await db.Track.destroy({
+      where: { id: trackId },
+      individualHooks: true,
+      transaction: t,
+    });
+  });
 };
 
+
+//dangkhoi them
+const getTracksByUserId = async (userId) => {
+  return await db.Track.findAll({
+    where: { uploaderId: userId },
+    
+    include: [
+      // 1) Lấy trackname từ Metadata, dùng alias 'Metadatum'
+      // 2) Lấy lịch sử nghe, dùng alias 'listeningHistories'
+      {
+        model: db.User,
+        attributes: [['name', 'UploaderName']],
+        required: false
+      },
+      {
+        model: db.listeningHistory,
+        as: 'listeningHistories',
+        attributes: ['listenCount', 'createdAt'],
+        include: [
+          // 3) Lấy thông tin listener, dùng alias 'listener'
+          {
+            model: db.User,
+            as: 'listener',
+            attributes: ['id', 'Name']
+          }
+        ]
+      }
+    ]
+  });
+};
+
+  const updateTrackStatus = async (id, status) => {
+    const track = await db.Track.findByPk(id);
+    if (!track) throw new Error('Track not found');
+    return await track.update({ status });
+  };
+  const getJoinedTracks = async () => {
+    return await db.Track.findAll({
+      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+      include: [
+        {
+          model: db.Metadata,
+          attributes: ['trackname'],
+          required: false
+        },
+        {
+          model: db.User,
+          attributes: [['name', 'UploaderName']],
+          required: false
+        },
+        {
+          model: db.listeningHistory,
+          as: 'listeningHistories',
+          attributes: ['listenCount', 'createdAt'],
+          required: false,
+          include: [
+            {
+              model: db.User,
+              as: 'listener',
+              attributes: [['name', 'Name']],
+              required: false
+            }
+          ]
+        }
+      ]
+    });
+  };
 export {
     getAllTracks,
     getAllTracksForAdmin,
@@ -261,5 +322,8 @@ export {
     getTracksByUploaderId,
     createTrack,
     updateTrack,
-    deleteTrack
+    deleteTrack,
+    getTracksByUserId,
+    getJoinedTracks,
+    updateTrackStatus
 };

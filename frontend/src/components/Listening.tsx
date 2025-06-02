@@ -3,12 +3,10 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Recent_LnU.css';
 import {
   fetchListeningHistory,
-  fetchAllTracks,
-  HistoryRecord,
-  TrackRecord
+  ListeningHistoryRecord,
 } from '../services/listeningService';
 
-// Import động ảnh từ thư mục assets/images (Vite)
+// Nếu bạn vẫn dùng ảnh local từ assets, giữ lại phần import động
 const imageModules = import.meta.glob(
   '../assets/images/*.{jpg,jpeg,png,svg}',
   { eager: true, as: 'url' }
@@ -36,35 +34,29 @@ const Recent_LnU: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        // Gọi đồng thời hai service
-        const [histories, tracks] = await Promise.all([
-          fetchListeningHistory(),
-          fetchAllTracks(),
-        ]);
+        const histories: ListeningHistoryRecord[] = await fetchListeningHistory();
 
-        // Ghép lịch sử nghe với thông tin track
-        const merged: ListeningItem[] = histories.map((h: HistoryRecord) => {
-          const t = tracks.find((tr: TrackRecord) => tr.id === h.trackId);
-          const filename = t?.imageUrl.split('/').pop() || '';
+        const mapped: ListeningItem[] = histories.map(h => {
+          const { track, metadata, listenCount, createdAt } = h;
+          const filename = track.imageUrl.split('/').pop() || '';
           return {
-            id: h.id,
-            title: t ? `Track ${t.id}` : 'Unknown',
-            artist: t ? `Uploader ${t.uploaderId}` : 'Unknown',
-            imageUrl: imageMap[filename] || '',
-            trackUrl: t?.trackUrl || '',
-            listenCount: h.listenCount,
-            timestamp: h.createdAt,
+            id: track.id,
+            title: metadata?.trackname ?? `Track ${track.id}`,
+            artist: track.User?.UploaderName ?? 'Unknown',
+            imageUrl: imageMap[filename] || track.imageUrl,
+            trackUrl: track.trackUrl,
+            listenCount,
+            timestamp: createdAt,
           };
         });
 
-        // Sắp xếp theo timestamp giảm dần và chỉ lấy 5 mục gần nhất
-        const topFive = merged
+        const topFive = mapped
           .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
           .slice(0, 5);
 
         setItems(topFive);
-      } catch (e) {
-        console.error('Fetch error', e);
+      } catch (error) {
+        console.error('Error fetching listening history:', error);
         setItems([]);
       } finally {
         setLoading(false);
@@ -72,7 +64,9 @@ const Recent_LnU: React.FC = () => {
     })();
   }, []);
 
-  if (loading) return <div className="Recent_LnU">Đang tải lịch sử nghe...</div>;
+  if (loading) {
+    return <div className="Recent_LnU">Đang tải lịch sử nghe...</div>;
+  }
 
   return (
     <div className="Recent_LnU">
@@ -90,8 +84,8 @@ const Recent_LnU: React.FC = () => {
               <div className="track_LnU-info">
                 <span className="track-title">{item.title}</span>
                 <span className="track-artist">{item.artist}</span>
-                <span className="track-count">Plays: {item.listenCount}</span>
-                <span className="track-time">{new Date(item.timestamp).toLocaleString()}</span>
+                
+                
               </div>
             </div>
           ))

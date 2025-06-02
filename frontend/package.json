@@ -15,10 +15,13 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.9.0",
+    "date-fns": "^4.1.0",
     "fast-average-color": "^9.5.0",
+    "lucide-react": "^0.510.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.4.0",
+    "recharts": "^2.15.3",
     "wavesurfer.js": "^7.9.4"
   },
   "devDependencies": {

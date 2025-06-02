@@ -1,80 +1,134 @@
-import axios from 'axios';
+// src/services/userService.ts
+import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:8080'; // backend base URL
-
-// --- Interface User ---
-// (Tùy chỉnh theo model backend trả về)
-export interface UserData {
-  id: number | string;
+// =========================
+// 📌 Interface
+// =========================
+export interface UserType {
+  id: number;
   userName: string;
   email: string;
-  password : string;
-  Name : string
+  roleId?: number;
+  password?: string;
+  Name?: string;
+  Birthday?: string;
+  Address?: string;
+  PhoneNumber?: string;
   Avatar?: string | null;
-  Birthday: string | Date | null;
-  Address: string | null;
-  PhoneNumber : string | null
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-// --- Ánh xạ dữ liệu từ API về UserData frontend ---
-export const mapApiDataToUserData = (raw: any): UserData => {
-  return {
-    id: raw.id || raw._id || 'unknown',
-    userName: raw.userName || 'Unknown',
-    email: raw.email || '',
-    password: raw.password || '',
-    Name: raw.Name || 'Unknown',
-    Birthday: raw.Birthday || '',
-    Address: raw.Address || '',
-    PhoneNumber: raw.PhoneNumber || '',
-    Avatar: raw.Avatar ? `${API_BASE_URL}/${raw.Avatar.replace(/^\/?/, '')}` : null,
-    createdAt: raw.createdAt,
-    updatedAt: raw.updatedAt,
-  };
-};
+export interface CreateUserPayload {
+  userName: string;
+  email: string;
+  password: string;
+  roleId?: number;
+  Name?: string;
+  Birthday?: string;
+  Address?: string;
+  PhoneNumber?: string;
+}
 
-export const getAllUsers = async (): Promise<UserData[]> => {
-  const res = await axios.get<{ message: string; data: any[] }>(`${API_BASE_URL}/api/users`);
-  return res.data.data.map(mapApiDataToUserData);
-};
+export interface UpdateUserPayload {
+  id: number;
+  userName?: string;
+  email?: string;
+  password?: string;
+  roleId?: number;
+  Name?: string;
+  Birthday?: string;
+  Address?: string;
+  PhoneNumber?: string;
+  Avatar?: string;
+}
 
+// =========================
+// 📌 Base URLs
+// =========================
+const API_BASE_URL = "http://localhost:8080";
+const USERS_API = `${API_BASE_URL}/api/users`;
 
-export const getUserById = async (id: number | string): Promise<UserData> => {
-  const res = await axios.get<{ message: string; data: any }>(`${API_BASE_URL}/api/users/${id}`);
-  return mapApiDataToUserData(res.data.data);
-};
+// =========================
+// 📌 Chuẩn hóa avatar URL
+// =========================
+export const normalizeUser = (user: UserType): UserType => ({
+  ...user,
+  Avatar: user.Avatar
+    ? `${API_BASE_URL}/${user.Avatar.replace(/^\/?/, "")}`
+    : null,
+});
 
-export const getUserByIdforUser = async (id: number | string): Promise<UserData> => {
-  if (!id || id === 'undefined') {
-    throw new Error(`❌ ID không hợp lệ khi gọi getUserByIdforUser: ${id}`);
-  }
-  const res = await axios.get<{ message: string; data: any }>(`${API_BASE_URL}/api/users/profile/${id}`);
-  return mapApiDataToUserData(res.data.data);
-};
+// =========================
+// 📌 API functions
+// =========================
 
-export const getMyProfile = async (): Promise<UserData> => {
-  const res = await axios.get<{ message: string; data: any }>(`${API_BASE_URL}/api/users/me`, {
+// 📥 Lấy tất cả người dùng (admin)
+export const fetchUsers = async (): Promise<UserType[]> => {
+  const resp = await axios.get<{ message: string; data: UserType[] }>(USERS_API, {
     withCredentials: true,
   });
-  return mapApiDataToUserData(res.data.data);
+  return resp.data.data.map(normalizeUser);
 };
 
+// 📥 Lấy người dùng theo ID (admin)
+export const getUserById = async (id: number | string): Promise<UserType> => {
+  const resp = await axios.get<{ message: string; data: UserType }>(
+    `${USERS_API}/${id}`
+  );
+  return normalizeUser(resp.data.data);
+};
+
+// 📥 Lấy profile người khác (dành cho FE khi xem người khác)
+export const getUserByIdforUser = async (id: number | string): Promise<UserType> => {
+  const resp = await axios.get<{ message: string; data: UserType }>(
+    `${USERS_API}/profile/${id}`
+  );
+  return normalizeUser(resp.data.data);
+};
+
+// 📥 Lấy profile chính mình
+export const getMyProfile = async (): Promise<UserType> => {
+  const resp = await axios.get<{ message: string; data: UserType }>(
+    `${USERS_API}/me`,
+    { withCredentials: true }
+  );
+  return normalizeUser(resp.data.data);
+};
+
+// 🆕 Tạo người dùng
+export const createUser = async (payload: CreateUserPayload): Promise<UserType> => {
+  const resp = await axios.post<{ message: string; user: UserType }>(
+    `${API_BASE_URL}/api/register`,
+    payload
+  );
+  return normalizeUser(resp.data.user);
+};
+
+// 🛠 Cập nhật người dùng
 export const updateUser = async (formData: FormData): Promise<{ message: string }> => {
-  const res = await axios.put(`${API_BASE_URL}/api/users/me`, formData,{
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  const res = await axios.put(`${USERS_API}/me`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
     withCredentials: true,
   });
   return res.data;
 };
 
-
-export const deleteUser = async (): Promise<{ message: string }> => {
-  const res = await axios.delete(`${API_BASE_URL}/delete-user`, {
+// ❌ Xóa người dùng (chính mình hoặc bởi admin)
+export const deleteUser = async (id?: number): Promise<{ message: string }> => {
+  const url = id ? `${USERS_API}/${id}` : `${API_BASE_URL}/api/delete-user`;
+  const resp = await axios.delete(url, {
     withCredentials: true,
   });
-  return res.data;
+  return resp.data;
+};
+
+export const fetchUserId = async (): Promise<number | null> => {
+  try {
+    const user = await getMyProfile();
+    return user.id;
+  } catch (err) {
+    console.error("Lỗi lấy userId:", err);
+    return null;
+  }
 };

@@ -1,0 +1,1215 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+  /* Admin Layout */
+  .admin_layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  /* Header styles */
+  .header_admin {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 60px;
+    background-color: #126d39;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .logo_admin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .logo_icon_admin {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo_text_admin {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  .search_container_admin {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 5px 10px;
+    width: 250px;
+  }
+  
+  .search_input_admin {
+    background-color: #184236 !important;
+    border: none;
+    color: rgb(0, 0, 0) ;
+    width: 100%;
+    padding: 5px;
+    outline: none;
+    background-color: #20c997;
+  }
+  
+  .search_input_admin::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .search_button_admin {
+    background: transparent;
+    border: none;
+    color: rgb(12, 86, 72);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .header_actions_admin {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .notification_button_admin {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .notification_badge_admin {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .user_profile_admin {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user_avatar_admin {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .settings_button_admin {
+    background: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  
+  /* Navigation styles */
+  .nav_admin {
+    background-color: transparent;
+    border-bottom: 1px solid #e0e0e0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .nav_list_admin {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .nav_item_admin {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    gap: 8px;
+    cursor: pointer;
+    color: #555;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  .nav_item_admin:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .active_admin {
+    color: #3498db;
+    border-bottom: 2px solid #3498db;
+  }
+  
+  .dropdown_icon_admin {
+    margin-left: 5px;
+  }
+  
+  /* Admin content wrapper */
+  .admin_content_wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+  
+  .admin_main_content {
+    margin-top: 40px;  
+    flex: 1;
+    padding: 20px;
+    background: linear-gradient(180deg, #e2e2e2, #54e3b1);
+
+    ;
+  }
+  
+  /* Section styles */
+  .section_admin {
+    padding: 0 10px;
+    font-family: 'Times New Roman', Times, serif;
+  }
+  
+  .breadcrumb_admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .welcome_message_admin h1 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .breadcrumb_links_admin {
+    font-size: 14px;
+    color: #777;
+  }
+  
+  .breadcrumb_separator_admin {
+    margin: 0 5px;
+  }
+  
+  /* Stats cards */
+  .stats_cards_admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .stat_card_admin {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .stat_purple_admin {
+    background-color: #a29bfe;
+    color: white;
+  }
+  
+  .stat_blue_admin {
+    background-color: #74b9ff;
+    color: white;
+  }
+  
+  .stat_pink_admin {
+    background-color: #fd79a8;
+    color: white;
+  }
+  
+  .stat_green_admin {
+    background-color: #55efc4;
+    color: white;
+  }
+  
+  .stat_title_admin {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  
+  .stat_value_admin {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .stat_change_admin {
+    font-size: 12px;
+  }
+  
+  .stat_percent_admin {
+    font-weight: 600;
+  }
+  
+  .stat_icon_admin {
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Charts container */
+  .charts_container_admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .chart_card_admin {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .chart_title_admin {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  
+  /* Chart placeholders */
+  .chart_placeholder_admin {
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+  
+  .donut_placeholder_admin {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: conic-gradient(#4e73df 0% 25%, #36b9cc 25% 50%, #f6c23e 50% 75%, #e74a3b 75% 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .donut_placeholder_admin::before {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background-color: white;
+    border-radius: 50%;
+  }
+  
+  .donut_center_admin {
+    position: relative;
+    z-index: 1;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .line_placeholder_admin {
+    width: 100%;
+    height: 200px;
+    background-image: linear-gradient(to right, transparent 0%, transparent 100%),
+      linear-gradient(to right, transparent 0%, transparent 100%),
+      linear-gradient(to right, transparent 0%, transparent 100%);
+    background-size: 100% 1px;
+    background-position: 0 25%, 0 50%, 0 75%;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+  
+  .line_placeholder_admin::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+        to right,
+        #4e73df 0%,
+        #4e73df 20%,
+        #4e73df 40%,
+        #4e73df 60%,
+        #4e73df 80%,
+        #4e73df 100%
+      ), linear-gradient(to right, #36b9cc 0%, #36b9cc 30%, #36b9cc 50%, #36b9cc 70%, #36b9cc 90%, #36b9cc 100%);
+    background-size: 100% 2px;
+    background-position: 0 30%, 0 70%;
+    background-repeat: no-repeat;
+  }
+  
+  .bar_placeholder_admin {
+    width: 100%;
+    height: 200px;
+    position: relative;
+  }
+  
+  .bar_placeholder_admin::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 10%;
+    width: 20%;
+    height: 60%;
+    background-color: #20c997;
+  }
+  
+  .bar_placeholder_admin::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 40%;
+    width: 20%;
+    height: 80%;
+    background-color: #20c997;
+  }
+  
+  /* Chart legends */
+  .chart_legend_admin {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  
+  .legend_item_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    color: #555;
+  }
+  
+  .legend_color_admin {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+  }
+  
+  .blue_legend_admin {
+    background-color: #4e73df;
+  }
+  
+  .light_blue_legend_admin {
+    background-color: #36b9cc;
+  }
+  
+  .orange_legend_admin {
+    background-color: #f6c23e;
+  }
+  
+  .yellow_legend_admin {
+    background-color: #f6c23e;
+  }
+  
+  .green_legend_admin {
+    background-color: #1cc88a;
+  }
+  
+  .red_legend_admin {
+    background-color: #e74a3b;
+  }
+  
+  .purple_legend_admin {
+    background-color: #8a63d2;
+  }
+  
+  .teal_legend_admin {
+    background-color: #20c997;
+  }
+  
+  
+  
+  /* Admin page container */
+  .admin_page_container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .stats_cards_admin {
+      grid-template-columns: 1fr;
+    }
+  
+    .charts_container_admin {
+      grid-template-columns: 1fr;
+    }
+  
+    .breadcrumb_admin {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    .nav_list_admin {
+      overflow-x: auto;
+      white-space: nowrap;
+      padding-bottom: 5px;
+    }
+  
+    .nav_item_admin {
+      padding: 10px 15px;
+    }
+  }
+  
+  /* User Management Table Styles */
+  .user_management_header_admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+  }
+  
+  .search_users_admin {
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 8px 12px;
+    width: 250px;
+  }
+  
+  .search_icon_admin {
+    color: #777;
+    margin-left: 10px;
+  }
+  
+  .search_input_users_admin {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .user_actions_admin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .selected_count_admin {
+    font-size: 14px;
+    color: #555;
+    margin-right: 5px;
+  }
+  
+  .delete_button_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #fff;
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+  }
+  
+  .delete_button_admin:hover {
+    background-color: #e74c3c;
+    color: #fff;
+  }
+  
+  .delete_icon_admin {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .export_button_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: #fff;
+    border: 1px solid #1a6e1a;
+    color: #05682b;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 10px;
+    cursor: pointer;
+  }
+  .export_button_admin:hover {
+    background-color: #50b329;
+    color: #fff;
+  }
+  .export_icon_admin {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .filter_button_admin {
+    display: center;
+    align-items: center;
+    gap: 5px;
+    background-color: #fff;
+    border: 1px solid #e0e0e0;
+    color: #555;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    position: relative;
+    width: 150px;
+
+  }
+  
+  .filter_icon_admin {
+    width: 14px;
+    height: 14px;
+  }
+  
+  
+  .users_table_admin {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .table_header_admin {
+    display: flex;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: 600;
+    font-size: 12px;
+    color: #555;
+  }
+  
+  .table_row_admin {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .table_row_admin:last-child {
+    border-bottom: none;
+  }
+  
+  .table_cell_admin {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+  }
+  /* ↓ Thu nhỏ font + cho phép wrap/bẻ từ khi dài */
+.users_table_admin .table_header_admin .table_cell_admin,
+.users_table_admin .table_row_admin .table_cell_admin {
+  font-size: 12px;        /* bạn có thể điều chỉnh 11px/0.75rem… tuỳ ý */
+  line-height: 1.2;       /* cho dễ đọc khi wrap */
+  white-space: normal;    /* cho phép xuống dòng */
+  word-break: break-word; /* bẻ từ nếu quá dài */
+}
+
+
+  .checkbox_cell_admin {
+    width: 40px;
+    justify-content: center;
+  }
+  
+  .checkbox_admin {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  
+  .name_cell_admin {
+    flex: 2;
+  }
+  
+  .position_cell_admin {
+    flex: 1.5;
+  }
+  
+  .country_cell_admin {
+    flex: 1;
+    max-width: 150px; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .status_cell_admin {
+    flex: 1;
+  }
+  
+  .portfolio_cell_admin {
+    flex: 1.5;
+  }
+  
+  .role_cell_admin {
+    flex: 1;
+  }
+  
+  .action_cell_admin {
+    flex: 0.8;
+    justify-content: flex-end;
+  }
+  
+  .sort_icon_admin {
+    margin-left: 5px;
+    color: #aaa;
+  }
+  
+  .user_info_admin {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .user_avatar_table_admin {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .user_avatar_letter_admin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 16px;
+  }
+  
+  .user_details_admin {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .user_name_admin {
+    font-weight: 500;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .verified_icon_admin {
+    color: #3498db;
+  }
+  
+  .user_email_admin {
+    font-size: 12px;
+    color: #777;
+  }
+  
+  .position_info_admin {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .position_title_admin {
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .position_department_admin {
+    font-size: 12px;
+    color: #777;
+  }
+  
+  .status_badge_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .status_dot_admin {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .status_active_admin {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+  }
+  
+  .status_active_admin .status_dot_admin {
+    background-color: #2ecc71;
+  }
+  
+  .status_pending_admin {
+    background-color: rgba(241, 196, 15, 0.1);
+    color: #f1c40f;
+  }
+  
+  .status_pending_admin .status_dot_admin {
+    background-color: #f1c40f;
+  }
+  
+  .status_suspended_admin {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+  }
+  
+  .status_suspended_admin .status_dot_admin {
+    background-color: #e74c3c;
+  }
+  
+  .portfolio_info_admin {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 5px;
+  }
+  
+  .portfolio_percent_admin {
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .progress_bar_container_admin {
+    width: 100%;
+    height: 6px;
+    background-color: #f1f1f1;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  
+  .progress_bar_admin {
+    height: 100%;
+    background-color: #3498db;
+    border-radius: 3px;
+  }
+  
+  .edit_button_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: transparent;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  
+  .edit_button_admin:hover {
+    text-decoration: underline;
+  }
+  
+  .action_cell_admin {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  
+  .delete_row_button_admin {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background-color: transparent;
+    border: 1px solid #e74c3c;
+    color: #e74c3c;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .delete_row_button_admin:hover {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .delete_row_button_admin svg {
+    stroke: currentColor;
+  }
+  
+  /* Responsive adjustments for user table */
+  @media (max-width: 1024px) {
+    .users_table_admin {
+      overflow-x: auto;
+    }
+  
+    .table_header_admin,
+    .table_row_admin {
+      min-width: 900px;
+    }
+  
+    .country_cell_admin {
+      display: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .user_management_header_admin {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  
+    .search_users_admin {
+      width: 100%;
+    }
+  
+    .user_actions_admin {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  /* Disabled state for row actions */
+.edit_button_admin:disabled,
+.delete_row_button_admin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Remove underline/hover styles when disabled */
+.edit_button_admin:disabled:hover,
+.delete_row_button_admin:disabled:hover {
+  text-decoration: none;
+  background-color: transparent;
+}
+.filter_dropdown_admin {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .filter_menu_admin {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    margin-top: 4px;
+    list-style: none;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 10;
+    width: 100%;
+  }
+  
+  .filter_menu_admin li {
+    padding: 8px 12px;
+    cursor: pointer;
+
+  }
+  
+  .filter_menu_admin li:hover {
+    background-color: #f5f5f5;
+  }
+  .modal_overlay_admin {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .modal_content_admin {
+    background:linear-gradient(90deg, #e2e2e2, #54e3b1);
+    padding: 30px;
+    border-radius: 8px;
+    width: 750px;
+    transform: scale(1.5);
+  transform-origin: center center;
+  }
+  .modal_content_admin h3 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+    color:#032d22;
+  }
+  .modal_content_admin form > * {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  .modal_actions_admin {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  /* màu xanh lá cho Save */
+.save_button_admin {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .save_button_admin:hover {
+    opacity: 0.9;
+  }
+  
+  /* màu đỏ cho Cancel */
+  .cancel_button_admin {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .cancel_button_admin:hover {
+    opacity: 0.9;
+  }
+/* container cho label + nút */
+.role_field_admin {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  /* label “Role:” */
+  .role_label_admin {
+    flex-shrink: 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: #333;
+    min-width: 50px; /* hoặc bạn có thể tùy chỉnh để canh đều */
+  }
+  
+  /* nhóm toggle */
+  .role_toggle_group_admin {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  /* style chung cho nút (làm nhỏ lại) */
+  .role_button_admin {
+    padding: 0.4rem 0.8rem; /* giảm padding */
+    font-size: 0.85rem;     /* giảm font-size */
+    background: #e2e2e2;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  /* khi active */
+  .role_button_admin.active {
+    background: #54e3b1;
+    color: #fff;
+    border-color: #54e3b1;
+  }
+  
+  /* hover state */
+  .role_button_admin:not(.active):hover {
+    background: #d0d0d0;
+  }
+
+
+/* Thêm vào admin.css */
+.settings_wrapper_admin {
+  position: relative;
+  display: inline-block;
+}
+.settings_dropdown_admin {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1000;
+  color: #000;
+  width: 100px; 
+}
+.settings_dropdown_item_admin {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.settings_dropdown_item_admin:hover {
+  background-color: #f5f5f5;
+}
+/* Overlay đen mờ */
+/* Overlay modal */
+.modal_overlay_admin {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+}
+
+/* Nội dung modal */
+.modal_content_edit_profile {
+  background: #fff;
+  border-radius: 12px;
+  width: 90%; max-width: 900px;
+  padding: 24px;
+  position: relative;
+  display: flex; flex-direction: column;
+}
+
+/* Nút đóng */
+.modal_close_admin {
+  position: absolute; top: 16px; right: 16px;
+  background: none; border: none; font-size: 24px;
+  cursor: pointer;
+}
+
+/* Body: flex hai cột */
+.modal_body_admin {
+  display: flex;
+  gap: 32px;
+  margin-top: 16px;
+}
+
+/* Cột trái */
+.profile_left_admin {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+}
+.profile_image_admin {
+  width: 100%; border-radius: 12px;
+  aspect-ratio: 1; object-fit: cover;
+  background: #a0aca9;
+}
+.btn_change_avatar_admin {
+  margin-top: 16px;
+  background: #3b7ddd; color: #fff;
+  padding: 12px 32px; border: none; cursor: pointer;
+  font-weight: bold;
+}
+
+/* Cột phải */
+.profile_right_admin {
+  flex: 1.2;
+}
+.profile_row_admin {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* ← thay space-between */
+  gap: 16px;                   /* ← tạo khoảng giữa label, input/span, icon */
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+.profile_label_admin {
+  flex: 0 0 140px;
+  font-weight: 600;
+}
+.profile_value_admin {
+  flex: 1;
+}
+.icon_edit_admin {
+  flex: 0 0 32px;
+  background: none; border: none; font-size: 18px;
+  cursor: pointer;
+}
+
+/* Footer save */
+.modal_footer_admin {
+  display: flex; justify-content: flex-end;
+  margin-top: 24px;
+}
+.btn_save_admin {
+  background: #3b7ddd; color: #fff;
+  padding: 12px 48px; border: none; cursor: pointer;
+  font-size: 16px;
+  border-radius: 6px;
+}
+.profile_input_admin {
+  flex: 1;                     /* ← chiếm đúng khoảng như .profile_value_admin */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white !important;
+  color: #000 !important ;
+}
+/* Đặt background trắng, chữ đen cho tất cả input date */
+input[type="date"] {
+  background-color: #fff;
+  color: #000;
+}
+
+/* Nếu dùng class chung cho input (ví dụ .profile_input_admin) thì: */
+.profile_input_admin {
+  background-color: #fff !important;
+  color: #000 !important;
+}
+
+/* Đổi màu placeholder nếu cần */
+input[type="date"]::placeholder,
+.profile_input_admin::placeholder {
+  color: #666;
+}
+
+/* Đảm bảo icon calendar cũng hiển thị đúng màu (Chrome/Webkit) */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+}
+/* 1. Tạo 1 flex container cho hai nút Edit/Delete */
+.users_table_admin .table_row_admin .action_cell_admin {
+  display: flex;           /* cho hai nút nằm trên cùng 1 hàng */
+  align-items: center;     /* canh giữa theo chiều dọc */
+  gap: 0.5rem;             /* khoảng cách giữa 2 nút */
+  
+  /* override wrap của .table_cell_admin */
+  white-space: nowrap;
+}
+
+/* 2. Đảm bảo nút bên trong không bị bẻ dòng */
+.users_table_admin .table_row_admin .action_cell_admin button {
+  white-space: nowrap;
+}
+/* Loại bỏ khung của container group */
+.form_group_admin {
+  border: none !important;
+  background: transparent !important;
+  padding: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Loại bỏ khung và outline của input */
+.form_group_admin input {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+}
+.form_group_admin label{
+  color: #000;
+}
+.delete_button_admin:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
