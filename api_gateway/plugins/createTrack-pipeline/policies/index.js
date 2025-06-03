@@ -19,7 +19,7 @@ module.exports = {
     return async (req, res, next) => {
       try {
         // 1. Lấy dữ liệu từ backend (proxy đã có mapResponse: true)
-        const dataFromBackend = res.locals.proxyResponse?.body;
+        const dataFromBackend = res.locals.proxyResponse.body;
 
         if (!dataFromBackend) {
           return res.status(500).json({ error: 'No data from backend response' });

@@ -48,10 +48,10 @@ module.exports = {
         console.error('[RecommendationPolicy] Error calling backend:', backendError.message);
         // Trả luôn lỗi về client, dừng pipeline
         return res.status(
-          backendError.response?.status || 500
+          backendError.response.status || 500
         ).json({
           error: 'Backend delete failed',
-          details: backendError.response?.data || backendError.message
+          details: backendError.response.data || backendError.message
         });
       }
 

@@ -1,6 +1,7 @@
 FROM expressgateway/express-gateway:latest
 WORKDIR /var/lib/eg
 
+
 COPY package.json ./
 RUN npm install
 

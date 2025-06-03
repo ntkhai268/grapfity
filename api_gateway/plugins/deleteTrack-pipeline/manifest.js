@@ -6,7 +6,7 @@ module.exports = {
     const policy = require('./policies/index'); 
     pluginContext.registerPolicy(policy);
   },
-  policies: ['deleteTrack-policy'],
+  policies: ['deleteTrack-pipeline-policy'],
   schema: {
   "$id": "http://express-gateway.io/schemas/plugins/deleteTrack-pipeline.json",
 }

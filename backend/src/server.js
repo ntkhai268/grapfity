@@ -18,9 +18,8 @@ const hostname = process.env.HOSTNAME || "0.0.0.0";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Cấu hình CORS an toàn
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Chỉ định domain cụ thể
+  origin: 'http://localhost:5173', // chính xác origin React app
   credentials: true
 }));
 

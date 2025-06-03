@@ -34,7 +34,7 @@ module.exports = {
         
         const rsRes = await axios.get(recommenderUrl);
 
-        const track_ids = rsRes
+        const track_ids = rsRes.data
         // const track_ids = [1002,1003,1004,1005,1006,1007, 1008 ,1009,1010]
 
 

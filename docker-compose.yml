@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  
 
   postgres:
     image: postgres:13
@@ -24,8 +23,11 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - recommender
+      - recommender1
+      - recommender2
     restart: always
+    expose:
+      - "80"
 
   mssql:
     build: ./database/mssql                   # Dùng Dockerfile để build image có sqlcmd
@@ -70,11 +72,10 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "5173:5173"
     depends_on:
       - api_gateway
     restart: always
-
   
   zookeeper:
     image: confluentinc/cp-zookeeper:6.2.0
@@ -82,6 +83,7 @@ services:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
     restart: always
+
   kafka:
     image: confluentinc/cp-kafka:6.2.0
     environment:
@@ -94,9 +96,8 @@ services:
     ports:
       - "9092:9092"
     restart: always
-    
 
-  recommender:
+  recommender1:
     build: ./recommender
     env_file: ./recommender/.env  
     depends_on:
@@ -106,10 +107,21 @@ services:
     volumes:
       - ./recommender:/app
   
-    ports:
-      - "8000:8000"
-
-
+    expose:
+      - "8000"
+  
+  recommender2:
+    build: ./recommender
+    env_file: ./recommender/.env  
+    depends_on:
+      - postgres
+      - kafka
+    restart: always
+    volumes:
+      - ./recommender:/app
+  
+    expose:
+      - "8000"
 
 volumes:
   mssql_data:

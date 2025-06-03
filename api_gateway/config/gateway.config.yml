@@ -1,7 +1,6 @@
 http:
   port: 8080
 
-
 apiEndpoints:
   recommendation:
     host: 'localhost'
@@ -9,18 +8,17 @@ apiEndpoints:
   event_tracking:
     host: 'localhost'
     paths: '/api/event_tracking'
-
   deleteTrack:
     host: 'localhost'
     paths: '/api/tracks/:id'
-
   createTrack:
     host: 'localhost'
     paths: '/api/tracks/create-track'
-
-  backend:
-    host: 'localhost'
-    paths: '/api/*'
+  default:
+    host: 'localhost'  # Đảm bảo host được chỉ định
+    paths: '/api/*'    # Pattern này sẽ khớp với /api/tracks/getTracksById
+    methods: [GET, POST, PUT, DELETE]  # Sửa "method" thành "methods"
+    preserveHeaders: true  # Giữ nguyên headers, bao gồm Cookie
 
 serviceEndpoints:
   recommender:
@@ -36,22 +34,19 @@ policies:
   - deleteTrack-pipeline-policy
   - createTrack-pipeline-policy
 
-
 pipelines:
-  recommendation:
-    apiEndpoints:
-      - recommendation
-    policies:
-      # - proxy:
-      #     - action:
-      #         serviceEndpoint: recommender
-      #         preserveHost: true
-      #         mapResponse: true 
-
-      - recommendation-pipeline-policy:
-          - action:
-              recommenderService: http://nginx:80/api/recommendation?user_id=
-              backendService: http://backend:8001/api/tracks/getTracksById
+  # recommendation:
+  #   apiEndpoints:
+  #     - recommendation
+  #   policies:
+  #     - proxy:
+  #         - action:
+  #             serviceEndpoint: recommender
+  #             preserveHeaders: true
+  #     - recommendation-pipeline-policy:
+  #         - action:
+  #             recommenderService: http://nginx:80/api/recommendation?user_id=
+  #             backendService: http://backend:8001/api/tracks/getTracksById
 
   event_tracking:
     apiEndpoints:
@@ -60,15 +55,21 @@ pipelines:
       - proxy:
           - action:
               serviceEndpoint: recommender
-              
+              preserveHeaders: true
+
   deleteTrack:
     apiEndpoints:
       - deleteTrack
     policies:
       - deleteTrack-pipeline-policy:
           - action:
-              recommenderService: http://nginx:80/api/delete_track
               backendService: http://backend:8001/api/tracks
+              recommenderService: http://nginx:80/api/delete_track
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              preserveHeaders: true
+
   createTrack:
     apiEndpoints:
       - createTrack
@@ -79,16 +80,20 @@ pipelines:
               changeOrigin: true
               stripPath: false
               mapResponse: true
+              preserveHeaders: true
       - createTrack-pipeline-policy:
           - action:
               recommenderUrl: http://nginx:80/api/add_track
-              
 
-  backend:
+  default:
     apiEndpoints:
-      - backend
+      - default  # Sửa từ "backend" thành "default" để khớp với apiEndpoints
     policies:
       - proxy:
           - action:
               serviceEndpoint: backend
-              preserveHost: true
+              changeOrigin: true
+              preserveHeaders: true  # Giữ nguyên headers, bao gồm Cookie
+              # headers:
+              #   whitelist:
+              #     - Cookie
