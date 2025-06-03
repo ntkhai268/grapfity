@@ -278,12 +278,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
-<<<<<<< HEAD
 /* .content {
     display: none;
 } */
-=======
->>>>>>> origin/final
 
 .content.active {
     display: block;

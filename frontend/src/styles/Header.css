@@ -228,11 +228,7 @@ header {
   }
   
   .popup-content {
-<<<<<<< HEAD
     background: transparent;
-=======
-    background: white;
->>>>>>> origin/final
     padding: 20px;
     border-radius: 8px;
     position: relative;
@@ -246,10 +242,7 @@ header {
     background: none;
     border: none;
     cursor: pointer;
-<<<<<<< HEAD
     color: white;
-=======
->>>>>>> origin/final
   }
   .search-bar {
     position: relative; /* Đảm bảo dropdown nằm trong thanh này */

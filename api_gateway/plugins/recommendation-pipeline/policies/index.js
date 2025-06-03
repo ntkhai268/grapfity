@@ -7,22 +7,22 @@ const cookie = require('cookie');
 module.exports = {
   name: 'recommendation-pipeline-policy',
   schema: {
-  "$id": "http://express-gateway.io/schemas/policies/recommendation-pipeline-policy.json",
-  "type": "object",
-  "properties": {
-    "recommenderService": {
-      "type": "string",
-      "format": "uri"
+    "$id": "http://express-gateway.io/schemas/policies/recommendation-pipeline-policy.json",
+    "type": "object",
+    "properties": {
+      "recommenderService": {
+        "type": "string",
+        "format": "uri"
+      },
+      "backendService": {
+        "type": "string",
+        "format": "uri"
+      }
     },
-    "backendService": {
-      "type": "string",
-      "format": "uri"
-    }
+    "required": ["recommenderService", "backendService"]
   },
-  "required": ["recommenderService", "backendService"]
-},
- policy:  (actionParams) => {
-     return async (req, res, next) => {
+  policy: (actionParams) => {
+    return async (req, res, next) => {
       try {
         const cookieHeader = req.headers.cookie;
 
@@ -46,10 +46,10 @@ module.exports = {
           }
         });
         const user_id_real = response.data.user_id;
- 
+
         // Gọi recommender API
         const recommenderUrl = `${actionParams.recommenderService}${user_id_real}`;
-        
+
         const rsRes = await axios.get(recommenderUrl);
 
         const track_ids = rsRes.data
@@ -60,18 +60,18 @@ module.exports = {
 
 
         const payload = {
-            track_ids,
-            };
+          track_ids,
+        };
 
         const beRes = await axios.post(
-            backendUrl,
-            payload,
-            {
-                headers: {
-                'Content-Type': 'application/json'
-                }
+          backendUrl,
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json'
             }
-            );
+          }
+        );
 
         // Trả response về client
         return res.status(200).json(beRes.data);
