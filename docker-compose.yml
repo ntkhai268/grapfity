@@ -1,0 +1,120 @@
+version: '3.8'
+
+services:
+  
+
+  postgres:
+    image: postgres:13
+    env_file: ./recommender/.env  
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/postgre/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    restart: always
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    restart: always
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - recommender
+    restart: always
+
+  mssql:
+    build: ./database/mssql                   # Dùng Dockerfile để build image có sqlcmd
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "StrongP@ssw0rd!"
+      MSSQL_PID: "Developer"
+      MSSQL_DATABASE: "DB_Graptify"
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    
+    healthcheck:
+      test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P 'StrongP@ssw0rd!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8001:8001"
+    depends_on:
+      mssql:
+        condition: service_healthy
+    restart: always
+  
+  api_gateway:
+    build: ./api_gateway
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - backend
+      - nginx
+      - redis
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api_gateway
+    restart: always
+
+  
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.2.0
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME=2000
+    restart: always
+  kafka:
+    image: confluentinc/cp-kafka:6.2.0
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    restart: always
+    
+
+  recommender:
+    build: ./recommender
+    env_file: ./recommender/.env  
+    depends_on:
+      - postgres
+      - kafka
+    restart: always
+    volumes:
+      - ./recommender:/app
+  
+    ports:
+      - "8000:8000"
+
+
+
+volumes:
+  mssql_data:
+  postgres_data:
+
+  
+
+ 

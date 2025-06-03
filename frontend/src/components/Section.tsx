@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"; // Thêm React nếu chưa có
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from './Sidebar';
 // Import GlobalAudioManager và các kiểu dữ liệu cần thiết
 // Đảm bảo đường dẫn này chính xác
@@ -11,7 +11,7 @@ import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
 import { PlaylistData } from "../components/Manager_Playlists/ManagerDataPlaylist";
 import { getAllPublicPlaylistsAPI } from "../services/playlistService"; 
 import { getTop10PopularTracksAPI } from "../services/listeningService";
-
+import {EventType, sendEvent} from "../services/eventTracking";
 
 
 import "../styles/Section.css"; // Đảm bảo đường dẫn CSS đúng
@@ -33,7 +33,8 @@ export const mapTrackDataToSong = (track: TrackData): Song => ({
 const Section: React.FC = () => { // Thêm kiểu React.FC
     const navigate = useNavigate(); // Khởi tạo useNavigate
     const [sidebarExpanded, setSidebarExpanded] = useState(false);
-
+    const { userId: profileUserId } = useParams<{ userId: string }>();
+    const viewedUserId = profileUserId ?? "me"; 
     // State lưu trữ mảng Song[] (đã sửa kiểu)
     const [allTracks, setAllTracks] = useState<Song[]>([]); 
     const [isLoading, setIsLoading] = useState<boolean>(true); 
@@ -170,6 +171,8 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             context: { id: contextId, type },
             },
         });
+        sendEvent(String(song.id), EventType.Click, viewedUserId);
+
     };
 
 

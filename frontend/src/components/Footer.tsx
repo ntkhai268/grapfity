@@ -5,9 +5,10 @@ import useFooterAudioPlayer, { UseFooterAudioPlayerReturn } from "../hooks/Foote
 import GlobalAudioManager, { Song } from "../hooks/GlobalAudioManager"; 
 import "../styles/Footer.css";
 import  { RepeatButton, ShuffleButton } from './modeControl';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import VolumeControl from "./VolumeControl";
 import { trackingListeningHistoryAPI } from "../services/listeningService";
+import { sendEvent, EventType } from "../services/eventTracking";
 
 
 // Interface cho FooterLeft (có thể giữ nguyên hoặc điều chỉnh)
@@ -150,7 +151,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-
 // --- Component Footer chính ---
 const Footer: React.FC = () => {
   // --- SỬA LỖI: Destructure đúng tên từ hook ---
@@ -173,6 +173,9 @@ const Footer: React.FC = () => {
     setVolume  
   }: UseFooterAudioPlayerReturn = useFooterAudioPlayer();
 
+  const { userId: profileUserId } = useParams<{ userId: string }>();
+  const viewedUserId = profileUserId ?? "me";
+
   // console.log("👈👈👈👈[Footer] render", {
   //   currentSong,
   //   isPlaying,
@@ -191,6 +194,9 @@ const Footer: React.FC = () => {
     ) {
       trackingListeningHistoryAPI(currentSong.id)
         .catch(() => { /* ignore */ });
+
+      sendEvent(
+      String(currentSong.id), EventType.Play, viewedUserId)
       lastTrackedId.current = currentSong.id;
     }
     // Không reset lastTrackedId khi pause, chỉ reset khi đổi sang bài khác!
