@@ -25,14 +25,27 @@ const sequelize = new Sequelize(
 );
 
 // Khởi tạo hàm kết nối để gọi khi chạy app
-const connectToDB = async () => {
-  try {
-    await sequelize.authenticate();
-    console.log('✅ Connection has been established successfully.');
-  } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
+const connectToDB = async (retries = 5, delay = 5000) => {
+  while (retries > 0) {
+    try {
+      await sequelize.authenticate();
+      console.log('Connection has been established successfully.');
+      return;
+    } catch (error) {
+      console.error(`Unable to connect to the database: ${error.message}`);
+      retries--;
+
+      if (retries === 0) {
+        console.error('All connection attempts failed. Exiting...');
+        process.exit(1); // Dừng ứng dụng nếu hết retries
+      }
+
+      console.log(`Retrying in ${delay / 1000} seconds... (${retries} retries left)`);
+      await new Promise(res => setTimeout(res, delay));
+    }
   }
 };
+
 
 // Hàm khởi tạo các model và trả về db
 const initDb = async () => {

@@ -1,0 +1,20 @@
+db:
+  redis:
+    host: redis
+    port: 6379
+    namespace: EG
+
+
+plugins:
+  recommendation-pipeline:
+    package: './plugins/recommendation-pipeline/manifest.js'
+  deleteTrack-pipeline:
+    package: './plugins/deleteTrack-pipeline/manifest.js'
+  createTrack-pipeline:
+    package: './plugins/createTrack-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'
+  # recommendation-pipeline:
+  #   package: './plugins/recommendation-pipeline/manifest.js'

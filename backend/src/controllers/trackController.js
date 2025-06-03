@@ -7,6 +7,7 @@ import { verityJWT } from '../middleware/JWTActions.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import {
+    getTracksById,
     getAllTracks,
     getTrackById,
     getTrackWithUploaderById,
@@ -19,7 +20,6 @@ import {
     getJoinedTracks,
     updateTrackStatus
 } from '../services/track_service.js';
-<<<<<<< HEAD
 import { verityJWT } from '../middleware/JWTActions.js';
 import path from 'path';
 
@@ -35,21 +35,6 @@ const getAllTracksController = async (req, res) => {
         console.error('Database connection failed:', err);
         res.status(500).send('Internal Server Error');
     }
-=======
-
-
-const getAllTracksController = async (req, res) => {
-  try {
-    const tracks = await getAllTracks();
-    return res.status(200).json({
-      message: 'Get all tracks succeed!',
-      data: tracks
-    });
-  } catch (err) {
-    console.error('Database connection failed:', err);
-    res.status(500).send('Internal Server Error');
-  }
->>>>>>> 283ee7bacd0a6219ad2a1c9149c88380e7e02c79
 };
 
 const getTrackByIdController = async (req, res) => {
@@ -202,27 +187,19 @@ const uploadTrackCoverController = async (req, res) => {
 };
 const createTrackController = async (req, res) => {
   try {
-<<<<<<< HEAD
     // Xác thực người dùng
     const jwtData = verityJWT(req.cookies.jwt);
     const uploaderId = jwtData.userId;
 
     // Lấy đường dẫn file
-=======
-    const jwtData = verityJWT(req.cookies.jwt);
-    const uploaderId = jwtData.userId;
-
->>>>>>> 283ee7bacd0a6219ad2a1c9149c88380e7e02c79
     const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
     const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
     const absAudioPath = path.resolve(`src/public/${trackUrl}`);
     const privacy = req.body.privacy || 'public';
     const trackname = req.body.title || 'Untitled';
 
-<<<<<<< HEAD
+
     // Gọi service
-=======
->>>>>>> 283ee7bacd0a6219ad2a1c9149c88380e7e02c79
     const newTrack = await createTrack({
       trackUrl,
       imageUrl,
@@ -234,14 +211,12 @@ const createTrackController = async (req, res) => {
 
     return res.status(200).json({
       message: 'Create track succeed!',
-      data: newTrack
+      data: newTrack,
+      track_file_name: req.files.audio[0].filename,
+      track_id: newTrack.id
     });
   } catch (err) {
-<<<<<<< HEAD
     console.error('❌ Track creation failed:', err);
-=======
-    console.error('Track creation failed:', err);
->>>>>>> 283ee7bacd0a6219ad2a1c9149c88380e7e02c79
     return res.status(500).json({ message: err.message || 'Internal Server Error' });
   }
 };
@@ -428,7 +403,24 @@ const getTracksByUserController = async (req, res) => {
     }
   };
 
+const getTracksByIdController = async (req, res) => {
+    try {
+        const trackIds = req.body.track_ids;
+        
+        if (!trackIds || !Array.isArray(trackIds)) {
+            return res.status(400).json({ error: 'Invalid track IDs' });
+        }
+
+        const tracks = await getTracksById(trackIds);
+        return res.status(200).json(tracks);
+    } catch (error) {
+        console.error('Error in getTracksByIdController:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export {
+    getTracksByIdController,
     getAllTracksController,
     getTrackByIdController,
     getTrackWithUploaderByIdController,
