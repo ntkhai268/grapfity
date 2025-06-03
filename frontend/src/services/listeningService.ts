@@ -71,31 +71,31 @@ export async function fetchListeningHistory(): Promise<ListeningHistoryRecord[]>
  * Lấy về danh sách tất cả tracks
  */
 export async function fetchAllTracks(): Promise<TrackRecord[]> {
-  const res = await axios.get<{ data: TrackRecord[] }>('/tracks');
+  const res = await axios.get<{ data: TrackRecord[] }>('/api/tracks');
   return res.data.data;
 }
 // Ghi nhận lượt nghe mới cho một track (trackId)
 export const trackingListeningHistoryAPI = async (trackId: string | number) => {
   console.log(trackId)
-  const res = await axios.post(`/track/${trackId}/listen`);
+  const res = await axios.post(`/api/track/${trackId}/listen`);
   // Backend trả về { message, history }
   return res.data.history;
 };
 // 3. Lấy top 10 bài hát phổ biến toàn hệ thống
 export const getTop10PopularTracksAPI = async () => {
-  const res = await axios.get('/popular/top10');
+  const res = await axios.get('/api/popular/top10');
   return res.data;
 };
 
 // 4. Lấy top 5 bài hát user nghe nhiều nhất
 export const getTop5TracksOfUserAPI = async () => {
-  const res = await axios.get('/popular/top5');
+  const res = await axios.get('/api/popular/top5');
   
   return res.data;
 };
 
 export const getTop5TracksOfOwnerAPI = async () => {
-  const res = await axios.get('/popular-owner/top5');
+  const res = await axios.get('/api/popular-owner/top5');
   
   return res.data;
 };

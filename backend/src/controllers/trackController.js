@@ -20,8 +20,8 @@ import {
     getJoinedTracks,
     updateTrackStatus
 } from '../services/track_service.js';
-import { verityJWT } from '../middleware/JWTActions.js';
-import path from 'path';
+
+
 
 
 const getAllTracksController = async (req, res) => {

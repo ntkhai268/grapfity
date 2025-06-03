@@ -18,10 +18,14 @@ const hostname = process.env.HOSTNAME || "0.0.0.0";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(cors({
-  origin: 'http://localhost:5173', // chính xác origin React app
-  credentials: true
-}));
+// app.use(cors({
+//   origin: 'http://localhost:5173', // chính xác origin React app
+//   credentials: true
+// }));
+
+// // Đảm bảo Express xử lý OPTIONS
+// app.options('/*', cors()); // để xử lý preflight OPTIONS
+
 
 app.use(json()); // Parse dữ liệu từ request body với định dạng json
 app.use(urlencoded({ extended: true })); // Parse dữ liệu từ request body với định dạng urlencoded
