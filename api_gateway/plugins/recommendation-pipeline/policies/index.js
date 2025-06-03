@@ -1,4 +1,6 @@
 const axios = require('axios');
+const cookie = require('cookie');
+
 // const  schema = require('./schema.json')
 
 
@@ -22,19 +24,25 @@ module.exports = {
  policy:  (actionParams) => {
      return async (req, res, next) => {
       try {
-       
-        const user_id = req.query.user_id;
+        const cookieHeader = req.headers.cookie;
 
-        if (!user_id) {
-          return res.status(400).json({ error: 'Missing user_id' });
+        if (!cookieHeader) {
+          return res.status(400).json({ error: 'Missing cookie' });
         }
 
-        const cookie = req.headers.cookie
+        const cookies = cookie.parse(cookieHeader);
+        const jwt = cookies.jwt;
+
+
+        if (!jwt) {
+          return res.status(400).json({ error: 'Missing jwt in cookie' });
+        }
+
         const backendJwtUrl = `${actionParams.backendService}/getUserId`
 
         const response = await axios.get(backendJwtUrl, {
           headers: {
-            Cookie: cookie  // truyền cookie tới backend
+            Cookie: cookieHeader  // truyền cookie tới backend
           }
         });
         const user_id_real = response.data.user_id;
@@ -66,7 +74,7 @@ module.exports = {
             );
 
         // Trả response về client
-        return res.status(200).json(beRes);
+        return res.status(200).json(beRes.data);
 
       } catch (err) {
         console.error('Error in recommendation policy:', err.message);

@@ -41,7 +41,6 @@ async def load_track_metadata():
             
         logger.info(f"Retrieved {len(data)} tracks from database")
 
-       
         
         track_metadata = pd.DataFrame(data)
         track_metadata = track_metadata.reset_index(drop=True)
@@ -63,6 +62,7 @@ async def content_based_recommend(user_id: str, n: int = 10):
             logger.info("Track metadata not loaded, loading now...")
             await load_track_metadata()
 
+        # If the model is not updated
         events = await get_user_events(user_id)
         logger.info(f"User {user_id} has {len(events)} events")
         
@@ -71,11 +71,13 @@ async def content_based_recommend(user_id: str, n: int = 10):
             random_state = int(os.getenv("FASTAPI_RANDOM_STATE", 42))
             return track_metadata['track_id'].sample(n,random_state =random_state).tolist()
         
+
         user_track_ids = list(set(event['track_id'] for event in events))
         logger.info(f"User {user_id} has interacted with {len(user_track_ids)} unique tracks")
 
         indices = track_metadata[track_metadata['track_id'].isin(user_track_ids)].index.tolist()
-        
+
+        # Find the position (index) of records in track_metadata whose track_id is in the user_track_ids list to get metadata for cosine simi.
         if not indices:
             logger.info(f"No matching tracks in metadata for user {user_id}, returning random tracks")
             return track_metadata['track_id'].sample(n,random_state =random_state).tolist()

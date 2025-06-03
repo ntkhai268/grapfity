@@ -1,5 +1,4 @@
 const axios = require('axios');
-// const  schema = require('./schema.json')
 
 
 module.exports = {
@@ -47,7 +46,7 @@ module.exports = {
               recommenderUrl,
               { track_id, track_file_name },
               {
-                headers: { // 🔧 Fix lỗi: phải là `headers`, không phải `header`
+                headers: { 
                   'Content-Type': 'application/json'
                 }
               }
