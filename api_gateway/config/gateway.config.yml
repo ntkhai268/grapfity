@@ -1,26 +1,35 @@
 http:
   port: 8080
 
-
 apiEndpoints:
+  # THÊM ENDPOINT MỚI CHO OPTIONS REQUESTS
+  cors-options:
+    host: '*'
+    paths: ['/*']
+    methods: ['OPTIONS']
+
+  image:
+    host: '*'
+    paths: '/assets/*'
+    
   recommendation:
-    host: 'localhost'
+    host: '*'  # ĐỔI TỪ 'localhost' THÀNH '*' ĐỂ CHẤP NHẬN MỌI HOST
     paths: '/api/recommendation*'
   event_tracking:
-    host: 'localhost'
+    host: '*'
     paths: '/api/event_tracking'
-
   deleteTrack:
-    host: 'localhost'
+    host: '*'
     paths: '/api/tracks/:id'
-
+    methods: ['DELETE']
   createTrack:
-    host: 'localhost'
+    host: '*'
     paths: '/api/tracks/create-track'
-
-  backend:
-    host: 'localhost'
+  default:
+    host: '*'
     paths: '/api/*'
+    methods: [GET, POST, PUT, DELETE]
+    preserveHeaders: true
 
 serviceEndpoints:
   recommender:
@@ -35,60 +44,111 @@ policies:
   - recommendation-pipeline-policy
   - deleteTrack-pipeline-policy
   - createTrack-pipeline-policy
-
+  - cors
 
 pipelines:
+  # PIPELINE MỚI XỬ LÝ OPTIONS REQUESTS
+  cors-options:
+    apiEndpoints:
+      - cors-options
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
+              maxAge: 86400  # Cache preflight trong 24h
+
   recommendation:
     apiEndpoints:
       - recommendation
     policies:
-      # - proxy:
-      #     - action:
-      #         serviceEndpoint: recommender
-      #         preserveHost: true
-      #         mapResponse: true 
-
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
       - recommendation-pipeline-policy:
           - action:
               recommenderService: http://nginx:80/api/recommendation?user_id=
-              backendService: http://backend:8001/api/tracks/getTracksById
+              backendService: http://backend:8001/api
 
   event_tracking:
     apiEndpoints:
       - event_tracking
     policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
       - proxy:
           - action:
               serviceEndpoint: recommender
-              
+              preserveHeaders: true
+
   deleteTrack:
     apiEndpoints:
       - deleteTrack
     policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
       - deleteTrack-pipeline-policy:
           - action:
-              recommenderService: http://nginx:80/api/delete_track
               backendService: http://backend:8001/api/tracks
+              recommenderService: http://nginx:80/api/delete_track
+
   createTrack:
     apiEndpoints:
       - createTrack
     policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
       - proxy:
           - action:
               serviceEndpoint: backend
               changeOrigin: true
               stripPath: false
               mapResponse: true
+              preserveHeaders: true
       - createTrack-pipeline-policy:
           - action:
               recommenderUrl: http://nginx:80/api/add_track
-              
 
-  backend:
+  image:
     apiEndpoints:
-      - backend
+      - track_image
     policies:
       - proxy:
           - action:
               serviceEndpoint: backend
-              preserveHost: true
+              changeOrigin: true
+              stripPath: false  # giữ nguyên /assets/track_image/...
+              preserveHeaders: true
+
+  default:
+    apiEndpoints:
+      - default
+    policies:
+      - cors:
+          - action:
+              origin: 'http://localhost:5173'
+              methods: ['GET', 'POST', 'PUT', 'DELETE']
+              allowedHeaders: ['Content-Type', 'Authorization']
+              credentials: true
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              changeOrigin: true
+              preserveHeaders: true

@@ -12,6 +12,8 @@ plugins:
     package: './plugins/deleteTrack-pipeline/manifest.js'
   createTrack-pipeline:
     package: './plugins/createTrack-pipeline/manifest.js'
+  # cors:
+  #   package: express-gateway-plugin-cors
   # recommendation-pipeline:
   #   package: './plugins/recommendation-pipeline/manifest.js'
   # recommendation-pipeline:

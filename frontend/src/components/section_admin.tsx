@@ -64,7 +64,6 @@ const Section_admin: React.FC = () => {
     setCheckedRows(init);
     setAllChecked(false);
   }, [searchTerm, tracks]);
-
   const handleSort = (option: string) => {
     let sorted = [...filteredTracks];
     switch (option) {

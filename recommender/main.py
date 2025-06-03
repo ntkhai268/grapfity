@@ -37,7 +37,11 @@ async def startup_event():
 async def track_event(event: Event):
     logger.info(f"Tracking event: {event.event_id}")
     try:
+<<<<<<< HEAD
         await send_event_to_kafka(event.dict())
+=======
+        await send_event_to_kafka(event)
+>>>>>>> origin/final
         return {"status": "Event received and sent to Kafka"}
     except Exception as e:
         logger.error(f"Event tracking failed: {str(e)}", exc_info=True)
@@ -83,11 +87,20 @@ class TrackRequest(BaseModel):
 @app.post("/api/add_track")
 def add_track_feature(track_data: TrackRequest):
 
+<<<<<<< HEAD
     # res = extract(track_data.track_file_name)
     track_file_name = track_data.track_file_name
     track_id = track_data.track_id
 
     return {"res": {track_file_name,track_id}}
+=======
+    res = extract(track_data.track_file_name)
+    # track_file_name = track_data.track_file_name
+    # track_id = track_data.track_id
+
+    return {"res": {res}}
+    # return {"res": {track_file_name,track_id}}
+>>>>>>> origin/final
 
 @app.delete("/api/delete_track/{id}")
 async def delete_track_feature(id: int):

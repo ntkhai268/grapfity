@@ -9,9 +9,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Tạo bảng tracks
 CREATE TABLE IF NOT EXISTS tracks (
-  trackname VARCHAR,
   track_id INTEGER PRIMARY KEY NOT NULL,
-  lyrics TEXT,
   explicit BOOLEAN,
   danceability FLOAT,
   energy FLOAT,
@@ -25,19 +23,16 @@ CREATE TABLE IF NOT EXISTS tracks (
   valence FLOAT,
   tempo FLOAT,
   duration_ms INTEGER,
-  time_signature INTEGER,
-  year INTEGER,
-  release_date DATE
+  time_signature INTEGER
 );
 
--- Tạo bảng events
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
-    event_id VARCHAR(50) NOT NULL,
+    event_id VARCHAR(50) NOT NULL UNIQUE,  -- thêm UNIQUE ở đây
     event_type VARCHAR(50) NOT NULL,
     track_id INTEGER NOT NULL REFERENCES tracks(track_id) ON DELETE CASCADE,
     user_id VARCHAR(50) NOT NULL,
-    timestamp TIMESTAMP NOT NULL
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_events_user_id ON events(user_id);
@@ -47,15 +42,13 @@ CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
 -- Chèn 100 bản ghi vào tracks
 -- ------------------------
 INSERT INTO tracks (
-  trackname, track_id, lyrics, explicit,
+   track_id, explicit,
   danceability, energy, key, loudness, mode,
   speechiness, acousticness, instrumentalness, liveness,
-  valence, tempo, duration_ms, time_signature, year, release_date
+  valence, tempo, duration_ms, time_signature
 )
 SELECT
-  'Track ' || gs.id AS trackname,
   gs.id AS track_id,
-  'Lyrics for track ' || gs.id AS lyrics,
   (random() < 0.3) AS explicit,
   random() AS danceability,
   random() AS energy,
@@ -69,9 +62,7 @@ SELECT
   random() AS valence,
   (random() * 200 + 60)::float AS tempo,
   (floor(random() * 300000) + 60000)::int AS duration_ms,
-  (floor(random() * 7) + 1)::int AS time_signature,
-  (2025 - floor(random() * 30))::int AS year,
-  (CURRENT_DATE - ((floor(random() * 365 * 30))::int || ' days')::interval)::date AS release_date
+  (floor(random() * 7) + 1)::int AS time_signature
 FROM generate_series(1,100) AS gs(id);
 
 -- ------------------------

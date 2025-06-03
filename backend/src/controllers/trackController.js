@@ -204,7 +204,9 @@ const createTrackController = async (req, res) => {
 
     return res.status(200).json({
       message: 'Create track succeed!',
-      data: newTrack
+      data: newTrack,
+      track_file_name: req.files.audio[0].filename,
+      track_id: newTrack.id
     });
   } catch (err) {
     console.error('Track creation failed:', err);
@@ -212,12 +214,10 @@ const createTrackController = async (req, res) => {
   }
 };
 
-
 const updateTrackController = async (req, res) => {
-  const id = req.params.id; // ID nằm trong URL
-  const { title, lyrics } = req.body;
-   const userId = req.userId;
- 
+  const id = req.params.id;
+  const { title, lyrics, privacy } = req.body;
+  const userId = req.userId;
 
   if (!id || !userId) {
     return res.status(400).json({ message: 'Thiếu ID hoặc chưa đăng nhập.' });
@@ -226,43 +226,27 @@ const updateTrackController = async (req, res) => {
   try {
     const updateData = {};
 
-    if (title) updateData.title = title;
+    if (title) updateData.trackname = title;  // 🔁 đổi từ 'title' sang 'trackname'
     if (lyrics !== undefined) updateData.lyrics = lyrics;
-    if (req.body.privacy) updateData.privacy = req.body.privacy;
+    if (privacy) updateData.privacy = privacy;
 
-    // ✅ Nhận file nếu có
     if (req.file) {
-     updateData.imageUrl = '/assets/track_image/' + req.file.filename;
+      updateData.imageUrl = '/assets/track_image/' + req.file.filename;
+      console.log("📥 Uploaded file:", req.file.filename);
     }
-    console.log("📥 Uploaded file:", req.file);
 
-    
-   
     const updatedTrack = await updateTrack(id, updateData, userId);
-    
-
-    if (title || lyrics !== undefined) {
-      const metadataUpdate = {};
-      if (title) metadataUpdate.trackname = title;
-      if (lyrics !== undefined) metadataUpdate.lyrics = lyrics;
-
-      await db.Metadata.update(
-        metadataUpdate,
-        { where: { track_id: id } }
-      );
-    }
-    
 
     return res.status(200).json({
-      message: 'Update track succeed!',
+      message: 'Cập nhật bài hát thành công!',
       data: updatedTrack
     });
+
   } catch (err) {
-    console.error('❌ Failed to update track:', err);
-    res.status(500).json({ message: err.message || 'Internal Server Error' });
+    console.error('❌ Lỗi khi cập nhật bài hát:', err);
+    res.status(500).json({ message: err.message || 'Lỗi máy chủ nội bộ' });
   }
 };
-
 
 const deleteTrackController = async (req, res) => { 
     const userId = req.userId;
@@ -394,6 +378,20 @@ const getTracksByUserController = async (req, res) => {
     }
   };
 
+const getTracksByIdController = async (req, res) => {
+    try {
+        const trackIds = req.body.track_ids;
+        if (!trackIds || !Array.isArray(trackIds)) {
+            return res.status(400).json({ error: 'Invalid track IDs' });
+        }
+        const tracks = await getTracksById(trackIds);
+        return res.status(200).json(tracks);
+    } catch (error) {
+        console.error('Error in getTracksByIdController:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 export {
     getAllTracksController,
     getTrackByIdController,
@@ -407,5 +405,6 @@ export {
     getJoinedTracksController,
     downloadTrackController,
     updateTrackStatusController,
-    getTracksByUserController
+    getTracksByUserController,
+    getTracksByIdController
 };

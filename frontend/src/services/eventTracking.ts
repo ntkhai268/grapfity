@@ -35,10 +35,10 @@ export const sendEvent = async (
     user_id: userId,
     timestamp: new Date().toISOString(),
   };
-  console.log("ahihi")
+  console.log("ahihi",event)
   try {
     const response = await axios.post(
-      'http://localhost:8080/api/eventTracking',
+      'http://localhost:8080/api/event_tracking',
       { event },
       {
         headers: {
