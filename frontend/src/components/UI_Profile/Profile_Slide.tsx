@@ -19,6 +19,7 @@ const ProfileSlide: React.FC<ProfileSlideProps> = ({ viewedUserId, currentUserId
   const [user, setUser] = useState<UserType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isOwner = viewedUserId === "me" || viewedUserId === currentUserId;
+  console.log("profile_slide: ", isOwner)
 
   useEffect(() => {
     const fetchUser = async () => {

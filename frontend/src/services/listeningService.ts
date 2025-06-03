@@ -77,7 +77,7 @@ export async function fetchAllTracks(): Promise<TrackRecord[]> {
 // Ghi nhận lượt nghe mới cho một track (trackId)
 export const trackingListeningHistoryAPI = async (trackId: string | number) => {
   console.log(trackId)
-  const res = await axios.post(`api/track/${trackId}/listen`);
+  const res = await axios.post(`/track/${trackId}/listen`);
   // Backend trả về { message, history }
   return res.data.history;
 };
@@ -89,7 +89,7 @@ export const getTop10PopularTracksAPI = async () => {
 
 // 4. Lấy top 5 bài hát user nghe nhiều nhất
 export const getTop5TracksOfUserAPI = async () => {
-  const res = await axios.get('api/popular/top5');
+  const res = await axios.get('/popular/top5');
   
   return res.data;
 };

@@ -84,7 +84,6 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
 
   const whereClause = {
     uploaderId: numericUserId,
-    status: 'approved',
     ...(isOwner ? {} : { privacy: 'public' }) // 👈 Nếu không phải chủ sở hữu thì chỉ thấy bài public
   };
 

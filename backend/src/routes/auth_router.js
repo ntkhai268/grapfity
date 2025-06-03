@@ -2,7 +2,7 @@ import { Router } from 'express';
 const authRouter = Router();
 import { registerController, handleUserLoginController, logoutController } from '../controllers/userController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js'
-import db from '../models/index.js';      // ✅ import toàn bộ models
+import db from '../models/index.js'; 
 const { User } = db;   
 
 authRouter.post('/register', registerController);
@@ -19,7 +19,9 @@ authRouter.get('/me', authenticateUser, async (req, res) => {
     }
 
     res.status(200).json({
-      id: user._id,
+      id: user.id,
+      name: user.name,
+      email: user.email
     });
   } catch (err) {
     console.error('Lỗi khi lấy thông tin user:', err);

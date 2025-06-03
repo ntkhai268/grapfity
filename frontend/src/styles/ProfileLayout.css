@@ -278,6 +278,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
+/* .content {
+    display: none;
+} */
 
 .content.active {
     display: block;
@@ -775,7 +778,7 @@ body.profile-page {
     padding-right: 10px;
   }
   
-  .track-item {
+  .track-item-profile {
     display: flex;
     align-items: center;
     padding: 8px 0;
@@ -785,15 +788,15 @@ body.profile-page {
     border-radius: 5px;
   }
   
-  .track-item:hover {
+  .track-item-profile:hover {
     background-color: #1F1F1F;
   }
   
-  .track-item.active {
+  .track-item-profile.active {
     background-color: #f2f2f2;
   }
   
-  .track-item.active .track-text {
+  .track-item-profile.active .track-text {
     color: #f50;
     font-weight: 500;
   }
