@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "audio-decode": "^2.2.2",
-    "essentia.js": "^0.1.3"
-  }
-}
