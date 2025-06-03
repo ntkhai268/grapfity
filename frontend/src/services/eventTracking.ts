@@ -35,7 +35,11 @@ export const sendEvent = async (
     user_id: userId,
     timestamp: new Date().toISOString(),
   };
+<<<<<<< HEAD
 
+=======
+  console.log("ahihi")
+>>>>>>> 2b77211b7755c6af3e6a2445fd02be158c15e4a7
   try {
     const response = await axios.post(
       'http://localhost:8080/api/eventTracking',
