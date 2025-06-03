@@ -124,7 +124,6 @@ const getTop5TracksOfUser = async (userId) => {
           },
           {
             model: User,
-        
             attributes: ['Name'] // Lấy tên nghệ sĩ (artist)
           }
         ]

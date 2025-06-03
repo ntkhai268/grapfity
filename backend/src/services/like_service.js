@@ -12,7 +12,7 @@ const unlikeTrack = async (userId, trackId) => {
         }
     });
 };
-const getLikedTracksByUser = async (userId) => {
+const getLikedTracksByProfile = async (userId) => {
   return await db.Like.findAll({
     where: { userId },
     include: [
@@ -46,7 +46,7 @@ const countLikesForTrack = async (trackId) => {
 export {
     likeTrack,
     unlikeTrack,
-    getLikedTracksByUser,
+    getLikedTracksByProfile,
     isTrackLikedByUser,
     countLikesForTrack
 };

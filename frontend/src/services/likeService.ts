@@ -27,13 +27,9 @@ export const unlikeTrackAPI = async (trackId: number | string): Promise<any> => 
 /**
  * Lấy danh sách tất cả track đã like bởi người dùng hiện tại
  */
-export const getLikedTracksByUserAPI = async (): Promise<any[]> => {
-  const response = await axios.get(`${LIKE_API_BASE_URL}/likes`, {
-    withCredentials: true,
-  });
+export const getLikedTracksByProfileAPI = async (userId: string | number): Promise<any[]> => {
+  const response = await axios.get(`${LIKE_API_BASE_URL}/likes/${userId}`);
   const rawTracks = response.data.data || [];
-  //  console.log("🧪 raw tracks:", rawTracks);
-
   return rawTracks.map(mapApiDataToTrackData);
 };
 

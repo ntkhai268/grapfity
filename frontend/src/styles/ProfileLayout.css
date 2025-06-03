@@ -278,9 +278,9 @@ body.profile-page {
 .tab:hover {
     color: white;
 }
-/* .content {
+.page-content .content {
     display: none;
-} */
+}
 
 .content.active {
     display: block;
