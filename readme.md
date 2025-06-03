@@ -1,0 +1,1 @@
+# bổ sung extractor_model.pkl vào recommender/static/matrix/
