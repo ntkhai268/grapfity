@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, RefObject } from "react";
 // Import API và kiểu dữ liệu Playlist từ service của bạn
 import { getMyPlaylistsAPI } from "../../services/playlistService";
 import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
+import {downloadTrackByIdAPI } from"../../services/trackServiceAPI";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
 import {  isTrackLikedByUserAPI,  likeTrackAPI,  unlikeTrackAPI,  countLikesForTrackAPI,} from "../../services/likeService";
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
@@ -31,6 +32,7 @@ const Controls: React.FC<ControlsProps> = ({
   // ...destructure các props khác nếu có
 }) => {
   // --- Hooks & State ---
+  // console.log('[DEBUG] Controls props:', {trackId, songUrl, currentTrackId, isPlaying});
 
   // Giả định có cách lấy trạng thái đăng nhập
   const isLoggedIn = true; // <<< !!! THAY THẾ BẰNG LOGIC LẤY TRẠNG THÁI ĐĂNG NHẬP THỰC TẾ !!!
@@ -173,7 +175,9 @@ const Controls: React.FC<ControlsProps> = ({
     };
 
     GlobalAudioManager.setPlaylist(playlist, index, context);
-    GlobalAudioManager.playSongAt(index);
+    setTimeout(() => {
+      GlobalAudioManager.playSongAt(index);
+    }, 50);
   } else {
     if (isCurrentlyPlaying) {
       GlobalAudioManager.pausePlayback();
@@ -206,7 +210,9 @@ const Controls: React.FC<ControlsProps> = ({
     fetchLikeState();
   }, [trackId, isLoggedIn]);
 
-
+  useEffect(() => {
+  console.log('[DEBUG] Controls nhận props mới:', { trackId, songUrl, currentTrackId, isPlaying });
+}, [trackId, songUrl, currentTrackId, isPlaying]);
   
 // console.log("Controls xxxxxxxxxx:", { trackId, currentTrackId, isPlaying,  }); 
   // --- Render ---
@@ -236,8 +242,12 @@ const Controls: React.FC<ControlsProps> = ({
         <span style={{ fontSize: "12px", marginLeft: "4px", color: "#ccc" }}>{likeCount}</span>
       </div>
 
-      <div className="control-icon">
-        <i className="fas fa-arrow-down" style={{ color: "white" }}></i>
+     <div
+        className="control-icon"
+        title="Tải bài hát về"
+        onClick={() => trackId != null && downloadTrackByIdAPI(trackId)}
+      >
+        <i className="fas fa-arrow-down" style={{ color: "white", cursor: "pointer" }}></i>
       </div>
 
       {/* Ellipsis Icon & Main Dropdown Trigger */}

@@ -1,121 +1,159 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Thêm useNavigate để điều hướng
-import "../styles/TopArtistsLis.css";
+// src/components/TopArtistsLis.tsx
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchListeningHistory, ListeningHistoryRecord } from '../services/listeningService';
+import '../styles/TopArtistsLis.css';
 
-interface Artist {
-  id: number;
+interface ArtistItem {
   name: string;
-  image: string;
   scrobbles: number;
-  rank: number;
+  lastListened: string;
 }
 
-const TopArtistsLis: React.FC = () => {
-  // Local state for the time filter
-  const [timeFilter_artists, setTimeFilter_artists] = useState("Last 7 days");
+type FilterOption = 'all' | 'last7' | 'scrobblesDesc' | 'scrobblesAsc' | 'nameAsc' | 'nameDesc';
 
-  // Sử dụng useNavigate để điều hướng
+const formatDate = (iso: string) => {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+};
+
+const TopArtistsLis: React.FC = () => {
+  const [artists, setArtists] = useState<ArtistItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filter, setFilter] = useState<FilterOption>('all');
   const navigate = useNavigate();
 
-  // Sample data for the artists
-  const artists_artists: Artist[] = [
-    {
-      id: 1,
-      name: "k.d. lang",
-      image: "/placeholder.svg?height=60&width=60",
-      scrobbles: 299,
-      rank: 1,
-    },
-    {
-      id: 2,
-      name: "Carly Rae Jepsen",
-      image: "/placeholder.svg?height=60&width=60",
-      scrobbles: 228,
-      rank: 2,
-    },
-    {
-      id: 3,
-      name: "Liz Phair",
-      image: "/placeholder.svg?height=60&width=60",
-      scrobbles: 156,
-      rank: 3,
-    },
-    {
-      id: 4,
-      name: "Fletcher",
-      image: "/placeholder.svg?height=60&width=60",
-      scrobbles: 138,
-      rank: 4,
-    },
-  ];
+  useEffect(() => {
+    (async () => {
+      try {
+        const histories = await fetchListeningHistory();
+        const map = new Map<string, { rec: ListeningHistoryRecord; count: number }>();
+        histories.forEach(h => {
+          const artistName = h.track.User?.UploaderName ?? 'Unknown Artist';
+          const prev = map.get(artistName);
+          if (prev) {
+            prev.count += h.listenCount;
+            if (new Date(h.createdAt) > new Date(prev.rec.createdAt)) {
+              prev.rec = h;
+            }
+          } else {
+            map.set(artistName, { rec: h, count: h.listenCount });
+          }
+        });
+        const list = Array.from(map.values()).map(({ rec, count }) => ({
+          name: rec.track.User?.UploaderName ?? 'Unknown Artist',
+          scrobbles: count,
+          lastListened: rec.createdAt,
+        }));
+        setArtists(list);
+      } catch (err) {
+        console.error(err);
+        setArtists([]);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
-  // Stats data
-  const stats_artists = {
-    plays: 1,
-    likes: 0,
-    comments: 1,
-    reposts: 0,
-    downloads: 0,
-  };
+  const displayed = useMemo(() => {
+    let arr = [...artists];
+    const now = Date.now();
+    if (filter === 'last7') {
+      const weekAgo = now - 7 * 24 * 60 * 60 * 1000;
+      arr = arr.filter(a => new Date(a.lastListened).getTime() >= weekAgo);
+    }
+    if (filter === 'scrobblesDesc') arr.sort((a, b) => b.scrobbles - a.scrobbles);
+    if (filter === 'scrobblesAsc') arr.sort((a, b) => a.scrobbles - b.scrobbles);
+    if (filter === 'nameAsc') arr.sort((a, b) => a.name.localeCompare(b.name));
+    if (filter === 'nameDesc') arr.sort((a, b) => b.name.localeCompare(a.name));
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      arr = arr.filter(a => a.name.toLowerCase().includes(q));
+    }
+    return arr;
+  }, [artists, filter, searchTerm]);
 
-  // Hàm xử lý sự kiện nhấn nút quay lại
-  const handleBackButtonClick = () => {
-    navigate("/listening");  // Điều hướng trở lại trang /listening
-  };
+  const totalScrobbles = displayed.reduce((sum, a) => sum + a.scrobbles, 0);
 
   return (
-    <div className="listening-container_artists">
-      <h1 className="listening-title_artists">Listening</h1>
+    <div className="listening-page">
+      <h1 className="page-title">Listening</h1>
+      <div className="content-wrapper">
 
-      <div className="top-section_artists">
-        <button className="back-button_artists" onClick={handleBackButtonClick}>
-          <span>&#8249;</span>  {/* Nút quay lại */}
-        </button>
-        <h2 className="section-title_artists">Top Artists</h2>
-        <div className="filter-dropdown_artists">
-          <span>{timeFilter_artists}</span>
-          <span className="dropdown-arrow_artists">&#9662;</span>
-        </div>
-      </div>
+        {/* Sidebar */}
+        <div className="sidebar_listening">
+          <button className="back-button" onClick={() => navigate('/listening')}>
+            ‹ Top artists
+          </button>
 
-      <div className="stats-bar_artists">
-        <div className="stat-item_artists play-stat_artists">
-          <span className="play-icon_artists">▶</span>
-          <span>{stats_artists.plays} play</span>
-        </div>
-        <div className="stat-item_artists">
-          <span className="heart-icon_artists">♡</span>
-          <span>{stats_artists.likes} likes</span>
-        </div>
-        <div className="stat-item_artists">
-          <span className="comment-icon_artists">💬</span>
-          <span>{stats_artists.comments} comment</span>
-        </div>
-        <div className="stat-item_artists">
-          <span className="repost-icon_artists">↺</span>
-          <span>{stats_artists.reposts} reposts</span>
-        </div>
-        <div className="stat-item_artists">
-          <span className="download-icon_artists">↓</span>
-          <span>{stats_artists.downloads} downloads</span>
-        </div>
-      </div>
+          <input
+            type="text"
+            placeholder="Search artist..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
 
-      <div className="artists-list_artists">
-        {artists_artists.map((artist) => (
-          <div key={artist.id} className="artist-item_artists">
-            <div className="artist-rank_artists">{artist.rank}</div>
-            <div className="artist-image_artists">
-              <img src={artist.image || "/placeholder.svg"} alt={artist.name} />
-            </div>
-            <div className="artist-info_artists">
-              <div className="artist-name_artists">{artist.name}</div>
-              <div className="scrobbles-count_artists">
-                {artist.scrobbles} {artist.rank === 1 ? "scrobbles" : ""} <span className="arrow-icon_artists">›</span>
-              </div>
-            </div>
+          <select
+            value={filter}
+            onChange={e => setFilter(e.target.value as FilterOption)}
+            className="select-filter"
+          >
+            <option value="all">All</option>
+            <option value="last7">Last 7 days</option>
+            <option value="scrobblesDesc">Scrobbles: high → low</option>
+            <option value="scrobblesAsc">Scrobbles: low → high</option>
+            <option value="nameAsc">Name: A → Z</option>
+            <option value="nameDesc">Name: Z → A</option>
+          </select>
+        </div>
+
+        {/* Main content */}
+        <div className="main-content">
+          <div className="plays-summary">
+            <span className="play-icon">▶</span>
+            <span>{totalScrobbles} scrobbles</span>
           </div>
-        ))}
+
+          <div className="tracks-table">
+            {loading ? (
+              <p>Loading...</p>
+            ) : (
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Artist</th>
+                    <th>Date</th>
+                    <th>Scrobbles</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayed.map((a, idx) => (
+                    <tr key={a.name}>
+                      <td>{idx + 1}</td>
+                      <td className="cell-track">
+                        <div className="track-info">
+                          <div className="avatar-letter">
+                            {a.name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className="track-title">{a.name}</span>
+                        </div>
+                      </td>
+                      <td>{formatDate(a.lastListened)}</td>
+                      <td className="cell-played">{a.scrobbles}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+
       </div>
     </div>
   );

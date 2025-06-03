@@ -1,4 +1,4 @@
-// D:\web_html\gop\grapfity\backend\src\models\track.js
+// src/models/track.js
 'use strict';
 import { Model } from 'sequelize';
 
@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       Track.belongsTo(models.User, {
         foreignKey: 'uploaderId',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       });
 
       Track.belongsToMany(models.Playlist, {
@@ -22,13 +22,13 @@ export default (sequelize, DataTypes) => {
       });
 
       Track.hasMany(models.listeningHistory, {
-        foreignKey: 'trackId'
+        foreignKey: 'trackId',
       });
 
       Track.hasOne(models.Metadata, {
         foreignKey: 'track_id',
         onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onUpdate: 'CASCADE',
       });
     }
   }
@@ -59,9 +59,9 @@ export default (sequelize, DataTypes) => {
   });
 
   Track.addHook('afterDestroy', async (track, options) => {
-    const {Track} = sequelize.models;
-    await Track.destroy({ where: { id: track.id }, transaction: options.transaction});
-  })
+    const { listeningHistory } = sequelize.models;
+    await listeningHistory.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+  });
 
   return Track;
 };

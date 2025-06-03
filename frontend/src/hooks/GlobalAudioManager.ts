@@ -9,7 +9,7 @@ export interface Song {
   
   export interface PlaylistContext {
     id: string | number; // ID định danh cho playlist (ví dụ: từ DB, API)
-    type: 'album' | 'playlist' | 'artist' | 'search' | 'queue' | 'waveform' |'section'| string; // Loại ngữ cảnh playlist
+    type: 'profile'| 'album' | 'playlist' | 'artist' | 'search' | 'queue' | 'waveform' |'section'| string; // Loại ngữ cảnh playlist
   }
   
   // --- Constants cho localStorage keys ---
@@ -251,7 +251,15 @@ export interface Song {
       playFnInput?: ((index: number) => void) | null,
       containerInput?: HTMLElement | null,
       onEndedInput?: () => void
+  
     ) {
+    
+     console.log("👈👈[GlobalAudioManager] setPlaylist called", {
+      playlistLength: newPlaylist.length,
+      context,
+      currentIndex,
+      isPlaying,
+    });
       if (!Array.isArray(newPlaylist) || !context) {
         console.error("[GlobalAudioManager] Invalid parameters for setPlaylist."); // Giữ lại lỗi quan trọng
         return;
@@ -264,10 +272,11 @@ export interface Song {
       if (!isSamePlaylist(newPlaylist, context)) {
         playlist = [...newPlaylist];
         currentPlaylistContext = context;
-  
+         updateCurrentState(null, -1, context, currentAudio); // mới
         if (newPlaylist.length > 0 && startIndex >= 0 && startIndex < newPlaylist.length) {
           // Chỉ chuẩn bị state, không tự động phát
-          // updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);
+          updateCurrentState(newPlaylist[startIndex], startIndex, context, undefined);// mới mới
+          
         } else {
           updateCurrentState(null, -1, context, currentAudio);
         }
@@ -283,6 +292,7 @@ export interface Song {
     }
   
     function playSongAt(index: number, preferredAudioElement?: HTMLAudioElement) {
+    
       if (isTransitioning) {
         // console.warn(`[GlobalAudioManager] playSongAt(${index}) ignored: Currently transitioning.`);
         return;
@@ -318,6 +328,8 @@ export interface Song {
       }
   
       if (preferredAudioElement) {
+      console.log('[DEBUGDEBUG][playSongAt] Called with:', { index, playlistLength: playlist.length, currentPlaylistContext, songToPlay });
+
         const currentSrcOfPreferred = preferredAudioElement.src ? new URL(preferredAudioElement.src, window.location.href).href : "";
         const newSongSrc = new URL(songToPlay.src, window.location.href).href;
         if (currentSrcOfPreferred !== newSongSrc) {
@@ -328,11 +340,13 @@ export interface Song {
         audioToUse = preferredAudioElement;
       } else if (currentAudio && currentSong?.id === songToPlay.id && !isPlaying) {
         audioToUse = currentAudio;
+        console.log('[DEBUGDEBUG][playSongAt] Using currentAudio:', { src: currentAudio.src });
       } else {
         audioToUse = new Audio(songToPlay.src);
         audioToUse.crossOrigin = "anonymous";
         audioToUse.preload = "auto";
         currentTime = 0; duration = 0; progress = 0; isPlaying = false;
+        console.log('[DEBUGDEBUG][playSongAt] Created new Audio:', { src: audioToUse.src });
       }
   
       if (previousAudioToStop) {
@@ -347,7 +361,12 @@ export interface Song {
           audioToUse.pause();
         }
       };
-  
+      console.log('[DEBUGDEBUG][playSongAt] Ready to play:', {
+        src: audioToUse.src,
+        readyState: audioToUse.readyState,
+        paused: audioToUse.paused,
+        currentTime: audioToUse.currentTime
+      });
       const playPromise = audioToUse.play();
   
       const cleanupTransition = () => {
@@ -540,7 +559,7 @@ export interface Song {
     }
   
     function isSamePlaylist(newPlaylist: Song[], newContext?: PlaylistContext) {
-    
+      if (!newContext || !currentPlaylistContext) return false; // mới
       if (newContext && currentPlaylistContext) {
         if (newContext.id !== currentPlaylistContext.id || newContext.type !== currentPlaylistContext.type) {
           return false;

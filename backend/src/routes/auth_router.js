@@ -1,11 +1,11 @@
 import { Router } from 'express';
 const authRouter = Router();
-import { createUserController, handleUserLoginController, logoutController } from '../controllers/userController.js';
+import { registerController, handleUserLoginController, logoutController } from '../controllers/userController.js';
 import { authenticateUser } from '../middleware/authMiddleware.js'
 import db from '../models/index.js';      // ✅ import toàn bộ models
 const { User } = db;   
 
-authRouter.post('/register', createUserController);
+authRouter.post('/register', registerController);
 authRouter.post('/login', handleUserLoginController);
 authRouter.get('/me', authenticateUser, async (req, res) => {
   try {

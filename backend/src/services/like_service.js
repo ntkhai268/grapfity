@@ -21,7 +21,6 @@ const getLikedTracksByUser = async (userId) => {
         include: [
           {
             model: db.Metadata,
-            as: 'Metadatum' // đảm bảo đúng alias theo model
           },
           {
             model: db.User,

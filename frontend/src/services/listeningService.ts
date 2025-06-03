@@ -1,9 +1,34 @@
 // src/services/listeningService.ts
 import axios from 'axios';
 
+
 // Cấu hình Axios chung cho toàn project
-axios.defaults.baseURL = 'http://localhost:8080';
+axios.defaults.baseURL = 'http://localhost:8080/api';
 axios.defaults.withCredentials = true;
+
+export interface ListeningHistoryRecord {
+  listenCount: number;
+  createdAt: string;
+  metadata: {
+    trackname: string | null;
+  } | null;
+  track: {
+    id: number;
+    trackUrl: string;
+    imageUrl: string;
+    uploaderId: number;
+    status: string;
+    createdAt: string;
+    User: {
+      id: number;
+      UploaderName: string;
+    };
+  };
+  listener: {
+    id: number;
+    Name: string;
+  };
+}
 
 export interface HistoryRecord {
   id: number;
@@ -21,17 +46,56 @@ export interface TrackRecord {
 }
 
 /**
- * Lấy về mảng lịch sử nghe của user
+ * Lấy lịch sử nghe với đầy đủ thông tin track, metadata, và người nghe
  */
-export async function fetchListeningHistory(): Promise<HistoryRecord[]> {
-  const res = await axios.get<{ histories: HistoryRecord[] }>('/api/listening-history');
-  return res.data.histories;
+export async function fetchListeningHistory(): Promise<ListeningHistoryRecord[]> {
+  const res = await axios.get<{ data: any[] }>('/api/listening-history');
+
+  // map từ response về đúng với ListeningHistoryRecord
+  const normalized = res.data.data.map(item => ({
+    listenCount: item.listenCount,
+    createdAt: item.createdAt,
+    metadata: item.Track?.Metadatum ?? null,
+    track: {
+      ...item.Track,
+      User: item.Track?.User ?? { id: 0, UploaderName: 'Unknown' }
+    },
+    listener: item.User ?? { id: 0, Name: 'Unknown' }
+  }));
+
+  return normalized;
 }
+
 
 /**
  * Lấy về danh sách tất cả tracks
  */
 export async function fetchAllTracks(): Promise<TrackRecord[]> {
-  const res = await axios.get<{ data: TrackRecord[] }>('/api/tracks');
+  const res = await axios.get<{ data: TrackRecord[] }>('/tracks');
   return res.data.data;
 }
+// Ghi nhận lượt nghe mới cho một track (trackId)
+export const trackingListeningHistoryAPI = async (trackId: string | number) => {
+  console.log(trackId)
+  const res = await axios.post(`/track/${trackId}/listen`);
+  // Backend trả về { message, history }
+  return res.data.history;
+};
+// 3. Lấy top 10 bài hát phổ biến toàn hệ thống
+export const getTop10PopularTracksAPI = async () => {
+  const res = await axios.get('/popular/top10');
+  return res.data;
+};
+
+// 4. Lấy top 5 bài hát user nghe nhiều nhất
+export const getTop5TracksOfUserAPI = async () => {
+  const res = await axios.get('/popular/top5');
+  
+  return res.data;
+};
+
+export const getTop5TracksOfOwnerAPI = async () => {
+  const res = await axios.get('/popular-owner/top5');
+  
+  return res.data;
+};

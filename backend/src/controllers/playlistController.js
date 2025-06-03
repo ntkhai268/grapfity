@@ -248,79 +248,49 @@ const uploadPlaylistCoverController = async (req, res) => {
  */
 const updatePlaylistController = async (req, res) => {
     try {
-        const userId = req.userId; // Lấy userId từ middleware xác thực
-        const { playlistId } = req.params; // Lấy playlistId từ URL
-        const { title, imageUrl } = req.body; // Lấy title và imageUrl từ body request
+        const userId = req.userId;
+        const { playlistId } = req.params;
+        const { title, imageUrl, privacy } = req.body;
 
-        // --- VALIDATION ---
         if (!userId) {
-            console.error('updatePlaylistController Error: userId không tìm thấy trên req.');
-            // Trả về 401 Unauthorized nếu không có userId
             return res.status(401).json({ error: 'Unauthorized: Yêu cầu đăng nhập.' });
         }
         if (!playlistId || isNaN(Number(playlistId))) {
-            console.error('updatePlaylistController Error: playlistId không hợp lệ hoặc thiếu.');
-            // Trả về 400 Bad Request nếu playlistId không hợp lệ
             return res.status(400).json({ error: 'Bad Request: ID của playlist không hợp lệ hoặc thiếu.' });
         }
-        // Thêm kiểm tra cho title (trường bắt buộc)
         if (typeof title !== 'string' || title.trim() === '') {
-             console.error('updatePlaylistController Error: title không hợp lệ hoặc thiếu.');
-             // Trả về 400 Bad Request nếu title không hợp lệ
-             return res.status(400).json({ error: 'Bad Request: Tiêu đề playlist không được để trống.' });
+            return res.status(400).json({ error: 'Bad Request: Tiêu đề playlist không được để trống.' });
         }
-        // Kiểm tra imageUrl (nếu được gửi lên, phải là string hoặc null)
-        // Service đã có validation chi tiết hơn, ở đây chỉ kiểm tra kiểu cơ bản nếu cần
         if (imageUrl !== undefined && imageUrl !== null && typeof imageUrl !== 'string') {
-             console.error('updatePlaylistController Error: imageUrl không hợp lệ.');
-             // Trả về 400 Bad Request nếu imageUrl có kiểu không đúng
-             return res.status(400).json({ error: 'Bad Request: Định dạng imageUrl không hợp lệ.' });
+            return res.status(400).json({ error: 'Bad Request: Định dạng imageUrl không hợp lệ.' });
         }
-        // ------------------
+        if (privacy !== undefined && privacy !== 'public' && privacy !== 'private') {
+            return res.status(400).json({ error: 'Bad Request: Giá trị privacy không hợp lệ.' });
+        }
 
-        console.log(`Controller: User ID ${userId} đang cập nhật playlist ID: ${playlistId}`);
-
-        // --- GỌI SERVICE VỚI ĐÚNG THỨ TỰ THAM SỐ ---
         const updatedPlaylist = await updatePlaylist(
-            Number(playlistId), // 1. playlistId
-            userId,             // 2. userId
-            title.trim(),       // 3. title (đã trim)
-            imageUrl            // 4. imageUrl (có thể là null hoặc undefined)
+            Number(playlistId),
+            userId,
+            title.trim(),
+            imageUrl,
+            privacy
         );
-        // --------------------------------------------
 
-        // --- TRẢ VỀ KẾT QUẢ THÀNH CÔNG ---
         return res.status(200).json({
             message: 'Cập nhật playlist thành công!',
-            // Trả về dữ liệu playlist đã cập nhật từ service
             data: updatedPlaylist
         });
-        // ----------------------------------
 
-    } catch (err) { // <-- Đổi tên biến lỗi thành err cho nhất quán
-        // Bắt lỗi từ service
-        console.error(`Lỗi trong updatePlaylistController cho user ${req.userId || 'UNKNOWN'}, playlist ${req.params?.playlistId}:`, err);
-
-        // Lấy statusCode và message từ lỗi (nếu có)
+    } catch (err) {
         const statusCode = err.statusCode || 500;
         let errorMessage = err.message || 'Lỗi server khi cập nhật playlist.';
-
-        // Xử lý các mã lỗi cụ thể từ service
-        if (statusCode === 404) {
-            errorMessage = 'Không tìm thấy playlist.';
-        } else if (statusCode === 403) {
-            errorMessage = 'Bạn không có quyền cập nhật playlist này.';
-        } else if (statusCode === 400) {
-            // Giữ nguyên message lỗi từ service nếu là lỗi 400 (ví dụ: "Tiêu đề không hợp lệ")
-            // Hoặc đặt một message chung
-             errorMessage = err.message || 'Dữ liệu gửi lên không hợp lệ.';
-        }
-        // Các lỗi 500 sẽ dùng message mặc định hoặc message từ lỗi gốc
-
-        // Trả về phản hồi lỗi
+        if (statusCode === 404) errorMessage = 'Không tìm thấy playlist.';
+        else if (statusCode === 403) errorMessage = 'Bạn không có quyền cập nhật playlist này.';
+        else if (statusCode === 400) errorMessage = err.message || 'Dữ liệu gửi lên không hợp lệ.';
         return res.status(statusCode).json({ error: errorMessage });
     }
 };
+
 
 
 

@@ -63,16 +63,14 @@ const ProfileSection = () => {
                     <Tab />
                     <ProfileStat />
 
-                    <div className="tabs_below">
-                        <span>Recent</span>
-                    </div>
+                    
                 </div>
 
                 <div className="bottom_section">
                     <div className="left_section">
                     <Song viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
-                    <PopularTracks />
-                    <Tracks />
+                    <PopularTracks viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
+                    <Tracks viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
                     <Playlists viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""} />
                     </div>
 

@@ -1,0 +1,517 @@
+[
+    {
+        "label": "asyncpg",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "asyncpg",
+        "description": "asyncpg",
+        "detail": "asyncpg",
+        "documentation": {}
+    },
+    {
+        "label": "os",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "os",
+        "description": "os",
+        "detail": "os",
+        "documentation": {}
+    },
+    {
+        "label": "text",
+        "importPath": "sqlalchemy",
+        "description": "sqlalchemy",
+        "isExtraImport": true,
+        "detail": "sqlalchemy",
+        "documentation": {}
+    },
+    {
+        "label": "BaseModel",
+        "importPath": "pydantic",
+        "description": "pydantic",
+        "isExtraImport": true,
+        "detail": "pydantic",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "datetime",
+        "importPath": "datetime",
+        "description": "datetime",
+        "isExtraImport": true,
+        "detail": "datetime",
+        "documentation": {}
+    },
+    {
+        "label": "AIOKafkaConsumer",
+        "importPath": "aiokafka",
+        "description": "aiokafka",
+        "isExtraImport": true,
+        "detail": "aiokafka",
+        "documentation": {}
+    },
+    {
+        "label": "AIOKafkaProducer",
+        "importPath": "aiokafka",
+        "description": "aiokafka",
+        "isExtraImport": true,
+        "detail": "aiokafka",
+        "documentation": {}
+    },
+    {
+        "label": "json",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "json",
+        "description": "json",
+        "detail": "json",
+        "documentation": {}
+    },
+    {
+        "label": "logging",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "logging",
+        "description": "logging",
+        "detail": "logging",
+        "documentation": {}
+    },
+    {
+        "label": "insert_event",
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "isExtraImport": true,
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_all_event_data",
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "isExtraImport": true,
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "get_track_metadata",
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "isExtraImport": true,
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "load_dotenv",
+        "importPath": "dotenv",
+        "description": "dotenv",
+        "isExtraImport": true,
+        "detail": "dotenv",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "FastAPI",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "HTTPException",
+        "importPath": "fastapi",
+        "description": "fastapi",
+        "isExtraImport": true,
+        "detail": "fastapi",
+        "documentation": {}
+    },
+    {
+        "label": "Dict",
+        "importPath": "typing",
+        "description": "typing",
+        "isExtraImport": true,
+        "detail": "typing",
+        "documentation": {}
+    },
+    {
+        "label": "pandas",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "pandas",
+        "description": "pandas",
+        "detail": "pandas",
+        "documentation": {}
+    },
+    {
+        "label": "SVD",
+        "importPath": "surprise",
+        "description": "surprise",
+        "isExtraImport": true,
+        "detail": "surprise",
+        "documentation": {}
+    },
+    {
+        "label": "Dataset",
+        "importPath": "surprise",
+        "description": "surprise",
+        "isExtraImport": true,
+        "detail": "surprise",
+        "documentation": {}
+    },
+    {
+        "label": "Reader",
+        "importPath": "surprise",
+        "description": "surprise",
+        "isExtraImport": true,
+        "detail": "surprise",
+        "documentation": {}
+    },
+    {
+        "label": "joblib",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "joblib",
+        "description": "joblib",
+        "detail": "joblib",
+        "documentation": {}
+    },
+    {
+        "label": "numpy",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "numpy",
+        "description": "numpy",
+        "detail": "numpy",
+        "documentation": {}
+    },
+    {
+        "label": "TfidfVectorizer",
+        "importPath": "sklearn.feature_extraction.text",
+        "description": "sklearn.feature_extraction.text",
+        "isExtraImport": true,
+        "detail": "sklearn.feature_extraction.text",
+        "documentation": {}
+    },
+    {
+        "label": "cosine_similarity",
+        "importPath": "sklearn.metrics.pairwise",
+        "description": "sklearn.metrics.pairwise",
+        "isExtraImport": true,
+        "detail": "sklearn.metrics.pairwise",
+        "documentation": {}
+    },
+    {
+        "label": "asyncio",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "asyncio",
+        "description": "asyncio",
+        "detail": "asyncio",
+        "documentation": {}
+    },
+    {
+        "label": "update_utility_matrix",
+        "importPath": "src.services.event_tracking",
+        "description": "src.services.event_tracking",
+        "isExtraImport": true,
+        "detail": "src.services.event_tracking",
+        "documentation": {}
+    },
+    {
+        "label": "Event",
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "isExtraImport": true,
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
+        "label": "send_event_to_kafka",
+        "importPath": "src.services.kafka.kafka_producer",
+        "description": "src.services.kafka.kafka_producer",
+        "isExtraImport": true,
+        "detail": "src.services.kafka.kafka_producer",
+        "documentation": {}
+    },
+    {
+        "label": "consume_events",
+        "importPath": "src.services.kafka.kafka_consumer",
+        "description": "src.services.kafka.kafka_consumer",
+        "isExtraImport": true,
+        "detail": "src.services.kafka.kafka_consumer",
+        "documentation": {}
+    },
+    {
+        "label": "get_recommendations",
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "isExtraImport": true,
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "update_model",
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "isExtraImport": true,
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "POSTGRES_HOST",
+        "kind": 5,
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "peekOfCode": "POSTGRES_HOST = os.getenv(\"POSTGRES_HOST\", \"localhost\")\nPOSTGRES_PORT = os.getenv(\"POSTGRES_PORT\", \"5432\")\nPOSTGRES_USER = os.getenv(\"POSTGRES_USER\", \"your_user\")\nPOSTGRES_PASSWORD = os.getenv(\"POSTGRES_PASSWORD\", \"your_password\")\nPOSTGRES_DB = os.getenv(\"POSTGRES_DB\", \"your_database\")\nasync def get_db_connection():\n    return await asyncpg.connect(\n        user=POSTGRES_USER,\n        password=POSTGRES_PASSWORD,\n        database=POSTGRES_DB,",
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "POSTGRES_PORT",
+        "kind": 5,
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "peekOfCode": "POSTGRES_PORT = os.getenv(\"POSTGRES_PORT\", \"5432\")\nPOSTGRES_USER = os.getenv(\"POSTGRES_USER\", \"your_user\")\nPOSTGRES_PASSWORD = os.getenv(\"POSTGRES_PASSWORD\", \"your_password\")\nPOSTGRES_DB = os.getenv(\"POSTGRES_DB\", \"your_database\")\nasync def get_db_connection():\n    return await asyncpg.connect(\n        user=POSTGRES_USER,\n        password=POSTGRES_PASSWORD,\n        database=POSTGRES_DB,\n        host=POSTGRES_HOST,",
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "POSTGRES_USER",
+        "kind": 5,
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "peekOfCode": "POSTGRES_USER = os.getenv(\"POSTGRES_USER\", \"your_user\")\nPOSTGRES_PASSWORD = os.getenv(\"POSTGRES_PASSWORD\", \"your_password\")\nPOSTGRES_DB = os.getenv(\"POSTGRES_DB\", \"your_database\")\nasync def get_db_connection():\n    return await asyncpg.connect(\n        user=POSTGRES_USER,\n        password=POSTGRES_PASSWORD,\n        database=POSTGRES_DB,\n        host=POSTGRES_HOST,\n        port=POSTGRES_PORT",
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "POSTGRES_PASSWORD",
+        "kind": 5,
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "peekOfCode": "POSTGRES_PASSWORD = os.getenv(\"POSTGRES_PASSWORD\", \"your_password\")\nPOSTGRES_DB = os.getenv(\"POSTGRES_DB\", \"your_database\")\nasync def get_db_connection():\n    return await asyncpg.connect(\n        user=POSTGRES_USER,\n        password=POSTGRES_PASSWORD,\n        database=POSTGRES_DB,\n        host=POSTGRES_HOST,\n        port=POSTGRES_PORT\n    )",
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "POSTGRES_DB",
+        "kind": 5,
+        "importPath": "src.database.db",
+        "description": "src.database.db",
+        "peekOfCode": "POSTGRES_DB = os.getenv(\"POSTGRES_DB\", \"your_database\")\nasync def get_db_connection():\n    return await asyncpg.connect(\n        user=POSTGRES_USER,\n        password=POSTGRES_PASSWORD,\n        database=POSTGRES_DB,\n        host=POSTGRES_HOST,\n        port=POSTGRES_PORT\n    )\nasync def get_all_event_data():",
+        "detail": "src.database.db",
+        "documentation": {}
+    },
+    {
+        "label": "Event",
+        "kind": 6,
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "peekOfCode": "class Event(BaseModel):\n    event_id: str\n    event_type: str\n    track_id: str\n    user_id: str\n    timestamp: datetime",
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
+        "label": "logger",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_consumer",
+        "description": "src.services.kafka.kafka_consumer",
+        "peekOfCode": "logger = logging.getLogger(__name__)\n# Đọc file .env\nload_dotenv()\n# Lấy cấu hình từ .env\nKAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    consumer = AIOKafkaConsumer(\n        'event_tracking_topic',",
+        "detail": "src.services.kafka.kafka_consumer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_HOST",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_consumer",
+        "description": "src.services.kafka.kafka_consumer",
+        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    consumer = AIOKafkaConsumer(\n        'event_tracking_topic',\n        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n        group_id=\"event_tracking_group\",\n        auto_offset_reset='earliest'\n    )",
+        "detail": "src.services.kafka.kafka_consumer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_PORT",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_consumer",
+        "description": "src.services.kafka.kafka_consumer",
+        "peekOfCode": "KAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    consumer = AIOKafkaConsumer(\n        'event_tracking_topic',\n        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n        group_id=\"event_tracking_group\",\n        auto_offset_reset='earliest'\n    )\n    try:",
+        "detail": "src.services.kafka.kafka_consumer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_BOOTSTRAP_SERVERS",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_consumer",
+        "description": "src.services.kafka.kafka_consumer",
+        "peekOfCode": "KAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    consumer = AIOKafkaConsumer(\n        'event_tracking_topic',\n        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n        group_id=\"event_tracking_group\",\n        auto_offset_reset='earliest'\n    )\n    try:\n        logger.info(f\"Connecting to Kafka at {KAFKA_BOOTSTRAP_SERVERS}\")",
+        "detail": "src.services.kafka.kafka_consumer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_HOST",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_producer",
+        "description": "src.services.kafka.kafka_producer",
+        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n    await producer.start()\n    try:\n        event_data = json.dumps(event).encode('utf-8')\n        await producer.send_and_wait(topic, event_data)\n    finally:",
+        "detail": "src.services.kafka.kafka_producer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_PORT",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_producer",
+        "description": "src.services.kafka.kafka_producer",
+        "peekOfCode": "KAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n    await producer.start()\n    try:\n        event_data = json.dumps(event).encode('utf-8')\n        await producer.send_and_wait(topic, event_data)\n    finally:\n        await producer.stop()",
+        "detail": "src.services.kafka.kafka_producer",
+        "documentation": {}
+    },
+    {
+        "label": "KAFKA_BOOTSTRAP_SERVERS",
+        "kind": 5,
+        "importPath": "src.services.kafka.kafka_producer",
+        "description": "src.services.kafka.kafka_producer",
+        "peekOfCode": "KAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n    await producer.start()\n    try:\n        event_data = json.dumps(event).encode('utf-8')\n        await producer.send_and_wait(topic, event_data)\n    finally:\n        await producer.stop()",
+        "detail": "src.services.kafka.kafka_producer",
+        "documentation": {}
+    },
+    {
+        "label": "process_data",
+        "kind": 2,
+        "importPath": "src.services.event_tracking",
+        "description": "src.services.event_tracking",
+        "peekOfCode": "def process_data(data):\n    \"\"\"Xử lý dữ liệu và tính score\"\"\"\n    count_dict = {}\n    for row in data:\n        user_id, track_id, event_type = row\n        key = (user_id, track_id, event_type)\n        count_dict[key] = count_dict.get(key, 0) + 1\n    score_dict = {}\n    for (user_id, track_id, event_type), count in count_dict.items():\n        score = count * SCORE_MAP.get(event_type, 0)",
+        "detail": "src.services.event_tracking",
+        "documentation": {}
+    },
+    {
+        "label": "create_dataframe",
+        "kind": 2,
+        "importPath": "src.services.event_tracking",
+        "description": "src.services.event_tracking",
+        "peekOfCode": "def create_dataframe(score_dict):\n    \"\"\"Tạo bảng 2 chiều từ dữ liệu đã xử lý\"\"\"\n    df = pd.DataFrame(list(score_dict.items()), columns=[\"key\", \"score\"])\n    df[[\"user_id\", \"track_id\"]] = pd.DataFrame(df[\"key\"].tolist(), index=df.index)\n    df = df.pivot(index=\"track_id\", columns=\"user_id\", values=\"score\").fillna(0)\n    return df\ndef generate_csv(df):\n    try:\n        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n        filename = f\"events_matrix_{timestamp}.csv\"",
+        "detail": "src.services.event_tracking",
+        "documentation": {}
+    },
+    {
+        "label": "generate_csv",
+        "kind": 2,
+        "importPath": "src.services.event_tracking",
+        "description": "src.services.event_tracking",
+        "peekOfCode": "def generate_csv(df):\n    try:\n        timestamp = datetime.now().strftime(\"%Y%m%d_%H%M%S\")\n        filename = f\"events_matrix_{timestamp}.csv\"\n        matrix_folder = os.getenv(\"FASTAPI_MATRIX_FOLDER\", \"static/matrix/\")\n        os.makedirs(matrix_folder, exist_ok=True)\n        if not os.access(matrix_folder, os.W_OK):\n            raise PermissionError(f\"No write permission for directory: {matrix_folder}\")\n        path = os.path.join(matrix_folder, filename)\n        df.to_csv(path, index=False)",
+        "detail": "src.services.event_tracking",
+        "documentation": {}
+    },
+    {
+        "label": "train_svd_and_save_matrices",
+        "kind": 2,
+        "importPath": "src.services.event_tracking",
+        "description": "src.services.event_tracking",
+        "peekOfCode": "def train_svd_and_save_matrices(df, k=10):\n    \"\"\"Huấn luyện SVD và lưu ma trận P, Q\"\"\"\n    reader = Reader(rating_scale=(0, df.values.max()))\n    data = Dataset.load_from_df(df.stack().reset_index(), reader)\n    trainset = data.build_full_trainset()\n    svd = SVD(n_factors=k)\n    svd.fit(trainset)\n    matrix_folder = os.getenv(\"FASTAPI_MATRIX_FOLDER\", \"static/matrix/\")\n    os.makedirs(matrix_folder, exist_ok=True)\n    joblib.dump(svd.pu, os.path.join(matrix_folder, \"P_matrix.pkl\"))",
+        "detail": "src.services.event_tracking",
+        "documentation": {}
+    },
+    {
+        "label": "load_matrices",
+        "kind": 2,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "def load_matrices():\n    global P, Q\n    matrix_folder = os.getenv(\"FASTAPI_MATRIX_FOLDER\", \"static/matrix/\")\n    P = joblib.load(os.path.join(matrix_folder, \"P_matrix.pkl\"))\n    Q = joblib.load(os.path.join(matrix_folder, \"Q_matrix.pkl\"))\ndef content_based_recommend(user_id: str, n=10):\n    # Giả sử có hàm lấy tracks người dùng đã tương tác (cần triển khai nếu cần)\n    user_tracks = []  # Thay bằng logic thực tế nếu có\n    if not user_tracks:\n        return track_metadata['track_id'].head(n).tolist()  # Trả về tracks phổ biến",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "content_based_recommend",
+        "kind": 2,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "def content_based_recommend(user_id: str, n=10):\n    # Giả sử có hàm lấy tracks người dùng đã tương tác (cần triển khai nếu cần)\n    user_tracks = []  # Thay bằng logic thực tế nếu có\n    if not user_tracks:\n        return track_metadata['track_id'].head(n).tolist()  # Trả về tracks phổ biến\n    user_vector = track_vectors[user_tracks].mean(axis=0)\n    similarities = cosine_similarity(user_vector, track_vectors).flatten()\n    top_n_indices = similarities.argsort()[::-1][:n]\n    return track_metadata['track_id'].iloc[top_n_indices].tolist()\ndef get_recommendations(user_id: str, n=10):",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "get_recommendations",
+        "kind": 2,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "def get_recommendations(user_id: str, n=10):\n    global P, Q\n    if P is None or Q is None:\n        load_matrices()\n    # Giả sử P và Q là mảng numpy với index tương ứng user_id và track_id\n    user_idx = np.where(np.array(list(track_metadata['user_id'])) == user_id)[0]\n    if len(user_idx) == 0:\n        return content_based_recommend(user_id, n)\n    user_idx = user_idx[0]\n    predictions = np.dot(P[user_idx], Q.T)",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "update_model",
+        "kind": 2,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "def update_model():\n    asyncio.run(update_utility_matrix())\n    load_matrices()",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "P",
+        "kind": 5,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "P = None\nQ = None\ntrack_metadata = None\nvectorizer = TfidfVectorizer()\ntrack_vectors = None\nasync def load_track_metadata():\n    global track_metadata, track_vectors\n    data = await get_track_metadata()\n    track_metadata = pd.DataFrame(data, columns=['track_id', 'genre', 'description'])\n    track_vectors = vectorizer.fit_transform(track_metadata['description'])",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "Q",
+        "kind": 5,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "Q = None\ntrack_metadata = None\nvectorizer = TfidfVectorizer()\ntrack_vectors = None\nasync def load_track_metadata():\n    global track_metadata, track_vectors\n    data = await get_track_metadata()\n    track_metadata = pd.DataFrame(data, columns=['track_id', 'genre', 'description'])\n    track_vectors = vectorizer.fit_transform(track_metadata['description'])\ndef load_matrices():",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "track_metadata",
+        "kind": 5,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "track_metadata = None\nvectorizer = TfidfVectorizer()\ntrack_vectors = None\nasync def load_track_metadata():\n    global track_metadata, track_vectors\n    data = await get_track_metadata()\n    track_metadata = pd.DataFrame(data, columns=['track_id', 'genre', 'description'])\n    track_vectors = vectorizer.fit_transform(track_metadata['description'])\ndef load_matrices():\n    global P, Q",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "vectorizer",
+        "kind": 5,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "vectorizer = TfidfVectorizer()\ntrack_vectors = None\nasync def load_track_metadata():\n    global track_metadata, track_vectors\n    data = await get_track_metadata()\n    track_metadata = pd.DataFrame(data, columns=['track_id', 'genre', 'description'])\n    track_vectors = vectorizer.fit_transform(track_metadata['description'])\ndef load_matrices():\n    global P, Q\n    matrix_folder = os.getenv(\"FASTAPI_MATRIX_FOLDER\", \"static/matrix/\")",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "track_vectors",
+        "kind": 5,
+        "importPath": "src.services.recommendation",
+        "description": "src.services.recommendation",
+        "peekOfCode": "track_vectors = None\nasync def load_track_metadata():\n    global track_metadata, track_vectors\n    data = await get_track_metadata()\n    track_metadata = pd.DataFrame(data, columns=['track_id', 'genre', 'description'])\n    track_vectors = vectorizer.fit_transform(track_metadata['description'])\ndef load_matrices():\n    global P, Q\n    matrix_folder = os.getenv(\"FASTAPI_MATRIX_FOLDER\", \"static/matrix/\")\n    P = joblib.load(os.path.join(matrix_folder, \"P_matrix.pkl\"))",
+        "detail": "src.services.recommendation",
+        "documentation": {}
+    },
+    {
+        "label": "app",
+        "kind": 5,
+        "importPath": "main",
+        "description": "main",
+        "peekOfCode": "app = FastAPI()\n@app.on_event(\"startup\")\nasync def startup_event():\n    asyncio.create_task(consume_events())\n@app.get(\"/api/re-test\")\nasync def test():\n    try:\n        return {\"status\": \"Event received and sent to Kafka !II test\"}\n    except Exception as e:\n        raise HTTPException(status_code=500, detail=str(e))",
+        "detail": "main",
+        "documentation": {}
+    }
+]
