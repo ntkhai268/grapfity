@@ -7,6 +7,10 @@ apiEndpoints:
     host: '*'
     paths: ['/*']
     methods: ['OPTIONS']
+
+  image:
+    host: '*'
+    paths: '/assets/*'
     
   recommendation:
     host: '*'  # ĐỔI TỪ 'localhost' THÀNH '*' ĐỂ CHẤP NHẬN MỌI HOST
@@ -121,6 +125,17 @@ pipelines:
       - createTrack-pipeline-policy:
           - action:
               recommenderUrl: http://nginx:80/api/add_track
+
+  image:
+    apiEndpoints:
+      - track_image
+    policies:
+      - proxy:
+          - action:
+              serviceEndpoint: backend
+              changeOrigin: true
+              stripPath: false  # giữ nguyên /assets/track_image/...
+              preserveHeaders: true
 
   default:
     apiEndpoints:
