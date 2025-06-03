@@ -38,6 +38,7 @@ const ProfileSection = () => {
     const fetchCurrentUser = async () => {
       try {
         const user = await getCurrentUser();
+        console.log("tet ở profile user getCurrentUser:", user);
         if (user?.id) setCurrentUserId(user.id);
       } catch (err) {
         console.error("Không thể lấy current user:", err);
@@ -45,6 +46,8 @@ const ProfileSection = () => {
     };
     fetchCurrentUser();
   }, []);
+  console.log(" trong profileSection viewedUserId :", viewedUserId)
+  console.log(" trong profileSection profileUserId :", profileUserId)
   return (
     <div>
       <div className="container">
@@ -68,10 +71,10 @@ const ProfileSection = () => {
 
                 <div className="bottom_section">
                     <div className="left_section">
-                    <Song viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
-                    <PopularTracks viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
-                    <Tracks viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""}/>
-                    <Playlists viewedUserId={safeProfileUserId} currentUserId={currentUserId ?? ""} />
+                    <Song viewedUserId={viewedUserId} currentUserId={currentUserId ?? ""}/>
+                    <PopularTracks viewedUserId={viewedUserId} currentUserId={currentUserId ?? ""}/>
+                    <Tracks viewedUserId={viewedUserId} currentUserId={currentUserId ?? ""}/>
+                    <Playlists viewedUserId={viewedUserId} currentUserId={currentUserId ?? ""} />
                     </div>
 
                     <SongRight />

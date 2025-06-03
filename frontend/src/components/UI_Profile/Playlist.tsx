@@ -181,7 +181,7 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
                                         {/* Kiểm tra playlist.tracks là mảng */}
                                         {Array.isArray(playlist.tracks) && playlist.tracks.map((track, trackIndex) => (
                                             <div
-                                                className="track-item" // Giữ lại class gốc
+                                                className="track-item-profile" // Giữ lại class gốc
                                                 key={track.id || trackIndex}
                                                 onClick={() => {
                                                     const containerElement = playlistContainerRefs.current[playlistIndex];

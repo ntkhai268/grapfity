@@ -191,12 +191,7 @@ const Header: React.FC = () => {
         )}
       </div>
 
-      <button className="btn-upload" onClick={toggleUploadModal}>
-        Upload
-      </button>
-      <button className="btn-TB">
-        <img src={bellIcon} alt="Thông báo" />
-      </button>
+      
         <div className="right-controls">
           {/* Upload Button */}
           <button className="btn-upload" onClick={toggleUploadModal}>

@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'react';
-import { UserData } from '../../services/userService';
+import { UserType } from '../../services/userService';
 import '../../styles/EditProfileModal.css';
 import { verifyPassword } from '../../services/authService';
 
 interface EditProfileModalProps {
-  user: UserData; 
+  user: UserType; 
   onClose: () => void;
   onSave: (formData: FormData) => void;
 }
 
 const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSave }) => {
-  const [formData, setFormData] = useState<UserData>({ ...user, password: '' });
+  const [formData, setFormData] = useState<UserType>({ ...user, password: '' });
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

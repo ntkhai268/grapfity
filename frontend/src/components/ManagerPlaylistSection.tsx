@@ -13,6 +13,8 @@ import DataPlaylist from "./Manager_Playlists/DataPlaylist";     // Component hi
 import "../styles/ManagerSongLayout.css"; // Import CSS
 import { PlaylistData } from "./Manager_Playlists/ManagerDataPlaylist";
 import { getTracksInPlaylistAPI } from "../services/trackPlaylistService";
+import { getCurrentUser } from "../services/authService";
+
 
 // Component ManagerPlaylistSection
 const ManagerPlaylistSection: React.FC = () => {
@@ -43,6 +45,7 @@ const ManagerPlaylistSection: React.FC = () => {
     );
   };
 
+  const [CurrentuserId, setCurrentUserId] = useState<string | null>(null);
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const handleSidebarExpandChange = (expanded: boolean) => {
     setSidebarExpanded(expanded);
@@ -57,6 +60,17 @@ const ManagerPlaylistSection: React.FC = () => {
       fetchPlaylistDetails();
   }, [playlistId]);
  
+  useEffect(() => {
+  const fetchUser = async () => {
+    const user = await getCurrentUser();
+    console.log('Kết quả getCurrentUser:', user); // log này rất quan trọng!
+    if (user && user.id) {
+      setCurrentUserId(user.id.toString());
+    }
+  };
+  fetchUser();
+}, []);
+  console.log(" id của người đang đăng nhập:", CurrentuserId)
 
   return (
     <div className="container">
@@ -71,7 +85,8 @@ const ManagerPlaylistSection: React.FC = () => {
           className="Management_playlist"
         >
           {/* PlaylistHeader có thể cũng dùng useParams để lấy ID và fetch dữ liệu */}
-          <PlaylistHeader onColorExtract={setBgColor} />
+          <PlaylistHeader onColorExtract={setBgColor}  currentUserId={CurrentuserId} />
+
 
           {/* === SỬA ĐỔI QUAN TRỌNG === */}
           {/* Chỉ render ControlPlaylist nếu playlistId có giá trị (không phải undefined) */}

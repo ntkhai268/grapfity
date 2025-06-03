@@ -42,6 +42,7 @@ export const mapApiDataToPlaylistData = (playlistFromApi: any): PlaylistData => 
     id: playlistFromApi.id,
     title: playlistFromApi.title || 'Untitled Playlist',
     artist: playlistFromApi.User?.Name || 'Unknown Artist',
+    userId: playlistFromApi.userId,
     uploaderId: playlistFromApi.User?.id,
     timeAgo: calculateTimeAgo(playlistFromApi.createDate),
     cover: cover,
@@ -165,6 +166,7 @@ export const createPlaylistAPI = async (trackId?: string | number | null): Promi
              id: response.data.id,
              title: response.data.title || "Untitled Playlist",
              artist: "Bạn",
+             userId: response.data.userId, 
              timeAgo: calculateTimeAgo(response.data.createDate),
              cover: response.data.imageUrl || null,
              tracks: response.data.Tracks?.map((track: any): TrackItem => ({

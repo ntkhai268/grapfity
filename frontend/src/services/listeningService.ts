@@ -83,7 +83,7 @@ export const trackingListeningHistoryAPI = async (trackId: string | number) => {
 };
 // 3. Lấy top 10 bài hát phổ biến toàn hệ thống
 export const getTop10PopularTracksAPI = async () => {
-  const res = await axios.get('/popular/top10');
+  const res = await axios.get('api/popular/top10');
   return res.data;
 };
 

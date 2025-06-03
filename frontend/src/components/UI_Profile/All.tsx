@@ -178,7 +178,7 @@ const SongList: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
                 <div className="track-list">
                   {Array.isArray(playlist.tracks) && playlist.tracks.map((track, trackIndex) => (
                     <div
-                      className="track-item"
+                      className="track-item-profile"
                       key={track.id || trackIndex}
                       title={`Play: ${track.title}`}
                       onClick={() => {
