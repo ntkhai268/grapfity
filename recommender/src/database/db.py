@@ -1,6 +1,7 @@
 import asyncpg
 import os
 import logging
+from src.models.user_behavior import Event
 
 logger = logging.getLogger(__name__)
 
@@ -76,17 +77,10 @@ async def del_events_of_track_id(track_id: int):
 
     conn = await get_db_connection()
     try:
-<<<<<<< HEAD
         async with conn.transaction():
             result = await conn.execute(query, track_id)
             logger.info(f"Deleted events of track_id: {track_id}, result: {result}")
             return {"status": "success", "detail": result}
-=======
-        logger.info(f"Connecting as user: {POSTGRES_USER} to database: {POSTGRES_DB}")
-        result = await conn.execute(query, track_id)
-        logger.info(f"Deleted events of track_id: {track_id}, result: {result}")
-        return {"status": "success", "detail": result}
->>>>>>> 2b77211b7755c6af3e6a2445fd02be158c15e4a7
     except Exception as e:
         logger.error(f"Database query failed: {str(e)}", exc_info=True)
         raise
@@ -94,11 +88,10 @@ async def del_events_of_track_id(track_id: int):
         await conn.close()
         logger.info("Database connection closed")
 
-async def insert_event(event: dict):
-    logger.info(f"Inserting event: {event['event_id']}")
+async def insert_event(event: Event):
+    logger.info(f"Inserting event: {event.event_id}")
     conn = await get_db_connection()
     try:
-<<<<<<< HEAD
         async with conn.transaction():
             await conn.execute(
                 """
@@ -106,30 +99,15 @@ async def insert_event(event: dict):
                 VALUES ($1, $2, $3, $4, $5)
                 ON CONFLICT (event_id) DO NOTHING
                 """,
-                event['event_id'],
-                event['event_type'],
-                event['track_id'],
-                event['user_id'],
-                event['timestamp']
+                event.event_id,
+                event.event_type,
+                event.track_id,
+                event.user_id,
+                event.timestamp
             )
-            logger.info(f"Event {event['event_id']} inserted successfully")
-=======
-        await conn.execute(
-            """
-            INSERT INTO events (event_id, event_type, track_id, user_id, timestamp)
-            VALUES ($1, $2, $3, $4, $5)
-            ON CONFLICT (event_id) DO NOTHING
-            """,
-            event['event_id'],
-            event['event_type'],
-            event['track_id'],
-            event['user_id'],
-            event['timestamp']
-        )
-        logger.info(f"Event {event['event_id']} inserted successfully")
->>>>>>> 2b77211b7755c6af3e6a2445fd02be158c15e4a7
+            logger.info(f"Event {event.event_id} inserted successfully")
     except Exception as e:
-        logger.error(f"Error inserting event {event['event_id']}: {str(e)}", exc_info=True)
+        logger.error(f"Error inserting event {event.event_id}: {str(e)}", exc_info=True)
         raise
     finally:
         await conn.close()
@@ -180,17 +158,10 @@ async def del_track_metadata(track_id: int):
 
     conn = await get_db_connection()
     try:
-<<<<<<< HEAD
         async with conn.transaction():
             result = await conn.execute(query, track_id)
             logger.info(f"Deleted track metadata of track_id: {track_id}, result: {result}")
             return {"status": "success", "detail": result}
-=======
-        logger.info(f"Connecting as user: {POSTGRES_USER} to database: {POSTGRES_DB}")
-        result = await conn.execute(query, track_id)
-        logger.info(f"Deleted track metadata of track_id: {track_id}, result: {result}")
-        return {"status": "success", "detail": result}
->>>>>>> 2b77211b7755c6af3e6a2445fd02be158c15e4a7
     except Exception as e:
         logger.error(f"Database query failed: {str(e)}", exc_info=True)
         raise

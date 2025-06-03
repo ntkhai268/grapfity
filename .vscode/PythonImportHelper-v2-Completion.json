@@ -27,6 +27,38 @@
         "documentation": {}
     },
     {
+        "label": "Event",
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "isExtraImport": true,
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
+        "label": "Event",
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "isExtraImport": true,
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
+        "label": "Event",
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "isExtraImport": true,
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
+        "label": "Event",
+        "importPath": "src.models.user_behavior",
+        "description": "src.models.user_behavior",
+        "isExtraImport": true,
+        "detail": "src.models.user_behavior",
+        "documentation": {}
+    },
+    {
         "label": "BaseModel",
         "importPath": "pydantic",
         "description": "pydantic",
@@ -326,14 +358,6 @@
         "documentation": {}
     },
     {
-        "label": "Event",
-        "importPath": "src.models.user_behavior",
-        "description": "src.models.user_behavior",
-        "isExtraImport": true,
-        "detail": "src.models.user_behavior",
-        "documentation": {}
-    },
-    {
         "label": "send_event_to_kafka",
         "importPath": "src.services.kafka.kafka_producer",
         "description": "src.services.kafka.kafka_producer",
@@ -440,7 +464,7 @@
         "kind": 6,
         "importPath": "recommender.src.models.user_behavior",
         "description": "recommender.src.models.user_behavior",
-        "peekOfCode": "class Event(BaseModel):\n    event_id: str\n    event_type: str\n    track_id: str\n    user_id: str\n    timestamp: datetime",
+        "peekOfCode": "class Event(BaseModel):\n    event_id: str\n    event_type: str\n    track_id: int\n    user_id: str\n    timestamp: datetime",
         "detail": "recommender.src.models.user_behavior",
         "documentation": {}
     },
@@ -575,7 +599,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_consumer",
         "description": "recommender.src.services.kafka.kafka_consumer",
-        "peekOfCode": "logger = logging.getLogger(__name__)\nload_dotenv()\nKAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    logger.info(\"Initializing Kafka consumer...\")\n    try:\n        consumer = AIOKafkaConsumer(\n            'event_tracking_topic',",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nload_dotenv()\nKAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"kafka\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    logger.info(\"Initializing Kafka consumer...\")\n    try:\n        consumer = AIOKafkaConsumer(\n            'event_tracking_topic',",
         "detail": "recommender.src.services.kafka.kafka_consumer",
         "documentation": {}
     },
@@ -584,7 +608,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_consumer",
         "description": "recommender.src.services.kafka.kafka_consumer",
-        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    logger.info(\"Initializing Kafka consumer...\")\n    try:\n        consumer = AIOKafkaConsumer(\n            'event_tracking_topic',\n            bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n            group_id=\"event_tracking_group\",",
+        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"kafka\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def consume_events():\n    logger.info(\"Initializing Kafka consumer...\")\n    try:\n        consumer = AIOKafkaConsumer(\n            'event_tracking_topic',\n            bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,\n            group_id=\"event_tracking_group\",",
         "detail": "recommender.src.services.kafka.kafka_consumer",
         "documentation": {}
     },
@@ -611,7 +635,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_producer",
         "description": "recommender.src.services.kafka.kafka_producer",
-        "peekOfCode": "logger = logging.getLogger(__name__)\nKAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event['event_id']} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()",
+        "peekOfCode": "logger = logging.getLogger(__name__)\nKAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: Event, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event.event_id} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()",
         "detail": "recommender.src.services.kafka.kafka_producer",
         "documentation": {}
     },
@@ -620,7 +644,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_producer",
         "description": "recommender.src.services.kafka.kafka_producer",
-        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event['event_id']} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = json.dumps(event).encode('utf-8')",
+        "peekOfCode": "KAFKA_HOST = os.getenv(\"KAFKA_HOST\", \"localhost\")\nKAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: Event, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event.event_id} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = event.json().encode(\"utf-8\")  # Pydantic tự serialize datetime",
         "detail": "recommender.src.services.kafka.kafka_producer",
         "documentation": {}
     },
@@ -629,7 +653,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_producer",
         "description": "recommender.src.services.kafka.kafka_producer",
-        "peekOfCode": "KAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event['event_id']} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = json.dumps(event).encode('utf-8')\n        logger.debug(f\"Event data size: {len(event_data)} bytes\")",
+        "peekOfCode": "KAFKA_PORT = os.getenv(\"KAFKA_PORT\", \"9092\")\nKAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: Event, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event.event_id} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = event.json().encode(\"utf-8\")  # Pydantic tự serialize datetime\n        logger.debug(f\"Event data size: {len(event_data)} bytes\")",
         "detail": "recommender.src.services.kafka.kafka_producer",
         "documentation": {}
     },
@@ -638,7 +662,7 @@
         "kind": 5,
         "importPath": "recommender.src.services.kafka.kafka_producer",
         "description": "recommender.src.services.kafka.kafka_producer",
-        "peekOfCode": "KAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: dict, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event['event_id']} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = json.dumps(event).encode('utf-8')\n        logger.debug(f\"Event data size: {len(event_data)} bytes\")\n        await producer.send_and_wait(topic, event_data)",
+        "peekOfCode": "KAFKA_BOOTSTRAP_SERVERS = f\"{KAFKA_HOST}:{KAFKA_PORT}\"\nasync def send_event_to_kafka(event: Event, topic: str = \"event_tracking_topic\"):\n    logger.info(f\"Sending event {event.event_id} to Kafka topic: {topic}\")\n    try:\n        producer = AIOKafkaProducer(bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)\n        logger.info(\"Starting Kafka producer...\")\n        await producer.start()\n        event_data = event.json().encode(\"utf-8\")  # Pydantic tự serialize datetime\n        logger.debug(f\"Event data size: {len(event_data)} bytes\")\n        await producer.send_and_wait(topic, event_data)",
         "detail": "recommender.src.services.kafka.kafka_producer",
         "documentation": {}
     },
@@ -782,7 +806,7 @@
         "kind": 6,
         "importPath": "recommender.main",
         "description": "recommender.main",
-        "peekOfCode": "class TrackRequest(BaseModel):\n    track_file_name: str\n    track_id: str\n@app.post(\"/api/add_track\")\ndef add_track_feature(track_data: TrackRequest):\n    # res = extract(track_data.track_file_name)\n    track_file_name = track_data.track_file_name\n    track_id = track_data.track_id\n    return {\"res\": {track_file_name,track_id}}\n@app.delete(\"/api/delete_track/{id}\")",
+        "peekOfCode": "class TrackRequest(BaseModel):\n    track_file_name: str\n    track_id: str\n@app.post(\"/api/add_track\")\ndef add_track_feature(track_data: TrackRequest):\n    res = extract(track_data.track_file_name)\n    # track_file_name = track_data.track_file_name\n    # track_id = track_data.track_id\n    return {\"res\": {res}}\n    # return {\"res\": {track_file_name,track_id}}",
         "detail": "recommender.main",
         "documentation": {}
     },
@@ -791,7 +815,7 @@
         "kind": 2,
         "importPath": "recommender.main",
         "description": "recommender.main",
-        "peekOfCode": "def add_track_feature(track_data: TrackRequest):\n    # res = extract(track_data.track_file_name)\n    track_file_name = track_data.track_file_name\n    track_id = track_data.track_id\n    return {\"res\": {track_file_name,track_id}}\n@app.delete(\"/api/delete_track/{id}\")\nasync def delete_track_feature(id: int):\n    try:\n        logger.info(f\"Received request to delete track with ID: {id}\")\n        result = await delete_event_relative_track_id(id)",
+        "peekOfCode": "def add_track_feature(track_data: TrackRequest):\n    res = extract(track_data.track_file_name)\n    # track_file_name = track_data.track_file_name\n    # track_id = track_data.track_id\n    return {\"res\": {res}}\n    # return {\"res\": {track_file_name,track_id}}\n@app.delete(\"/api/delete_track/{id}\")\nasync def delete_track_feature(id: int):\n    try:\n        logger.info(f\"Received request to delete track with ID: {id}\")",
         "detail": "recommender.main",
         "documentation": {}
     },

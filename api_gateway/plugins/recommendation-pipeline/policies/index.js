@@ -29,17 +29,26 @@ module.exports = {
           return res.status(400).json({ error: 'Missing user_id' });
         }
 
+        const cookie = req.headers.cookie
+        const backendJwtUrl = `${actionParams.backendService}/getUserId`
+
+        const response = await axios.get(backendJwtUrl, {
+          headers: {
+            Cookie: cookie  // truyền cookie tới backend
+          }
+        });
+        const user_id_real = response.data.user_id;
+ 
         // Gọi recommender API
-        const recommenderUrl = `${actionParams.recommenderService}${user_id}`;
+        const recommenderUrl = `${actionParams.recommenderService}${user_id_real}`;
         
         const rsRes = await axios.get(recommenderUrl);
 
         const track_ids = rsRes.data
         // const track_ids = [1002,1003,1004,1005,1006,1007, 1008 ,1009,1010]
 
-
         // Gọi backend API
-        const backendUrl = `${actionParams.backendService}`;
+        const backendUrl = `${actionParams.backendService}/tracks/getTracksById`;
 
 
         const payload = {

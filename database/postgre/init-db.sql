@@ -9,9 +9,8 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Tạo bảng tracks
 CREATE TABLE IF NOT EXISTS tracks (
-  trackname VARCHAR,
   track_id INTEGER PRIMARY KEY NOT NULL,
-  lyrics TEXT,
+  
   explicit BOOLEAN,
   danceability FLOAT,
   energy FLOAT,
@@ -26,18 +25,15 @@ CREATE TABLE IF NOT EXISTS tracks (
   tempo FLOAT,
   duration_ms INTEGER,
   time_signature INTEGER,
-  year INTEGER,
-  release_date DATE
 );
 
--- Tạo bảng events
 CREATE TABLE IF NOT EXISTS events (
     id SERIAL PRIMARY KEY,
-    event_id VARCHAR(50) NOT NULL,
+    event_id VARCHAR(50) NOT NULL UNIQUE,  -- thêm UNIQUE ở đây
     event_type VARCHAR(50) NOT NULL,
     track_id INTEGER NOT NULL REFERENCES tracks(track_id) ON DELETE CASCADE,
     user_id VARCHAR(50) NOT NULL,
-    timestamp TIMESTAMP NOT NULL
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_events_user_id ON events(user_id);
