@@ -7,12 +7,8 @@ const getListeningHistoryOfUser = async (userId) => {
     include: [
       {
         model: db.Track,
-        attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+        attributes: ['id', 'trackname', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt'],
         include: [
-          {
-            model: db.Metadata,
-            attributes: ['trackname']
-          },
           {
             model: db.User,
             attributes: ['id', ['name', 'UploaderName']]
@@ -60,13 +56,8 @@ const getTop10PopularTracks = async () => {
     {
       model: db.Track,
       where: { privacy: 'public' },
-      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId'],
+      attributes: ['id', 'trackname','trackUrl', 'imageUrl', 'uploaderId'],
       include: [
-          {
-            model: db.Metadata,
-
-             attributes: ['trackname'] 
-          },
           {
             model: db.User,
             attributes: ['id','Name']

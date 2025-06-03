@@ -3,10 +3,10 @@ import React, { useState, useEffect, useRef } from "react";
 import { fetchJoinedTracks, JoinedTrack, deleteTrack } from "../services/trackService";
 import "../styles/admin.css";
 
-const imageModules = import.meta.glob(
-  "../assets/images/*.{png,jpg,jpeg,svg}",
-  { eager: true, as: "url" }
-);
+const imageModules = import.meta.glob("../assets/images/*.{png,jpg,jpeg,svg}", {
+  eager: true,
+  as: "url",
+});
 const imageMap: Record<string, string> = {};
 Object.entries(imageModules).forEach(([path, url]) => {
   const filename = path.split("/").pop();
@@ -26,11 +26,10 @@ const Section_admin: React.FC = () => {
     const loadData = async () => {
       try {
         const data = await fetchJoinedTracks();
-        const approved = data.filter((t) => t.status === "approved");
-        setTracks(approved);
-        setFilteredTracks(approved);
+        setTracks(data);
+        setFilteredTracks(data);
         const init: Record<number, boolean> = {};
-        approved.forEach((t) => (init[t.id] = false));
+        data.forEach((t) => (init[t.id] = false));
         setCheckedRows(init);
         setAllChecked(false);
       } catch (err) {
@@ -65,6 +64,7 @@ const Section_admin: React.FC = () => {
     setCheckedRows(init);
     setAllChecked(false);
   }, [searchTerm, tracks]);
+
   const handleSort = (option: string) => {
     let sorted = [...filteredTracks];
     switch (option) {
@@ -79,14 +79,10 @@ const Section_admin: React.FC = () => {
         );
         break;
       case "date-asc":
-        sorted.sort((a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        );
+        sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
         break;
       case "date-desc":
-        sorted.sort((a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         break;
       case "played-asc":
         sorted.sort(
@@ -108,7 +104,6 @@ const Section_admin: React.FC = () => {
     setFilteredTracks(sorted);
     setFilterOpen(false);
   };
-  
 
   const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
@@ -145,16 +140,12 @@ const Section_admin: React.FC = () => {
     if (!window.confirm(`Xác nhận xoá ${idsToDelete.length} tracks?`)) return;
 
     try {
-      // gọi xoá tuần tự hoặc Promise.all
       await Promise.all(idsToDelete.map((id) => deleteTrack(id)));
-      // reload lại dữ liệu
       const data = await fetchJoinedTracks();
-      const approved = data.filter((t) => t.status === "approved");
-      setTracks(approved);
-      setFilteredTracks(approved);
-      // reset checkbox
+      setTracks(data);
+      setFilteredTracks(data);
       const init: Record<number, boolean> = {};
-      approved.forEach((t) => (init[t.id] = false));
+      data.forEach((t) => (init[t.id] = false));
       setCheckedRows(init);
       setAllChecked(false);
     } catch (err) {
@@ -163,16 +154,13 @@ const Section_admin: React.FC = () => {
     }
   };
 
-  // Hàm xoá từng dòng
   const handleDeleteRow = (id: number) => async () => {
     if (!window.confirm(`Xác nhận xoá track ID ${id}?`)) return;
     try {
       await deleteTrack(id);
-      // remove khỏi state hiện tại để không cần reload toàn bộ
       const newTracks = tracks.filter((t) => t.id !== id);
       setTracks(newTracks);
       setFilteredTracks((prev) => prev.filter((t) => t.id !== id));
-      // cập nhật checkedRows và allChecked
       const updated = { ...checkedRows };
       delete updated[id];
       setCheckedRows(updated);
@@ -182,7 +170,6 @@ const Section_admin: React.FC = () => {
       alert("Xoá không thành công. Vui lòng thử lại.");
     }
   };
-
 
   return (
     <section className="section_admin">
@@ -199,12 +186,12 @@ const Section_admin: React.FC = () => {
         <div className="user_actions_admin">
           <span className="selected_count_admin">{selectedCount} Selected</span>
           <button
-          className="delete_button_admin"
-          disabled={selectedCount === 0}
-          onClick={handleDeleteSelected}
-        >
-          Delete
-        </button>
+            className="delete_button_admin"
+            disabled={selectedCount === 0}
+            onClick={handleDeleteSelected}
+          >
+            Delete
+          </button>
           <div className="filter_dropdown_admin" ref={filterRef}>
             <button
               className="filter_button_admin"
@@ -213,7 +200,7 @@ const Section_admin: React.FC = () => {
               Filter <span className="filter_badge_admin" />
             </button>
             {filterOpen && (
-              <div className="filter_menu_admin" style={{ width: "100%", padding: "4px 0" }}>
+              <div className="filter_menu_admin">
                 <div className="filter_option_admin" onClick={() => handleSort("name-asc")}>
                   A → Z
                 </div>
@@ -227,18 +214,17 @@ const Section_admin: React.FC = () => {
                   Newest First
                 </div>
                 <div className="filter_option_admin" onClick={() => handleSort("played-asc")}>
-      Played ↑
-    </div>
-    <div className="filter_option_admin" onClick={() => handleSort("played-desc")}>
-      Played ↓
-    </div>
+                  Played ↑
+                </div>
+                <div className="filter_option_admin" onClick={() => handleSort("played-desc")}>
+                  Played ↓
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Table */}
       <div className="users_table_admin">
         <div className="table_header_admin">
           <div className="table_cell_admin checkbox_cell_admin">
@@ -259,10 +245,8 @@ const Section_admin: React.FC = () => {
 
         {filteredTracks.map((t) => {
           const title = t.Metadatum?.trackname || `Track ${t.id}`;
-          const fileName = t.imageUrl.split("/").pop()!;
+          const fileName = t.imageUrl?.split("/").pop() || "";
           const imgSrc = imageMap[fileName] || "";
-          const statusClass = "status_active_admin";
-          const statusText = "Approved";
           const listenCount = t.listeningHistories[0]?.listenCount || 0;
 
           return (
@@ -277,11 +261,7 @@ const Section_admin: React.FC = () => {
               </div>
               <div className="table_cell_admin name_cell_admin">
                 <div className="user_info_admin">
-                  <img
-                    src={imgSrc}
-                    alt={title}
-                    className="user_avatar_table_admin"
-                  />
+                  <img src={imgSrc} alt={title} className="user_avatar_table_admin" />
                   <div className="user_details_admin">
                     <div className="user_name_admin">{title}</div>
                     <div className="user_email_admin">ID: {t.id}</div>
@@ -291,12 +271,10 @@ const Section_admin: React.FC = () => {
               <div className="table_cell_admin position_cell_admin">
                 {t.User?.UploaderName || "N/A"}
               </div>
-              <div className="table_cell_admin country_cell_admin">
-                {formatDate(t.createdAt)}
-              </div>
+              <div className="table_cell_admin country_cell_admin">{formatDate(t.createdAt)}</div>
               <div className="table_cell_admin status_cell_admin">
-                <span className={`status_badge_admin ${statusClass}`}>
-                  <span className="status_dot_admin" /> {statusText}
+                <span className={`status_badge_admin status_active_admin`}>
+                  <span className="status_dot_admin" /> OK
                 </span>
               </div>
               <div className="table_cell_admin portfolio_cell_admin">
@@ -315,14 +293,13 @@ const Section_admin: React.FC = () => {
                 </div>
               </div>
               <div className="table_cell_admin action_cell_admin">
-                
-              <button
-                className="delete_row_button_admin"
-                onClick={handleDeleteRow(t.id)}
-                disabled={!checkedRows[t.id]}
-              >
-                Delete
-              </button>
+                <button
+                  className="delete_row_button_admin"
+                  onClick={handleDeleteRow(t.id)}
+                  disabled={!checkedRows[t.id]}
+                >
+                  Delete
+                </button>
               </div>
             </div>
           );

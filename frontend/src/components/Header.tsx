@@ -21,8 +21,6 @@ Object.entries(imageModules).forEach(([path, url]) => {
   const filename = path.split("/").pop();
   if (filename) imageMap[filename] = url as string;
 });
-import { getCurrentUser } from "../services/authService";
-import { getMyProfile, UserType as UserData  } from "../services/userService.ts";
 
 const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -32,31 +30,9 @@ const Header: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-   const [user, setUser] = useState<UserData | null>(null);
 
   const toggleUserMenu = () => setShowMenu((prev) => !prev);
   const toggleUploadModal = () => setShowUploadModal((prev) => !prev);
-
-  // Xử lý tìm kiếm
-  const handleLogout = async () => {
-    try {
-      await fetch("http://localhost:8080/api/logout", {
-        method: "POST",
-        credentials: "include", // GỬI cookie để backend xoá nó
-      });
-    } catch (err) {
-      console.error("Lỗi khi gọi logout:", err);
-    }
-
-    // Xoá dữ liệu phụ nếu bạn lưu gì thêm
-    localStorage.removeItem("roleId");
-    localStorage.removeItem("userId");
-    // hoặc clear hết nếu không có gì quan trọng:
-    // localStorage.clear();
-
-    window.location.href = "/mainpage"; 
-  };
 
   const handleSearch = () => {
     const q = searchValue.trim();
@@ -90,18 +66,6 @@ const Header: React.FC = () => {
     return () => clearTimeout(delay);
   }, [searchValue]);
 
-  // dùng để lấy avatar
-  useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const profile = await getMyProfile();
-          setUser(profile);
-        } catch (err) {
-          console.error("Không thể tải thông tin người dùng:", err);
-        }
-      };
-      fetchUser();
-    }, []);
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -111,19 +75,9 @@ const Header: React.FC = () => {
         setShowDropdown(false);
       }
     };
-   
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-   useEffect(() => {
-      const checkLogin = async () => {
-        const user = await getCurrentUser();
-        setIsLoggedIn(!!user); // true nếu có user, false nếu null
-      };
-  
-      checkLogin();
-    }, []);
 
   return (
     <header>
@@ -197,16 +151,6 @@ const Header: React.FC = () => {
       <button className="btn-TB">
         <img src={bellIcon} alt="Thông báo" />
       </button>
-        <div className="right-controls">
-          {/* Upload Button */}
-          <button className="btn-upload" onClick={toggleUploadModal}>
-            Upload
-          </button>
-
-          {/* Notification */}
-          <button className="btn-TB">
-            <img src={bellIcon} alt="Thông báo" />
-          </button>
 
       <div className="user-dropdown">
         <button className="btn-ND" onClick={toggleUserMenu}>
@@ -230,37 +174,6 @@ const Header: React.FC = () => {
         )}
       </div>
 
-          {/* User Dropdown */}
-          <div className="user-dropdown" ref={dropdownRef}>
-            { isLoggedIn ? (
-              <button className="btn-ND" onClick={toggleUserMenu}>
-                <img src={user?.Avatar || userIcon} alt="Người dùng" />
-              </button>
-              ) :(
-              <button className="Login" onClick={() => navigate("/login")}>
-                  Đăng Nhập
-              </button>
-              )
-            }
-            
-            {showMenu && (
-              <div className="dropdown-menu">
-                <div className="menu-item" onClick={() => navigate("/profile")}>
-                  Profile
-                </div>
-                <div className="menu-item" onClick={() => navigate("/stats")}>
-                  Stats
-                </div>
-                {isLoggedIn && (
-                  <div className="menu-item" onClick={handleLogout}>
-                    Logout
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      {/* Upload Modal */}
       {showUploadModal && (
         <div className="popup-backdrop" onClick={toggleUploadModal}>
           <div onClick={(e) => e.stopPropagation()} className="popup-content">

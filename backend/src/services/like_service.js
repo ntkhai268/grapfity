@@ -20,9 +20,6 @@ const getLikedTracksByUser = async (userId) => {
         model: db.Track,
         include: [
           {
-            model: db.Metadata,
-          },
-          {
             model: db.User,
             attributes: ['id','Name']
           }
