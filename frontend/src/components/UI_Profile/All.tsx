@@ -87,7 +87,7 @@ const SongList: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
   const handleDeleteTrack = async (songId: number) => {
     const confirmDelete = window.confirm("Bạn có chắc muốn xoá bài nhạc này không?");
     if (!confirmDelete) return;
-  
+    console.log("*********************")
     const result = await deleteTrackAPI(songId);
     if (!result.success) {
       alert(`❌ Xóa thất bại: ${result.message}`);

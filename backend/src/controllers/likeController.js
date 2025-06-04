@@ -17,9 +17,7 @@ const likeTrackController = async (req, res) => {
 };
 
 const getLikedTracksByUserController = async (req, res) => {
-    const JWT = req.cookies;
-    const data = verityJWT(JWT.jwt);
-    const userId = data.userId;
+    const userId = req.params.userId;
 
     try {
         const likedTrack = await getLikedTracksByUser(userId);

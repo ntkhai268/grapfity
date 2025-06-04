@@ -7,6 +7,8 @@ import router from './routes/api.js';
 import db from './models/index.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import mime from 'mime-types';
+import fs from 'fs';
 
 const app = express();
 

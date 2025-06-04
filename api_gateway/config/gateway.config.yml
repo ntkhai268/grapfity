@@ -4,38 +4,38 @@ http:
 apiEndpoints:
   # THÊM ENDPOINT MỚI CHO OPTIONS REQUESTS
   cors-options:
-    host: '*'
-    paths: ['/*']
-    methods: ['OPTIONS']
+    host: "*"
+    paths: ["/*"]
+    methods: ["OPTIONS"]
 
   image:
-    host: '*'
-    paths: '/assets/*'
-    
+    host: "*"
+    paths: "/assets/*"
+
   recommendation:
-    host: '*'  # ĐỔI TỪ 'localhost' THÀNH '*' ĐỂ CHẤP NHẬN MỌI HOST
-    paths: '/api/recommendation*'
+    host: "*" # ĐỔI TỪ 'localhost' THÀNH '*' ĐỂ CHẤP NHẬN MỌI HOST
+    paths: "/api/recommendation*"
   event_tracking:
-    host: '*'
-    paths: '/api/event_tracking'
+    host: "*"
+    paths: "/api/event_tracking"
   deleteTrack:
-    host: '*'
-    paths: '/api/tracks/:id'
-    methods: ['DELETE']
+    host: "*"
+    paths: "/api/tracks/:id"
+    methods: ["DELETE"]
   createTrack:
-    host: '*'
-    paths: '/api/tracks/create-track'
+    host: "*"
+    paths: "/api/tracks/create-track"
   default:
-    host: '*'
-    paths: '/api/*'
+    host: "*"
+    paths: "/api/*"
     methods: [GET, POST, PUT, DELETE]
     preserveHeaders: true
 
 serviceEndpoints:
   recommender:
-    url: 'http://nginx:80'
+    url: "http://nginx:80"
   backend:
-    url: 'http://backend:8001'
+    url: "http://backend:8001"
 
 policies:
   - proxy
@@ -54,11 +54,11 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
-              maxAge: 86400  # Cache preflight trong 24h
+              maxAge: 86400 # Cache preflight trong 24h
 
   recommendation:
     apiEndpoints:
@@ -66,9 +66,9 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
       - recommendation-pipeline-policy:
           - action:
@@ -81,9 +81,9 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
       - proxy:
           - action:
@@ -96,9 +96,9 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
       - deleteTrack-pipeline-policy:
           - action:
@@ -111,9 +111,9 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
       - proxy:
           - action:
@@ -128,13 +128,25 @@ pipelines:
 
   image:
     apiEndpoints:
-      - track_image
+      - image
     policies:
+      - cors:
+          - action:
+              origin: "http://localhost:5173"
+              methods: ["GET"]
+              allowedHeaders: ["Content-Type", "Range"]
+              exposedHeaders:
+                [
+                  "Content-Length",
+                  "Content-Type",
+                  "Content-Range",
+                  "Accept-Ranges",
+                ]
       - proxy:
           - action:
               serviceEndpoint: backend
               changeOrigin: true
-              stripPath: false  # giữ nguyên /assets/track_image/...
+              stripPath: false
               preserveHeaders: true
 
   default:
@@ -143,9 +155,9 @@ pipelines:
     policies:
       - cors:
           - action:
-              origin: 'http://localhost:5173'
-              methods: ['GET', 'POST', 'PUT', 'DELETE']
-              allowedHeaders: ['Content-Type', 'Authorization']
+              origin: "http://localhost:5173"
+              methods: ["GET", "POST", "PUT", "DELETE"]
+              allowedHeaders: ["Content-Type", "Authorization"]
               credentials: true
       - proxy:
           - action:

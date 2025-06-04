@@ -42,12 +42,12 @@ export const mapApiDataToTrackData = (trackFromApi: any): TrackData => {
     ? { username: trackFromApi.User.Name || 'Unknown Artist' }
     : undefined;
 
-  const title = trackFromApi.Metadatum?.trackname || 'Unknown Title';
-  const lyrics = trackFromApi.Metadatum?.lyrics || null;
+  const title = trackFromApi.trackname || 'Unknown Title';
+  const lyrics = trackFromApi.lyrics || null;
   
   const artist =
     uploaderInfo?.username ||
-    trackFromApi.Metadatum?.artistName ||
+    trackFromApi.artistName ||
     trackFromApi.artist ||
     null;
 

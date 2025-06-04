@@ -203,28 +203,6 @@ const Header: React.FC = () => {
             <img src={bellIcon} alt="Thông báo" />
           </button>
 
-      <div className="user-dropdown">
-        <button className="btn-ND" onClick={toggleUserMenu}>
-          <img src={userIcon} alt="Người dùng" />
-        </button>
-        {showMenu && (
-          <div className="dropdown-menu">
-            <div className="menu-item" onClick={() => navigate("/profile")}>
-              Profile
-            </div>
-            <div className="menu-item" onClick={() => navigate("/stats")}>
-              Stats
-            </div>
-            <div
-              className="menu-item"
-              onClick={() => console.log("Logging out...")}
-            >
-              Logout
-            </div>
-          </div>
-        )}
-      </div>
-
           {/* User Dropdown */}
           <div className="user-dropdown" ref={dropdownRef}>
             { isLoggedIn ? (

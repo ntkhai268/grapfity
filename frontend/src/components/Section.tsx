@@ -171,7 +171,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             context: { id: contextId, type },
             },
         });
-        sendEvent(String(song.id), EventType.Click, viewedUserId);
+        sendEvent(Number(song.id), EventType.Click, viewedUserId);
 
     };
 

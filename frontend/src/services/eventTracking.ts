@@ -11,7 +11,7 @@ export enum EventType {
 // ✅ Interface dữ liệu gửi đi
 interface EventTrackingData {
   event_id: string;
-  track_id: string;
+  track_id: Number;
   event_type: EventType;
   user_id: string;
   timestamp: string;
@@ -24,7 +24,7 @@ interface EventTrackingData {
  * @param userId - ID của người dùng
  */
 export const sendEvent = async (
-  trackId: string,
+  trackId: Number,
   eventType: EventType,
   userId: string
 ): Promise<any> => {
@@ -39,7 +39,7 @@ export const sendEvent = async (
   try {
     const response = await axios.post(
       'http://localhost:8080/api/event_tracking',
-      { event },
+      event,
       {
         headers: {
           'Content-Type': 'application/json',

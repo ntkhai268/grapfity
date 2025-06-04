@@ -1,5 +1,7 @@
-import  { useEffect } from 'react'; 
-import { Routes, Route, Navigate } from "react-router-dom"; 
+import  { useEffect, useState } from 'react'; 
+import { Routes, Route, Navigate, useParams } from "react-router-dom"; 
+import { getCurrentUser } from "./services/authService";
+
 
 import Homepage from "./container/HomePage";
 // import Profile from "./container/ProfilePage";
@@ -34,6 +36,23 @@ import { getAllTracksAPI} from './services/trackServiceAPI';
 import { getLikedTracksByUserAPI } from './services/likeService';
 import { getMyPlaylistsAPI } from './services/playlistService';
 
+
+export function useProfileUserId() {
+  const { userId: profileUserId } = useParams<{ userId: string }>();
+  const [currentUserId, setCurrentUserId] = useState<string | number | null>(null);
+
+  useEffect(() => {
+    if (!profileUserId) {
+      // Chỉ fetch nếu đang ở profile của mình
+      getCurrentUser().then(user => {
+        if (user?.id) setCurrentUserId(user.id);
+      });
+    }
+  }, [profileUserId]);
+
+  if (profileUserId) return profileUserId;
+  return currentUserId;
+}
 // Hàm tiện ích map từ TrackData (hoặc cấu trúc track trong PlaylistData) sang Song
 const mapTrackDataToSong = (track: any): Song => ({ 
     id: track.id, 
@@ -88,14 +107,15 @@ const App = () => {
         })) || null;
       }
 
-
+      const viewedUserId = useProfileUserId();
       if (context.type === 'profile' && context.id === 'liked') {
-        const likedTrackData = await getLikedTracksByUserAPI();
+        if (!viewedUserId) return null;
+        const likedTrackData = await getLikedTracksByUserAPI(viewedUserId);
         return likedTrackData.map(mapTrackDataToSong);
       }
 
       if (context.type === 'queue') {
-        const allTrackData = await getAllTracksAPI();
+        const allTrackData = await getAllTracksAPI();           
         return allTrackData.map(mapTrackDataToSong);
       }
 

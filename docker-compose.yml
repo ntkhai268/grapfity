@@ -68,6 +68,8 @@ services:
       - backend
       - nginx
       - redis
+    volumes:
+      - ./backend/src/public/assets:/app/public/assets
 
   frontend:
     build: ./frontend

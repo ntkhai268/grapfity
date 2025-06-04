@@ -195,8 +195,7 @@ const Footer: React.FC = () => {
       trackingListeningHistoryAPI(currentSong.id)
         .catch(() => { /* ignore */ });
 
-      sendEvent(
-      String(currentSong.id), EventType.Play, viewedUserId)
+      sendEvent(Number(currentSong.id), EventType.Play, viewedUserId)
       lastTrackedId.current = currentSong.id;
     }
     // Không reset lastTrackedId khi pause, chỉ reset khi đổi sang bài khác!
