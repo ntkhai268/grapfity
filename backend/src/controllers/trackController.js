@@ -17,7 +17,8 @@ import {
     getAllTracksForAdmin,
     getTracksByUserId,
     getJoinedTracks,
-    updateTrackStatus
+    updateTrackStatus,
+    getTracksById
 } from '../services/track_service.js';
 
 
@@ -380,10 +381,15 @@ const getTracksByUserController = async (req, res) => {
 
 const getTracksByIdController = async (req, res) => {
     try {
+      console.log("***************** req.body.track_ids", req.body.track_ids)
         const trackIds = req.body.track_ids;
+        console.log("***************** trackIds", req.body.track_ids)
+        console.log("typeof trackIds:", typeof trackIds);
+        console.log("***************** !trackIds", !trackIds)
         if (!trackIds || !Array.isArray(trackIds)) {
             return res.status(400).json({ error: 'Invalid track IDs' });
         }
+        
         const tracks = await getTracksById(trackIds);
         return res.status(200).json(tracks);
     } catch (error) {

@@ -25,7 +25,7 @@ export interface TrackData {
     lyrics?: string | null;
     duration_ms?: number;
     explicit?: boolean;
-     privacy?: 'public' | 'private';
+    privacy?: 'public' | 'private';
     
 }
 

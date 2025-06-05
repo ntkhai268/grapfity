@@ -77,7 +77,13 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             try {
                 const topTracksRaw: TrackData[] = await getTop10PopularTracksAPI();
                  console.log("check dữ liệu thô", topTracksRaw); // check dữ liệu thô
-                const topSongs: Song[] = topTracksRaw.map(mapTrackDataToSong);
+                const topSongs: Song[] = topTracksRaw.map((track: any): Song => ({
+  id: track.id,
+  src: normalizeUrl(track.trackUrl) || '',  // ánh xạ từ trackUrl
+  title: track.trackname ?? undefined,     // ánh xạ từ trackname
+  artist: track.User?.Name ?? undefined,   // ánh xạ từ User.Name
+  cover: normalizeUrl(track.imageUrl),     // ánh xạ từ imageUrl
+}));
                  console.log("Mapped top songs:", topSongs);
                 setTopTracks(topSongs);
             } catch (err) {

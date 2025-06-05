@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { countLikesForTrackAPI, getLikedTracksByProfileAPI, unlikeTrackAPI} from "../../services/likeService";
+import { countLikesForTrackAPI, getLikedTracksByUserAPI, unlikeTrackAPI} from "../../services/likeService";
 import type { TrackData } from "../../services/trackServiceAPI";
 import GlobalAudioManager, { Song, PlaylistContext } from "../../hooks/GlobalAudioManager";
 
@@ -28,7 +28,7 @@ const SongRight: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
   useEffect(() => {
     const fetchLikedTracksAndCounts = async () => {
       try {
-        const tracks = await getLikedTracksByProfileAPI(viewedUserId);
+        const tracks = await getLikedTracksByUserAPI(viewedUserId);
         // console.log("🧪 Tracks từ API /likes:", tracks);
         setLikedSongs(tracks);
         setTotalUserLikes(tracks.length);
