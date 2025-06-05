@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/ntkhai268/grapfity#readme",
   "dependencies": {
-    "@elastic/elasticsearch": "^9.0.0",
+    "@elastic/elasticsearch": "^8.18.2",
     "@sequelize/mssql": "^7.0.0-alpha.46",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",

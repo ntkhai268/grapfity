@@ -7,12 +7,8 @@ const getListeningHistoryOfUser = async (userId) => {
     include: [
       {
         model: db.Track,
-        attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+        attributes: ['id', 'trackname', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt'],
         include: [
-          {
-            model: db.Metadata,
-            attributes: ['trackname']
-          },
           {
             model: db.User,
             attributes: ['id', ['name', 'UploaderName']]
@@ -48,7 +44,7 @@ const trackingListeningHistory = async (userId, trackId) => {
 //lấy ra 10 bài có số lượt nghe cao nhất hệ thống
 // dùng group để đếm tổng số luuợt nghe dựa trên trackId
 const getTop10PopularTracks = async () => {
-  const { listeningHistory, Track, Metadata, User } = db;
+  const { listeningHistory, Track, User } = db;
 
   const results = await listeningHistory.findAll({
   attributes: [
@@ -60,13 +56,8 @@ const getTop10PopularTracks = async () => {
     {
       model: db.Track,
       where: { privacy: 'public' },
-      attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId'],
+      attributes: ['id', 'trackname','trackUrl', 'imageUrl', 'uploaderId'],
       include: [
-          {
-            model: db.Metadata,
-
-             attributes: ['trackname'] 
-          },
           {
             model: db.User,
             attributes: ['id','Name']
@@ -97,7 +88,7 @@ const getTop10PopularTracks = async () => {
   return track ? {
     id: track.id,
     src: track.trackUrl || "",                              // Chuẩn hóa field src
-    title: track.Metadatum?.trackname ?? undefined,         // Lấy từ Metadata
+    title: track.trackname  || "",     // Lấy từ Metadata
     artist: track.User?.Name ?? undefined,                  // Lấy từ User
     cover: track.imageUrl ?? undefined                      // Ảnh bìa
   } : null;
@@ -109,19 +100,15 @@ return tracks;
 
 // Service: Lấy 5 bài hát nghe nhiều nhất của user
 const getTop5TracksOfUser = async (userId) => {
-  const { listeningHistory, Track, Metadata, User } = db;
+  const { listeningHistory, Track, User } = db;
   const results = await listeningHistory.findAll({
     where: { userId },
     include: [
       {
         model: Track,
         where: { privacy: 'public' },
-        attributes: ['id', 'trackUrl', 'imageUrl', 'privacy', 'uploaderId'],
+        attributes: ['id', 'trackUrl', 'imageUrl', 'privacy', 'uploaderId', 'trackname'],
         include: [
-          {
-            model: Metadata,
-            attributes: ['trackname'] // Lấy title và các trường cần thiết
-          },
           {
             model: User,
         
@@ -147,9 +134,9 @@ const getTop5TracksOfUser = async (userId) => {
 return tracks;
 };
 
-const getTop5TracksByOwner = async (uploaderId) => {
+const getTop5TracksByProfile = async (uploaderId) => {
   // console.log("===>🧪🧪🧪 getTop5TracksByOwner được gọi với uploaderId:", uploaderId);
-  const { Track, Metadata, User } = db;
+  const { Track, User } = db;
 
   const topTracks = await db.sequelize.query(
     `
@@ -178,7 +165,6 @@ const getTop5TracksByOwner = async (uploaderId) => {
   const tracks = await Track.findAll({
     where: { id: trackIds},
     include: [
-      { model: Metadata, attributes: ['trackname'] },
       { model: User, attributes: ['Name'] }
     ]
   });
@@ -204,13 +190,10 @@ const getTop5TracksByOwner = async (uploaderId) => {
   }).filter(Boolean);
 };
 
-
-
-
 export {
     getListeningHistoryOfUser,
     trackingListeningHistory,
     getTop10PopularTracks,
     getTop5TracksOfUser,
-    getTop5TracksByOwner
+    getTop5TracksByProfile
 };

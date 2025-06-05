@@ -1,0 +1,6 @@
+{
+  "$id": "http://express-gateway.io/models/applications.json",
+  "type": "object", 
+  "properties": {},
+  "required": []
+}

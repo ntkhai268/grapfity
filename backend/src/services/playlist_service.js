@@ -15,16 +15,12 @@ const getAllPlaylistsByUserId = async (userId, currentUserId) => {
           },
         {
           model: db.Track,
-          attributes: ['id', 'trackUrl', 'imageUrl'],
+          attributes: ['id', 'trackUrl', 'imageUrl', 'trackname', 'duration_ms'],
           include: [
             {
               model: db.User,
               attributes: ['id', 'userName', 'Name']
             },
-            {
-              model: db.Metadata,
-              attributes: ['trackname', 'duration_ms']
-            }
           ],
         }
       ]
@@ -46,16 +42,12 @@ const getAllPublicPlaylists = async () => {
       },
       {
         model: db.Track,
-        attributes: ['id', 'trackUrl', 'imageUrl'],
+        attributes: ['id', 'trackUrl', 'imageUrl', 'trackname', 'duration_ms'],
         include: [
           {
             model: db.User,
             attributes: ['id', 'userName', 'Name']
           },
-          {
-            model: db.Metadata,
-            attributes: ['trackname', 'duration_ms']
-          }
         ]
       }
     ]

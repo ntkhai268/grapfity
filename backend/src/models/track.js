@@ -37,13 +37,14 @@ export default (sequelize, DataTypes) => {
     trackUrl: DataTypes.STRING,
     imageUrl: DataTypes.STRING,
     uploaderId: DataTypes.INTEGER,
-    status: {
+    duration_ms: DataTypes.INTEGER,
+    lyrics: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    trackname: {
       type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'pending',
-      validate: {
-        isIn: [['pending', 'approved', 'rejected']]
-      }
+      allowNull: true,
     },
     privacy: {
       type: DataTypes.STRING,

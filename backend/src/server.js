@@ -1,45 +1,61 @@
 import dotenv from 'dotenv';
-dotenv.config(); // Load biến môi trường từ .env
-import express, { json, urlencoded } from 'express'; // Import express và middleware
-import path from 'path'; // <-- THÊM IMPORT NÀY
-import { fileURLToPath } from 'url'; // <-- THÊM IMPORT NÀY (nếu dùng ES Modules)
-import router from './routes/api.js'; // Import router từ file api.js
-import db from './models/index.js'; // Import db từ file index.js trong thư mục models
+dotenv.config();
+import express, { json, urlencoded } from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import router from './routes/api.js';
+import db from './models/index.js';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-
+import mime from 'mime-types';
+import fs from 'fs';
 
 const app = express();
-const port = process.env.PORT;
-const hostname = process.env.HOSTNAME;
 
-// --- LẤY ĐƯỜNG DẪN THƯ MỤC HIỆN TẠI ---
+
+const port = process.env.PORT || 8001;
+const hostname = process.env.HOSTNAME || "0.0.0.0";
+
+// Lấy đường dẫn thư mục
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-console.log('Serving static files from directory:', path.join(__dirname, 'public')); // Log đường dẫn để kiểm tra
-// --------------------------------------
 
-app.use(cors({
-  origin: 'http://localhost:5173', // 👈 domain frontend
-  credentials: true // nếu bạn dùng cookies hoặc header xác thực
-}));
+// app.use(cors({
+//   origin: 'http://localhost:5173', // chính xác origin React app
+//   credentials: true
+// }));
+
+// // Đảm bảo Express xử lý OPTIONS
+// app.options('/*', cors()); // để xử lý preflight OPTIONS
+
 
 app.use(json()); // Parse dữ liệu từ request body với định dạng json
 app.use(urlencoded({ extended: true })); // Parse dữ liệu từ request body với định dạng urlencoded
 app.use(express.json());    
 app.use(cookieParser());
-
-// --- PHỤC VỤ FILE TĨNH TỪ THƯ MỤC 'public' ---
-// Middleware này phải được đặt TRƯỚC app.use('/api', router)
 app.use(express.static(path.join(__dirname, 'public')));
-// Giờ đây, yêu cầu GET /assets/track_image/ten_anh.jpg sẽ được phục vụ từ thư mục public/assets/track_image
-// --------------------------------------------
+
+// Kết nối database 
+try {
+  await db.connectToDB();
+  console.log('Database connected');
+} catch (err) {
+  console.error('Database connection failed:', err);
+}
 
 app.use('/api', router); // Định nghĩa các route API SAU middleware static
 
-// Test kết nối database
-db.connectToDB();
+// Xử lý lỗi 404
+app.use((req, res) => {
+  res.status(404).send('Not Found');
+});
+
+// Xử lý lỗi chung
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 app.listen(port, hostname, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Server running at http://${hostname}:${port}`);
 });

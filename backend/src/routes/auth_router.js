@@ -6,6 +6,14 @@ import db from '../models/index.js';      // ✅ import toàn bộ models
 const { User } = db;   
 
 authRouter.post('/register', registerController);
+
+authRouter.get('/getUserId', authenticateUser, (req,res)=>{
+  const id = req.userId
+  return res.status(200).json({
+      user_id: id,
+    });
+});
+
 authRouter.post('/login', handleUserLoginController);
 authRouter.get('/me', authenticateUser, async (req, res) => {
   try {
@@ -19,7 +27,9 @@ authRouter.get('/me', authenticateUser, async (req, res) => {
     }
 
     res.status(200).json({
-      id: user._id,
+      id: user.id,
+      name: user.name,
+      email: user.email
     });
   } catch (err) {
     console.error('Lỗi khi lấy thông tin user:', err);

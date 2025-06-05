@@ -174,8 +174,9 @@ const getPlaylistDetailsById = async (playlistId) => {
                 {
                     model: db.Track,
                     // Chọn các trường cần thiết từ bảng Track
-                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
+                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'trackname', 'duration_ms', 'lyrics'], 
                     where: { privacy: 'public' },
+                    required: false,
                     through: { attributes: [] }, // Quan trọng: Không lấy các trường từ bảng PlaylistTrack
                     // Sắp xếp các track trong playlist nếu cần (ví dụ: theo thứ tự thêm vào)
                     // order: [[ db.PlaylistTrack, 'createdAt', 'ASC' ]], // Cần include PlaylistTrack để order theo nó
@@ -184,16 +185,6 @@ const getPlaylistDetailsById = async (playlistId) => {
                             model: db.User, // User upload Track
                             attributes: ['id', 'userName', 'Name'],
                             // Nếu có alias trong model Track.belongsTo(User), dùng as: '...'
-                        },
-                        {
-                            model: db.Metadata,
-                            attributes: [    // <<< Lấy các trường cần từ Metadata
-                                'trackname', 
-                                'duration_ms', 
-                                'lyrics',
-                                // Thêm các trường khác nếu cần (explicit, tempo, key, ...)
-                            ],
-                            required: false // Dùng false để nếu track không có metadata thì vẫn trả về track
                         }
                     ] // Kết thúc include của Track
                 }
@@ -248,7 +239,8 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
                 },
                 {
                     model: db.Track,
-                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'],
+                    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'trackname', 'duration_ms', 'lyrics'],
+                    require: false,
                     through: { attributes: [] },
 
                     // ✅ LỌC TRACK THEO: public || uploader là chính người dùng hiện tại
@@ -263,11 +255,6 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
                         {
                             model: db.User,
                             attributes: ['id', 'userName', 'Name'],
-                        },
-                        {
-                            model: db.Metadata,
-                            attributes: ['trackname', 'duration_ms', 'lyrics'],
-                            required: false
                         }
                     ]
                 }
@@ -299,5 +286,5 @@ export {
     removeTrackFromPlaylist,
     // getTracksInPlaylist,
     getPlaylistDetailsById,
-     getPlaylistDetailsByIdforme
+    getPlaylistDetailsByIdforme
 };
