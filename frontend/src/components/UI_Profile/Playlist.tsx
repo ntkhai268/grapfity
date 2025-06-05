@@ -181,7 +181,7 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
                                         {/* Kiểm tra playlist.tracks là mảng */}
                                         {Array.isArray(playlist.tracks) && playlist.tracks.map((track, trackIndex) => (
                                             <div
-                                                className="track-item" // Giữ lại class gốc
+                                                className="track-item-profile" // Giữ lại class gốc
                                                 key={track.id || trackIndex}
                                                 onClick={() => {
                                                     const containerElement = playlistContainerRefs.current[playlistIndex];
@@ -195,7 +195,7 @@ const Playlist: React.FC<PlaylistsProps> = ({ viewedUserId, currentUserId }) => 
                                             >
                                                 {/* Giữ lại cấu trúc cũ với track-number và track-content */}
                                                 <div className="track-number">{trackIndex + 1}</div>
-                                                <div className="track-content">
+                                                <div className="track-content-playlist">
                                                     <div className="track-text">
                                                         <span>{track.title}</span>
                                                         {/* Có thể thêm artist của track nếu cần */}

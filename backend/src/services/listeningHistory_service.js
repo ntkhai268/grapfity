@@ -147,7 +147,7 @@ const getTop5TracksOfUser = async (userId) => {
 return tracks;
 };
 
-const getTop5TracksByOwner = async (uploaderId) => {
+const getTop5TracksByProfile = async (uploaderId) => {
   // console.log("===>🧪🧪🧪 getTop5TracksByOwner được gọi với uploaderId:", uploaderId);
   const { Track, Metadata, User } = db;
 
@@ -212,5 +212,5 @@ export {
     trackingListeningHistory,
     getTop10PopularTracks,
     getTop5TracksOfUser,
-    getTop5TracksByOwner
+    getTop5TracksByProfile  
 };
