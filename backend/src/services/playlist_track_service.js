@@ -250,7 +250,7 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
                 {
                     model: db.Track,
                     attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'],
-                    required: false,
+                    required: false,    
                     through: { attributes: [] },
 
                     // ✅ LỌC TRACK THEO: public || uploader là chính người dùng hiện tại
