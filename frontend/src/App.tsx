@@ -71,6 +71,7 @@ import Section_admin_profile from "./components/section_admin_statistical"
 
 const App = () => {
 
+
  useEffect(() => {
   const fetchPlaylist = async (context: PlaylistContext): Promise<Song[] | null> => {
     try {
@@ -154,6 +155,7 @@ const App = () => {
           </LoginLayout>
         }
       />
+      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route
         path="/mainpage"
         element={

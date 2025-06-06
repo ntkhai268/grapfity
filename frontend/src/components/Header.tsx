@@ -1,6 +1,6 @@
 // components/Header.tsx
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation  } from "react-router-dom";
 import "../styles/Header.css";
 import UploadSongMetadata from "../components/Manager_Songs/UploadSong_Metadata";
 import spotifyLogo from "../../public/assets/iconspotify.png";
@@ -11,16 +11,17 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { fetchJoinedTracks, JoinedTrack } from "../services/trackService";
 
+const API_BASE_URL = 'http://localhost:8080';
 // Ánh xạ toàn bộ ảnh từ /assets/images
-const imageModules = import.meta.glob(
-  "../assets/images/*.{png,jpg,jpeg,svg}",
-  { eager: true, as: "url" }
-);
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([path, url]) => {
-  const filename = path.split("/").pop();
-  if (filename) imageMap[filename] = url as string;
-});
+// const imageModules = import.meta.glob(
+//   "../assets/images/*.{png,jpg,jpeg,svg}",
+//   { eager: true, as: "url" }
+// );
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([path, url]) => {
+//   const filename = path.split("/").pop();
+//   if (filename) imageMap[filename] = url as string;
+// });
 import { getCurrentUser } from "../services/authService";
 import { getMyProfile, UserType as UserData  } from "../services/userService.ts";
 
@@ -32,6 +33,7 @@ const Header: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
+  const location = useLocation();//lấy thông tin location hiện tại
   const [isLoggedIn, setIsLoggedIn] = useState(false);
    const [user, setUser] = useState<UserData | null>(null);
 
@@ -125,6 +127,17 @@ const Header: React.FC = () => {
       checkLogin();
     }, []);
 
+    const handleUploadClick = () => {
+    if (!isLoggedIn) {
+      alert('Bạn cần đăng nhập để tải lên!');
+       navigate('/login', { state: { from: location } });  // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+    } else {
+      toggleUploadModal();  // Mở modal upload nếu đã đăng nhập
+    }
+  };
+
+
+
   return (
     <header>
       <h1>
@@ -161,7 +174,7 @@ const Header: React.FC = () => {
           <div className="search-dropdown">
             {suggestions.map((track) => {
               const fileName = track.imageUrl.split("/").pop()!;
-              const imgSrc = imageMap[fileName] || track.imageUrl;
+              const imgSrc = `${API_BASE_URL}/assets/track_image/${fileName}` || track.imageUrl;
 
               return (
                 <div
@@ -195,7 +208,7 @@ const Header: React.FC = () => {
 
         <div className="right-controls">
           {/* Upload Button */}
-          <button className="btn-upload" onClick={toggleUploadModal}>
+          <button className="btn-upload" onClick={handleUploadClick}>
             Upload
           </button>
 
@@ -213,7 +226,7 @@ const Header: React.FC = () => {
                 <img src={user?.Avatar || userIcon} alt="Người dùng" />
               </button>
               ) :(
-              <button className="Login" onClick={() => navigate("/login")}>
+              <button className="Login" onClick={() => navigate('/login', { state: { from: location } })}>
                   Đăng Nhập
               </button>
               )

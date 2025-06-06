@@ -7,15 +7,16 @@ import {
 } from '../services/listeningService';
 
 // Nếu bạn vẫn dùng ảnh local từ assets, giữ lại phần import động
-const imageModules = import.meta.glob(
-  '../assets/images/*.{jpg,jpeg,png,svg}',
-  { eager: true, as: 'url' }
-) as Record<string, string>;
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([path, url]) => {
-  const filename = path.split('/').pop()!;
-  imageMap[filename] = url;
-});
+const API_BASE_URL = 'http://localhost:8080';
+// const imageModules = import.meta.glob(
+//   '../assets/images/*.{jpg,jpeg,png,svg}',
+//   { eager: true, as: 'url' }
+// ) as Record<string, string>;
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([path, url]) => {
+//   const filename = path.split('/').pop()!;
+//   imageMap[filename] = url;
+// });
 
 interface ListeningItem {
   id: number;
@@ -39,11 +40,12 @@ const Recent_LnU: React.FC = () => {
         const mapped: ListeningItem[] = histories.map(h => {
           const { track, metadata, listenCount, createdAt } = h;
           const filename = track.imageUrl.split('/').pop() || '';
+          const imageUrl = `${API_BASE_URL}/assets/track_image/${filename}`; 
           return {
             id: track.id,
             title: metadata?.trackname ?? `Track ${track.id}`,
             artist: track.User?.UploaderName ?? 'Unknown',
-            imageUrl: imageMap[filename] || track.imageUrl,
+            imageUrl,
             trackUrl: track.trackUrl,
             listenCount,
             timestamp: createdAt,
