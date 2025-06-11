@@ -39,7 +39,7 @@ const addTrackToPlaylistController = async (req, res) => {
 
     } catch (error) {
         // Bắt lỗi từ service và trả về status code phù hợp
-        console.error(`Lỗi trong addTrackToPlaylistController cho user ${req.userId}, playlist ${req.params?.playlistId}, track ${req.body?.trackId}:`, error.message);
+        console.error(`Lỗi trong addTrackToPlaylistController cho user ${req.userId}, playlist ${req.params.playlistId}, track ${req.body.trackId}:`, error.message);
 
         // Ưu tiên sử dụng statusCode từ lỗi nếu service cung cấp
         const statusCode = error.statusCode || 500;
@@ -90,7 +90,7 @@ const removeTrackFromPlaylistController = async (req, res) => {
 
     } catch (error) {
         // Bắt lỗi từ service và trả về status code phù hợp
-        console.error(`Lỗi trong removeTrackFromPlaylistController cho user ${req.userId}, playlist ${req.params?.playlistId}, track ${req.params?.trackId}:`, error.message);
+        console.error(`Lỗi trong removeTrackFromPlaylistController cho user ${req.userId}, playlist ${req.params.playlistId}, track ${req.params.trackId}:`, error.message);
 
         const statusCode = error.statusCode || 500;
         let errorMessage = error.message || 'Lỗi server khi xóa track khỏi playlist.';
@@ -139,7 +139,7 @@ const getPlaylistDetailsController = async (req, res) => {
     });
 
   } catch (err) {
-    console.error(`Lỗi trong getPlaylistDetailsController cho playlist ${req.params?.playlistId}:`, err.message);
+    console.error(`Lỗi trong getPlaylistDetailsController cho playlist ${req.params.playlistId}:`, err.message);
     const statusCode = err.statusCode || 500;
     const errorMessage = err.message || 'Lỗi server khi lấy thông tin playlist.';
     res.status(statusCode).json({ error: errorMessage });

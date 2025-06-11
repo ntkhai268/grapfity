@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mssql:
+    build:
+        context: ./mssql
+        dockerfile: Dockerfile
+    container_name: mssql_server
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=nhomnaymanhNhat1!
+      - MSSQL_PID=Developer
+    ports:
+      - "1435:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+      
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "sqlcmd -S localhost -U sa -P 'nhomnaymanhNhat1!' -Q 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s 
+  
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      - DB_HOST=host.docker.internal
+    depends_on:
+      mssql:
+        condition: service_healthy
+    ports:
+      - 8080:8080
+
+
+volumes:
+  sql_data:
+    driver: local
+
+

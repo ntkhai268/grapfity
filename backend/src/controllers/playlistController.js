@@ -147,7 +147,7 @@ const deletePlaylistController = async (req, res) => {
 
     } catch (error) {
         // Bắt lỗi từ service
-        console.error(`Lỗi trong deletePlaylistController cho user ${req.userId || 'UNKNOWN'}, playlist ${req.params?.playlistId}:`, error);
+        console.error(`Lỗi trong deletePlaylistController cho user ${req.userId || 'UNKNOWN'}, playlist ${req.params.playlistId}:`, error);
 
         const statusCode = error.statusCode || 500;
         let errorMessage = error.message || 'Lỗi server khi xóa playlist.';
@@ -222,10 +222,10 @@ const uploadPlaylistCoverController = async (req, res) => {
         // -----------------------------------
 
     } catch (error) { // Bắt các lỗi không mong muốn khác
-        console.error(`Lỗi trong uploadPlaylistCoverController cho user ${req.userId || 'UNKNOWN'}, playlist ${req.params?.playlistId}:`, error);
+        console.error(`Lỗi trong uploadPlaylistCoverController cho user ${req.userId || 'UNKNOWN'}, playlist ${req.params.playlistId}:`, error);
 
         // Nếu có lỗi xảy ra sau khi file đã upload, xóa file đã upload để tránh rác
-        if (req.file?.path) {
+        if (req.file.path) {
              try {
                  fs.unlinkSync(req.file.path);
                  console.log(`Cleaned up uploaded file due to error: ${req.file.path}`);

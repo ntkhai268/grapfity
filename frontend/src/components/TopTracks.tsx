@@ -1,7 +1,7 @@
 // src/components/TopTracks.tsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUserTracks, TrackWithCount } from '../services/uploadService';
+import { getUserTracks } from '../services/uploadService';
 import '../styles/TopTracksLis.css';
 
 // load images from assets via Vite

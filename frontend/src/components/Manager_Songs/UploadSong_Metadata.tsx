@@ -111,12 +111,12 @@ const UploadSongMetadata: React.FC<UploadSongMetadataProps> = ({ onCancel }) => 
       releaseDate
     );
 
-    console.log("✅ Lưu thành công:", result);
+    console.log("Lưu thành công:", result);
     alert("Lưu thông tin và file thành công!");
     alert("Nhạc đang được kiểm duyệt, xin vui lòng chờ.");
     onCancel();
   } catch (error: any) {
-    console.error("❌ Lỗi khi tạo track:", error);
+    console.error("Lỗi khi tạo track:", error);
     alert(error.message || "Đã xảy ra lỗi khi tạo track.");
     
   }
