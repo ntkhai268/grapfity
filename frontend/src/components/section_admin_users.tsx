@@ -105,8 +105,8 @@ const Section_admin_users: React.FC = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [filterOpen]);
   const [userId, setUserId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadUserId = async () => {

@@ -23,9 +23,9 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, pr
 const connectToDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Connection has been established successfully.');
+    console.log('Kết nối với CSDL thành công!');
   } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
+    console.error('không thể kết nối với CSDL', error);
   }
 };
 

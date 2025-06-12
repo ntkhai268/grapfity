@@ -4,6 +4,8 @@ import "../styles/LoginForm.css";
 import { GoogleLogin } from "@react-oauth/google";
 
 const LoginForm: React.FC = () => {
+  const navigate = useNavigate();  // Hook để điều hướng
+  const location = useLocation();  // Hook để lấy thông tin location
   // --- Login form state ---
   const [loginUsername, setLoginUsername] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -58,13 +60,15 @@ const LoginForm: React.FC = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("roleId", data.roleId.toString());
         alert(data.message);
+        const from = location.state?.from?.pathname || '/';  // Lấy thông tin trang trước đó
+        navigate(from, { replace: true });  // Điều hướng về trang trước đó
 
         if (data.roleId === 1) {
-          window.location.href = "http://localhost:5173/mainpage";
+          navigate("/mainpage"); 
         } else if (data.roleId === 2) {
           window.location.href = "http://localhost:5173/admin";
         } else {
-          window.location.href = "http://localhost:5173/";
+          navigate("/");
         }
       } else {
         setLoginError(data.message || "Login failed");

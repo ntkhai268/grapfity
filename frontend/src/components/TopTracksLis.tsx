@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { fetchListeningHistory, ListeningHistoryRecord } from '../services/listeningService';
 import '../styles/TopTracksLis.css';
 
+const API_BASE_URL = 'http://localhost:8080';
 interface TrackItem {
   id: number;
   title: string;
@@ -28,15 +29,16 @@ const TopTracksLis: React.FC = () => {
   const [filter, setFilter] = useState<FilterOption>('all');
   const navigate = useNavigate();
 
+
   // load assets images
-  const imageModules = import.meta.glob(
-    '../assets/images/*.{jpg,jpeg,png,svg}',
-    { eager: true, as: 'url' }
-  ) as Record<string, string>;
-  const imageMap: Record<string, string> = {};
-  Object.entries(imageModules).forEach(([p, url]) => {
-    imageMap[p.split('/').pop()!] = url;
-  });
+  // const imageModules = import.meta.glob(
+  //   '../assets/images/*.{jpg,jpeg,png,svg}',
+  //   { eager: true, as: 'url' }
+  // ) as Record<string, string>;
+  // const imageMap: Record<string, string> = {};
+  // Object.entries(imageModules).forEach(([p, url]) => {
+  //   imageMap[p.split('/').pop()!] = url;
+  // });
 
   const formatDate = (iso: string) => {
     const d = new Date(iso);
@@ -63,11 +65,12 @@ const TopTracksLis: React.FC = () => {
         });
         const list = Array.from(map.values()).map(({ rec, count }) => {
           const fn = rec.track.imageUrl.split('/').pop()!;
+          const imageUrl = `${API_BASE_URL}/assets/images/${fn}` || rec.track.imageUrl;
           return {
             id: rec.track.id,
             title: rec.metadata?.trackname ?? `Track ${rec.track.id}`,
             artist: rec.track.User?.UploaderName ?? 'Unknown Artist',
-            imageUrl: imageMap[fn] || rec.track.imageUrl,
+            imageUrl,
             plays: count,
             listenedAt: rec.createdAt,
           };
@@ -162,11 +165,11 @@ const TopTracksLis: React.FC = () => {
                       <td className="cell-track">
                         <div className="track-info">
                           <img
-                            src={t.imageUrl}
+                           src={`${API_BASE_URL}/assets/track_image/${t.imageUrl.split('/').pop()}`}
                             alt={t.title}
                             onError={e => {
                               e.currentTarget.onerror = null;
-                              e.currentTarget.src = imageMap['placeholder.svg'] || '';
+                               e.currentTarget.src = `${API_BASE_URL}/assets/track_image/placeholder.svg`; 
                             }}
                           />
                           <div className="track-details">

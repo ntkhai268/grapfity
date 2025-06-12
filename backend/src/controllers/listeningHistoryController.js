@@ -1,4 +1,4 @@
-import { getListeningHistoryOfUser, trackingListeningHistory,getTop10PopularTracks, getTop5TracksOfUser, getTop5TracksByOwner } from '../services/listeningHistory_service.js';
+import { getListeningHistoryOfUser, trackingListeningHistory,getTop10PopularTracks, getTop5TracksOfUser, getTop5TracksByProfile } from '../services/listeningHistory_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 
   const getListeningHistoryOfUserController = async (req, res) => {
@@ -62,17 +62,14 @@ const getTop5TracksOfUserController = async (req, res) => {
     }
 };
 
-const getTop5TracksByOwnerController = async (req, res) => {
+const getTop5TracksByProfileController = async (req, res) => {
   try {
-    const JWT = req.cookies;
-    const data = verityJWT(JWT.jwt);
-    const userId = data.userId;
+    const userId = req.params.userId;
+    // Có thể check quyền nếu muốn bảo mật hơn
 
-    // Không trả dữ liệu nếu không có userId hợp lệ
-    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+    if (!userId) return res.status(400).json({ message: 'userId is required' });
 
-    const results = await getTop5TracksByOwner(userId);
-     console.log("==>🧪🧪🧪 [RESPONSE] Top 5 tracks trả về cho FE:", results);
+    const results = await getTop5TracksByProfile(userId);
     res.status(200).json(results);
   } catch (err) {
     console.error('Database connection failed:', err);
@@ -86,5 +83,5 @@ export {
     trackingListeningHistoryController,
     getTop10PopularTracksController,
     getTop5TracksOfUserController,
-    getTop5TracksByOwnerController // LẤY 5 BÀI CỦA USER UPLOAD DC NGHE NHIỀU NHẤT ĐỂ HIỂN THỊ
+    getTop5TracksByProfileController // LẤY 5 BÀI CỦA USER UPLOAD DC NGHE NHIỀU NHẤT ĐỂ HIỂN THỊ
 };

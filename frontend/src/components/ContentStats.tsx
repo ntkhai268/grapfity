@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom"; // 👈 Thêm Link từ react-router-dom
 import "../styles/ContentStats.css";
 

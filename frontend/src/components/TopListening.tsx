@@ -7,17 +7,18 @@ import {
   ListeningHistoryRecord,
 } from "../services/listeningService";
 
+const API_BASE_URL = 'http://localhost:8080';
 // --- IMPORT ĐỘNG ẢNH TỪ /src/assets/images ---
-const imageModules = import.meta.glob(
-  "../assets/images/*.{jpg,jpeg,png,svg}",
-  { eager: true, as: "url" }
-) as Record<string, string>;
+// const imageModules = import.meta.glob(
+//   "../assets/images/*.{jpg,jpeg,png,svg}",
+//   { eager: true, as: "url" }
+// ) as Record<string, string>;
 
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([fullPath, url]) => {
-  const filename = fullPath.split("/").pop()!;
-  imageMap[filename] = url;
-});
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([fullPath, url]) => {
+//   const filename = fullPath.split("/").pop()!;
+//   imageMap[filename] = url;
+// });
 
 interface StatsItem {
   id: number | string;
@@ -65,11 +66,12 @@ const TopListening: React.FC = () => {
         const tracksArray: StatsItem[] = Array.from(trackMap.entries()).map(
           ([id, { record, count }]) => {
             const fname = record.track.imageUrl?.split("/").pop() ?? "";
+             const coverUrl = `${API_BASE_URL}/assets/track_image/${fname}`;
             return {
               id,
               title: record.metadata?.trackname ?? `Track ${id}`,
               plays: count,
-              coverUrl: imageMap[fname] || record.track.imageUrl,
+              coverUrl,
             };
           }
         );

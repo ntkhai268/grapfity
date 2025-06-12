@@ -4,18 +4,19 @@ import { Link } from 'react-router-dom';
 import { getUserTracks, TrackWithCount } from '../services/uploadService';
 import '../styles/TopUpload.css';
 
+const API_BASE_URL = 'http://localhost:8080';
 // 1. Import tất cả ảnh trong src/assets/images qua Vite
-const imageModules = import.meta.glob('../assets/images/*.{jpg,jpeg,png,svg}', {
-  eager: true,
-  as: 'url'
-}) as Record<string, string>;
+// const imageModules = import.meta.glob('../assets/images/*.{jpg,jpeg,png,svg}', {
+//   eager: true,
+//   as: 'url'
+// }) as Record<string, string>;
 
-// 2. Build map filename → URL
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([fullPath, url]) => {
-  const filename = fullPath.split('/').pop()!;
-  imageMap[filename] = url;
-});
+// // 2. Build map filename → URL
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([fullPath, url]) => {
+//   const filename = fullPath.split('/').pop()!;
+//   imageMap[filename] = url;
+// });
 
 interface Listener {
   id: number;
@@ -41,9 +42,10 @@ const TopUpload: React.FC = () => {
           .slice(0, 3)
           .map(track => {
             const raw = track.imageUrl.split('/').pop()!;
+            const imageUrl = `${API_BASE_URL}/assets/track_image/${raw}`;
             return {
               ...track,
-              imageUrl: imageMap[raw] || track.imageUrl
+              imageUrl
             };
           });
         setTracks(top3Tracks);

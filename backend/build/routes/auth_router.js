@@ -10,7 +10,7 @@ authRouter.post('/register', registerController);
 authRouter.post('/login', handleUserLoginController);
 authRouter.get('/me', authenticateUser, async (req, res) => {
   try {
-    console.log("📌 req.userId:", req.userId); // <== Có tồn tại không
+    console.log("req.userId:", req.userId); // <== Có tồn tại không
     const user = await User.findByPk(req.userId); // không trả password
 
     if (!user) {

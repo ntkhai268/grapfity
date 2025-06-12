@@ -1,4 +1,4 @@
-import { likeTrack, unlikeTrack, getLikedTracksByUser, isTrackLikedByUser,countLikesForTrack } from '../services/like_service.js';
+import { likeTrack, unlikeTrack, getLikedTracksByProfile, isTrackLikedByUser,countLikesForTrack } from '../services/like_service.js';
 import { verityJWT } from '../middleware/JWTActions.js';
 
 const likeTrackController = async (req, res) => {
@@ -16,20 +16,20 @@ const likeTrackController = async (req, res) => {
     }
 };
 
-const getLikedTracksByUserController = async (req, res) => {
-    const JWT = req.cookies;
-    const data = verityJWT(JWT.jwt);
-    const userId = data.userId;
+const getLikedTracksByProfileController = async (req, res) => {
+    const userId = req.params.userId;
+    // Có thể kiểm tra quyền truy cập nếu chỉ muốn trả về like public
 
     try {
-        const likedTrack = await getLikedTracksByUser(userId);
+        const likedTrack = await getLikedTracksByProfile(userId);
         const formattedTracks = likedTrack
-        .filter(like => like.Track)
-        .map(like => like.Track);
+          .filter(like => like.Track)
+          .map(like => like.Track);
+
         res.status(200).json({
-        message: 'Lấy danh sách like thành công',
-        data: formattedTracks
-});
+            message: 'Lấy danh sách like thành công',
+            data: formattedTracks
+        });
     } catch (err) {
         console.error('Database connection failed:', err);
         res.status(500).send('Internal Server Error');
@@ -82,7 +82,7 @@ const countLikesForTrackController = async (req, res) => {
 // ✅ Xuất theo chuẩn ES module
 export {
     likeTrackController,
-    getLikedTracksByUserController,
+    getLikedTracksByProfileController,
     unlikeTrackController,
     isTrackLikedByUserController,
     countLikesForTrackController

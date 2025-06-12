@@ -28,9 +28,9 @@ const sequelize = new Sequelize(
 const connectToDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ Connection has been established successfully.');
+    console.log('Kết nối CSDL thành công!');
   } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
+    console.error('Kết nối CSDL thất bại:', error);
   }
 };
 

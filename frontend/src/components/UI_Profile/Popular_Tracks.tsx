@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { initWaveSurfer } from "../../hooks/WaveForm";
 import { Song } from "../../hooks/GlobalAudioManager";
-import {  TrackData } from "../../services/trackServiceAPI"; 
-import { getTop5TracksOfOwnerAPI } from "../../services/listeningService";
+import {  TrackData ,deleteTrackAPI} from "../../services/trackServiceAPI"; 
+import { getTop5TracksOfProfileAPI } from "../../services/listeningService";
 import SongOptionOfUser from "./SongOptionOfUser";
 import UpdateSongBasicInfo from "../Manager_Songs/updateSongBasicInfo";
 
@@ -26,7 +26,7 @@ export const mapTrackDataToSong = (track: TrackData): Song => ({
   artist: track.artist === null ? undefined : track.artist,
   cover: normalizeUrl(track.cover),
 });
-const PopularTrack: React.FC<SongProps> = () => {
+const PopularTrack: React.FC<SongProps> = ({ viewedUserId, currentUserId }) => {
   const [songs, setSongs] = useState<Song[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ const PopularTrack: React.FC<SongProps> = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const fetchedTracksData: TrackData[] = await getTop5TracksOfOwnerAPI();
+        const fetchedTracksData: TrackData[] = await getTop5TracksOfProfileAPI(viewedUserId);
         console.log("🧪 Top 5 track list:", fetchedTracksData);
         const fetchedSongs: Song[] = fetchedTracksData.map(mapTrackDataToSong);
         setSongs(fetchedSongs);
@@ -51,7 +51,9 @@ const PopularTrack: React.FC<SongProps> = () => {
       }
     };
     fetchTracks();
-  }, []);
+  }, [viewedUserId, currentUserId]);  
+
+ 
 
   // Khởi tạo waveform khi dữ liệu đã sẵn sàng
   useEffect(() => {
@@ -65,11 +67,19 @@ const PopularTrack: React.FC<SongProps> = () => {
 
   // Nếu muốn xóa, bạn sẽ cần sửa hàm này hoặc có thể bỏ nếu không cần xóa trong top 5
   const handleDeleteTrack = async (songId: number) => {
-    const confirmDelete = window.confirm("Bạn có chắc muốn xoá bài nhạc này không?");
-    if (!confirmDelete) return;
-    // Xử lý xóa thực tế nếu cần...
-    alert("Tính năng xóa chỉ có tác dụng khi dùng API getMyUploadedTracksAPI hoặc getPublicTracksOfUserAPI.");
-  };
+      const confirmDelete = window.confirm("Bạn có chắc muốn xoá bài nhạc này không?");
+      if (!confirmDelete) return;
+    
+      const result = await deleteTrackAPI(songId);
+      if (!result.success) {
+        alert(`❌ Xóa thất bại: ${result.message}`);
+        return;
+      }
+    
+      // ✅ Xoá thành công, cập nhật UI
+      setSongs(prevSongs => prevSongs.filter(song => song.id !== songId));
+      alert("✅ Bài hát đã được xoá thành công!");
+    };
 
   return (
     <div className="content popular">
@@ -106,7 +116,7 @@ const PopularTrack: React.FC<SongProps> = () => {
                 onEdit={() => setEditingSongId(Number(song.id))}
                 onDelete={() => handleDeleteTrack(Number(song.id))}
                 trackId={Number(song.id)}
-                isOwner={false} // Top 5 bài này có thể không phải của user
+                isOwner={viewedUserId === "me" || viewedUserId === currentUserId}
               />
             </div>
             {editingSongId === Number(song.id) && (
@@ -117,7 +127,7 @@ const PopularTrack: React.FC<SongProps> = () => {
                   setEditingSongId(null);
                   // Có thể reload lại list nếu muốn cập nhật thông tin bài hát đã chỉnh sửa
                   try {
-                    const updatedTracks = await getTop5TracksOfOwnerAPI();
+                    const updatedTracks = await getTop5TracksOfProfileAPI(viewedUserId);
                     const mappedSongs = updatedTracks.map(mapTrackDataToSong);
                     setSongs(mappedSongs);
                   } catch (err) {

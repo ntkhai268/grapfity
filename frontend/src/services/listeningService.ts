@@ -3,7 +3,13 @@ import axios from 'axios';
 
 
 // Cấu hình Axios chung cho toàn project
-axios.defaults.baseURL = 'http://localhost:8080/api';
+// cái này dễ lỗi do bị gọi nhiều lần nó đè nhau , mỗi file cấu hình 1 cái nên lỗi
+// axios.defaults.baseURL = 'http://localhost:8080/api';
+
+// axios.defaults.withCredentials = true;
+
+// dùng cài này an toàn 
+const API_BASE_URL = 'http://localhost:8080/api';
 axios.defaults.withCredentials = true;
 
 export interface ListeningHistoryRecord {
@@ -45,13 +51,10 @@ export interface TrackRecord {
   uploaderId: number;
 }
 
-/**
- * Lấy lịch sử nghe với đầy đủ thông tin track, metadata, và người nghe
- */
+// Lịch sử nghe nhạc
 export async function fetchListeningHistory(): Promise<ListeningHistoryRecord[]> {
-  const res = await axios.get<{ data: any[] }>('/api/listening-history');
-
-  // map từ response về đúng với ListeningHistoryRecord
+  const res = await axios.get<{ data: any[] }>(`${API_BASE_URL}/listening-history`);
+  // ... xử lý như cũ
   const normalized = res.data.data.map(item => ({
     listenCount: item.listenCount,
     createdAt: item.createdAt,
@@ -62,40 +65,35 @@ export async function fetchListeningHistory(): Promise<ListeningHistoryRecord[]>
     },
     listener: item.User ?? { id: 0, Name: 'Unknown' }
   }));
-
   return normalized;
 }
 
-
-/**
- * Lấy về danh sách tất cả tracks
- */
+// Lấy tất cả tracks
 export async function fetchAllTracks(): Promise<TrackRecord[]> {
-  const res = await axios.get<{ data: TrackRecord[] }>('/tracks');
+  const res = await axios.get<{ data: TrackRecord[] }>(`${API_BASE_URL}/tracks`);
   return res.data.data;
 }
-// Ghi nhận lượt nghe mới cho một track (trackId)
+
+// Ghi nhận lượt nghe mới
 export const trackingListeningHistoryAPI = async (trackId: string | number) => {
-  console.log(trackId)
-  const res = await axios.post(`/track/${trackId}/listen`);
-  // Backend trả về { message, history }
+  const res = await axios.post(`${API_BASE_URL}/track/${trackId}/listen`);
   return res.data.history;
 };
-// 3. Lấy top 10 bài hát phổ biến toàn hệ thống
+
+// Top 10 phổ biến toàn hệ thống
 export const getTop10PopularTracksAPI = async () => {
-  const res = await axios.get('/popular/top10');
+  const res = await axios.get(`${API_BASE_URL}/popular/top10`);
   return res.data;
 };
 
-// 4. Lấy top 5 bài hát user nghe nhiều nhất
+// Top 5 bài hát user nghe nhiều nhất
 export const getTop5TracksOfUserAPI = async () => {
-  const res = await axios.get('/popular/top5');
-  
+  const res = await axios.get(`${API_BASE_URL}/popular/top5`);
   return res.data;
 };
 
-export const getTop5TracksOfOwnerAPI = async () => {
-  const res = await axios.get('/popular-owner/top5');
-  
+// Top 5 bài hát phổ biến theo owner
+export const getTop5TracksOfProfileAPI = async (userId: string | number) =>{
+  const res = await axios.get(`${API_BASE_URL}/popular-user/${userId}/top5`);
   return res.data;
 };

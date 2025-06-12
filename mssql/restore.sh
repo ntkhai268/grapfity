@@ -1,6 +1,6 @@
 #!/bin/bash
-set -e  # ⛔ Ngắt script nếu bất kỳ lệnh nào lỗi
-echo "🔄 Restoring database from backup..."
+set -e  # Ngắt script nếu bất kỳ lệnh nào lỗi
+echo "Restoring database from backup..."
 
 sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -Q "
 RESTORE DATABASE [DB_Graptify]
@@ -10,4 +10,4 @@ WITH MOVE 'DB_Graptify' TO '/var/opt/mssql/data/DB_Graptify.mdf',
      REPLACE
 "
 
-echo "✅ Restore completed!"
+echo "Restore completed!"

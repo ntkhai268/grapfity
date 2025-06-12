@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom"; // 👈 Thêm Link từ react-router-dom
 import "../styles/NavStats.css";
 

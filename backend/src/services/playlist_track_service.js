@@ -176,6 +176,7 @@ const getPlaylistDetailsById = async (playlistId) => {
                     // Chọn các trường cần thiết từ bảng Track
                     attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'], 
                     where: { privacy: 'public' },
+                    required: false,
                     through: { attributes: [] }, // Quan trọng: Không lấy các trường từ bảng PlaylistTrack
                     // Sắp xếp các track trong playlist nếu cần (ví dụ: theo thứ tự thêm vào)
                     // order: [[ db.PlaylistTrack, 'createdAt', 'ASC' ]], // Cần include PlaylistTrack để order theo nó
@@ -249,6 +250,7 @@ const getPlaylistDetailsByIdforme = async (playlistId, currentUserId) => {
                 {
                     model: db.Track,
                     attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt'],
+                    required: false,    
                     through: { attributes: [] },
 
                     // ✅ LỌC TRACK THEO: public || uploader là chính người dùng hiện tại

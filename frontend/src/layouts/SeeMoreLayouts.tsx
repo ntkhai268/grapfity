@@ -1,6 +1,6 @@
 // src/layouts/SeeMoreLayouts.tsx
 import React, { ReactNode } from "react";  // Import ReactNode để định nghĩa kiểu cho children
-import NavStats from "../components/NavStats";  // Import NavStats
+// import NavStats from "../components/NavStats";  // Import NavStats
 
 interface SeeMoreLayoutsProps {
   children: ReactNode;  // Khai báo kiểu cho children là ReactNode

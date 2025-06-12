@@ -1,4 +1,3 @@
-import React from "react";
 import NavStats from "../components/NavStats";
 import ContentStats from "../components/ContentStats";
 import "../styles/StatsLayout.css";

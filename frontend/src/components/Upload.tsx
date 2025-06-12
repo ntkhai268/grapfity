@@ -2,17 +2,17 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Recent_LnU.css';
 import { getUserTracks, TrackWithCount } from '../services/uploadService';
-
+const API_BASE_URL = 'http://localhost:8080';
 // Import tất cả ảnh từ src/assets/images (Vite)
-const imageModules = import.meta.glob(
-  '../assets/images/*.{jpg,jpeg,png,svg}',
-  { eager: true, as: 'url' }
-) as Record<string, string>;
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([path, url]) => {
-  const filename = path.split('/').pop()!;
-  imageMap[filename] = url;
-});
+// const imageModules = import.meta.glob(
+//   '../assets/images/*.{jpg,jpeg,png,svg}',
+//   { eager: true, as: 'url' }
+// ) as Record<string, string>;
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([path, url]) => {
+//   const filename = path.split('/').pop()!;
+//   imageMap[filename] = url;
+// });
 
 const Recent_Uploads: React.FC = () => {
   const [tracks, setTracks] = useState<TrackWithCount[]>([]);
@@ -52,7 +52,7 @@ const Recent_Uploads: React.FC = () => {
         ) : (
           tracks.map(track => {
             const filename = track.imageUrl.split('/').pop() || '';
-            const imgUrl = imageMap[filename] || '';
+            const imgUrl = `${API_BASE_URL}/assets/track_image/${filename}` || '';
             return (
               <div key={track.id} className="track_LnU">
                 <div className="track_LnU-image">

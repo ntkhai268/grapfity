@@ -1,4 +1,3 @@
-import React from "react";
 import NavStats from "../components/NavStats";
 import Recent from "../components/Listening";
 import TopStats from "../components/TopListening";

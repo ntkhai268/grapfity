@@ -4,30 +4,31 @@ import { useNavigate } from 'react-router-dom';
 import { getUserTracks } from '../services/uploadService';
 import '../styles/TopTracksLis.css';
 
+const API_BASE_URL = 'http://localhost:8080';
 // load images from assets via Vite
-const imageModules = import.meta.glob(
-  '../assets/images/*.{jpg,jpeg,png,svg}',
-  { eager: true, as: 'url' }
-) as Record<string, string>;
-const imageMap: Record<string, string> = {};
-Object.entries(imageModules).forEach(([path, url]) => {
-  imageMap[path.split('/').pop()!] = url;
-});
+// const imageModules = import.meta.glob(
+//   '../assets/images/*.{jpg,jpeg,png,svg}',
+//   { eager: true, as: 'url' }
+// ) as Record<string, string>;
+// const imageMap: Record<string, string> = {};
+// Object.entries(imageModules).forEach(([path, url]) => {
+//   imageMap[path.split('/').pop()!] = url;
+// });
 
 // resolve image src
-function getImageSrc(url: string): string {
-  const filename = url.split('/').pop() || '';
-  if (filename && imageMap[filename]) {
-    return imageMap[filename];
-  }
-  if (/^(https?:)?\/\//.test(url)) {
-    return url;
-  }
-  if (url.startsWith('/')) {
-    return `${window.location.origin}${url}`;
-  }
-  return `${window.location.origin}/${url}`;
-}
+// function getImageSrc(url: string): string {
+//   const filename = url.split('/').pop() || '';
+//   if (filename && imageMap[filename]) {
+//     return imageMap[filename];
+//   }
+//   if (/^(https?:)?\/\//.test(url)) {
+//     return url;
+//   }
+//   if (url.startsWith('/')) {
+//     return `${window.location.origin}${url}`;
+//   }
+//   return `${window.location.origin}/${url}`;
+// }
 
 // format date dd/mm/yyyy
 function formatDate(iso: string): string {
@@ -160,11 +161,12 @@ const TopTracks: React.FC = () => {
                       <td className="cell-track">
                         <div className="track-info">
                           <img
-                            src={getImageSrc(t.imageUrl)}
+                            src={(`${API_BASE_URL}/assets/track_image/${t.imageUrl}`)}
                             alt={t.title}
                             onError={e => {
                               e.currentTarget.onerror = null;
-                              e.currentTarget.src = imageMap['placeholder.svg'] || '';
+                               const fallbackImage = `${API_BASE_URL}/assets/track_image/placeholder.svg`; 
+                              e.currentTarget.src = fallbackImage;
                             }}
                             className="track-image"
                           />
