@@ -36,18 +36,28 @@ services:
     ports:
       - 8080:8080
 
-  # nginx:
-  #   build:
-  #     context: ./frontend/
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   ports:
-  #     - 5173:80
-  #   volumes:
-  #     - ./frontend/dist:/usr/share/nginx/html
-  #     - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+  nginx:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - 5173:80
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
 volumes:
   sql_data:
-    driver: local
+  esdata:
 
 
