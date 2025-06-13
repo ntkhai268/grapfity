@@ -37,14 +37,6 @@ export default (sequelize, DataTypes) => {
     trackUrl: DataTypes.STRING,
     imageUrl: DataTypes.STRING,
     uploaderId: DataTypes.INTEGER,
-    status: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      defaultValue: 'pending',
-      validate: {
-        isIn: [['pending', 'approved', 'rejected']]
-      }
-    },
     privacy: {
       type: DataTypes.STRING,
       allowNull: false,

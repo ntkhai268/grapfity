@@ -1,34 +1,41 @@
-const LocalStrategy = require('passport-local').Strategy;
-const { handleUserLogin } = require('../services/user_service');
-const db = require('../models'); // Import db từ models
+import { Client } from '@elastic/elasticsearch';
+import { readFileSync } from 'fs';
 
-module.exports = (passport) => {
-    passport.use(new LocalStrategy(async (username, password, done) => {
-        try {
-            const user = await handleUserLogin(username, password); // Gọi hàm của bạn
-            console.log('User trong này:', user); 
-            if (!user) return done(null, false, { message: 'Sai thông tin đăng nhập' });
-            return done(null, user);
-        } catch (err) {
-            return done(err);
-        }
-    }));
+const client = new Client({ node: 'http://elasticsearch:9200' });
 
-    passport.serializeUser((user, done) => {
-        try{
-            done(null, user.id); // Lưu ID vào session
-        }catch (err) {
-            done(err);
-        }
+async function waitForElastic() {
+  let connected = false;
+  while (!connected) {
+    try {
+      await client.ping();
+      connected = true;
+      console.log('✅ Elasticsearch is up');
+    } catch (err) {
+      console.log('⏳ Waiting for Elasticsearch...');
+      await new Promise(res => setTimeout(res, 2000));
+    }
+  }
+}
+
+async function initIndex(indexName, mappingFile) {
+  const exists = await client.indices.exists({ index: indexName });
+  if (!exists) {
+    console.log(`🔨 Creating index: ${indexName}`);
+    const mapping = JSON.parse(readFileSync(mappingFile, 'utf8'));
+    await client.indices.create({
+      index: indexName,
+      body: mapping
     });
+  } else {
+    console.log(`✅ Index ${indexName} already exists`);
+  }
+}
 
-    passport.deserializeUser(async (id, done) => {
-        try {
-            // Gợi ý: nên có getUserById() từ DB
-            const user = await db.User.findByPk(id); // nếu dùng Sequelize
-            done(null, user);
-        } catch (err) {
-            done(err);
-        }
-    });
-};
+async function initElastic() {
+  await waitForElastic();
+  await initIndex('songs', './config/elastic/songs_mapping.json');
+  await initIndex('playlists', './config/elastic/playlists_mapping.json');
+  await initIndex('search_logs', './config/elastic/search_logs_mapping.json');
+}
+
+export default { client, initElastic };

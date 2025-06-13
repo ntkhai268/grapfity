@@ -155,6 +155,7 @@ const createTrack = async ({
   absAudioPath,
   trackname
 }) => {
+  console.log('🧪 absAudioPath:', absAudioPath);
   const metadata = await extractMetadata(absAudioPath);
 
   metadata.trackname = trackname;
@@ -170,38 +171,36 @@ const createTrack = async ({
     imageUrl,
     uploaderId,
     privacy,
-    status: 'approved'
   });
 
   metadata.track_id = newTrack.id;
   
+  
   const {
-    track_id, explicit, danceability, energy, key, loudness, mode,
-    speechiness, acousticness, instrumentalness, liveness,
-    valence, tempo, duration_ms, time_signature, year, release_date, lyrics
+    track_id,
+    duration_ms,
+    energy,
+    loudness,
+    tempo,
+    key,
+    mode,
+    embedding,
+    release_date
   } = metadata;
 
   await db.Metadata.create({
-    trackname,
-    track_id,
-    explicit,
-    danceability,
-    energy,
-    key,
-    loudness,
-    mode,
-    speechiness,
-    acousticness,
-    instrumentalness,
-    liveness,
-    valence,
-    tempo,
-    duration_ms,
-    time_signature,
-    year,
-    release_date,
-    lyrics
-  });
+  trackname,
+  track_id,
+  duration_ms,
+  energy,
+  loudness,
+  tempo,
+  key,
+  mode,
+  embedding,
+  release_date,
+  lyrics
+});
 
   return newTrack;
 };

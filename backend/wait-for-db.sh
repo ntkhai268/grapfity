@@ -20,6 +20,12 @@ if [ $i -eq $MAX_TRIES ]; then
   exit 1
 fi
 
+echo "Import dữ liệu vào Elasticsearch..."
+node ./src/script/importToElastic.js || {
+  echo "Import thất bại"
+  exit 1
+}
+
 # 🛠 Bắt đầu build và chạy backend
 echo "Biên dịch source..."
 npm run build-src || { echo "Build thất bại"; exit 1; }

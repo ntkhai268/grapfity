@@ -19,6 +19,7 @@ RUN apt-get update && \
 
 # Copy script khởi tạo DB
 COPY ./init/init.sql /usr/src/app/init.sql
+COPY ./init/alt_db.sql /usr/src/app/alt_db.sql
 COPY ./init/init.sh /usr/src/app/init.sh
 RUN chmod +x /usr/src/app/init.sh
 

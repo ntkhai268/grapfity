@@ -1,45 +1,30 @@
-import { exec } from 'child_process';
+import axios from 'axios';
+import fs from 'fs';
+import FormData from 'form-data';
 import path from 'path';
-import util from 'util';
-import db from '../models/index.js';
-
-const execAsync = util.promisify(exec);
 
 const extractMetadata = async (filePath) => {
+  try {
     const absolutePath = path.resolve(filePath);
-    const inputDir = path.dirname(absolutePath);
-    const filename = path.basename(absolutePath);
+    const form = new FormData();
+    form.append('file', fs.createReadStream(absolutePath));
 
-    const dockerCmd = [
-        'sudo docker run --rm',
-        `-v "${inputDir}:/input"`,
-        'ntkhai2608/music-extractor',
-        'python', 'scripts/extract_audio_features.py',
-        `/input/${filename}`
-    ].join(' ');
+    const response = await axios.post(
+      'http://extract-track-feature:5000/extract', // hoặc http://localhost:5000 nếu test local
+      form,
+      {
+        headers: form.getHeaders()
+      }
+    );
 
-    try {
-        const { stdout } = await execAsync(dockerCmd);
-        const jsonStart = stdout.indexOf('{');
-        const jsonEnd = stdout.lastIndexOf('}') + 1;
-
-        if (jsonStart === -1 || jsonEnd === -1) {
-            throw new Error('Không tìm thấy JSON trong output.');
-        }
-
-        const jsonStr = stdout.slice(jsonStart, jsonEnd);
-        const result = JSON.parse(jsonStr);
-
-        const { prediction = {}, ...rest } = result;
-
-        return {
-        ...rest,
-        ...prediction
-        };
-    } catch (err) {
-        console.error(`❌ Lỗi khi extract metadata cho file ${filePath}:`, err.message);
-        throw new Error('Docker metadata extraction failed');
-    }
+    const result = response.data;
+    console.log(result);
+    
+    return result;
+  } catch (err) {
+    console.error(`❌ Lỗi khi extract metadata cho file ${filePath}:`, err.message);
+    throw new Error('HTTP metadata extraction failed');
+  }
 };
 
 const metadataStats = {

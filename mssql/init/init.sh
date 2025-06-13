@@ -32,7 +32,8 @@ if [ "$DB_EXISTS" -eq 0 ]; then
     echo "Database chưa tồn tại, đang chạy script khởi tạo..."
     /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -d master -i /usr/src/app/init.sql
 else
-    echo "Database DB_Graptify đã tồn tại, bỏ qua khởi tạo"
+    echo "Database DB_Graptify đã tồn tại, đang cập nhật schema..."
+    /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P "$SA_PASSWORD" -d DB_Graptify -i /usr/src/app/alt_db.sql
 fi
 
 # Giữ container chạy

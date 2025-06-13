@@ -23,22 +23,42 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.TEXT,
       allowNull: true
     },
-    explicit: DataTypes.FLOAT,
-    danceability: DataTypes.FLOAT,
-    energy: DataTypes.FLOAT,
-    key: DataTypes.INTEGER,
-    loudness: DataTypes.FLOAT,
-    mode: DataTypes.INTEGER,
-    speechiness: DataTypes.FLOAT,
-    acousticness: DataTypes.FLOAT,
-    instrumentalness: DataTypes.FLOAT,
-    liveness: DataTypes.FLOAT,
-    valence: DataTypes.FLOAT,
-    tempo: DataTypes.FLOAT, 
-    duration_ms: DataTypes.INTEGER,
-    time_signature: DataTypes.INTEGER,
-    year: DataTypes.INTEGER,
-    release_date: DataTypes.DATEONLY
+    duration_ms: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    energy: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    loudness: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    tempo: {
+      type: DataTypes.FLOAT,
+      allowNull: false
+    },
+    key: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    mode: {
+      type: DataTypes.INTEGER,
+      allowNull: false
+    },
+    embedding: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      get() {
+        const raw = this.getDataValue('embedding');
+        return raw ? JSON.parse(raw) : null;
+      },
+      set(val) {
+        this.setDataValue('embedding', JSON.stringify(val));
+      }
+    },
+    release_date: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Metadata'
