@@ -98,7 +98,7 @@ const LoginForm: React.FC = () => {
           userName: regUsername,
           email: regEmail,
           password: regPassword,
-          roleId: 2, // mặc định roleId 1 cho user thường
+          roleId: 1, // mặc định roleId 1 cho user thường
         }),
       });
       const data: { message: string } = await response.json();
