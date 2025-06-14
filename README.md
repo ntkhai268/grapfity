@@ -1,45 +1,49 @@
-# 🎶 Website Nghe Nhạc Trực Tuyến
+# 🎧 Musicify - Website Nghe Nhạc Trực Tuyến
 
-> Dự án xây dựng nền tảng nghe nhạc trực tuyến, kết hợp công nghệ hiện đại và AI để mang lại trải nghiệm âm nhạc cá nhân hóa và tiện lợi cho người dùng.
+> Dự án fullstack cho phép người dùng nghe, tìm kiếm và quản lý bài hát với gợi ý từ AI.
 
-## 🌟 Giới thiệu
+## 📸 Screenshots
 
-Website nghe nhạc trực tuyến được xây dựng nhằm đáp ứng nhu cầu giải trí hiện đại, cho phép người dùng nghe, quản lý, và khám phá âm nhạc thuận tiện mọi lúc mọi nơi. Hệ thống tích hợp công nghệ Node.js, Express.js và ReactJS cùng mô hình AI đề xuất bài hát dựa trên sở thích của người dùng.
+### 🖼️ Trang người dùng:
 
-## 🎯 Mục tiêu
+<img width="805" alt="Ảnh màn hình 2025-06-14 lúc 10 28 28" src="https://github.com/user-attachments/assets/ac4dd8c6-a19b-4e5e-a64b-ed62f8d05af6" />
 
-* Xây dựng giao diện trực quan, thân thiện với người dùng.
-* Cung cấp tính năng nghe nhạc trực tuyến, đăng bài hát, quản lý danh sách phát, và tìm kiếm dễ dàng.
-* Tích hợp AI gợi ý bài hát cá nhân hóa.
-* Hỗ trợ quản trị viên quản lý hệ thống, duyệt bài hát và thống kê.
 
-## 🚀 Tính năng nổi bật
+### 🖼️ Trang admin thống kê:
 
-* Phát nhạc trực tuyến mọi lúc mọi nơi.
-* Đăng ký và đăng nhập cho người dùng và quản trị viên.
-* Quản lý bài hát, danh sách phát cá nhân.
-* Tìm kiếm và khám phá nhạc nhanh chóng.
-* Hệ thống gợi ý bài hát bằng mô hình AI dựa trên sở thích cá nhân.
-* Quản lý, duyệt nội dung và thống kê lượt nghe cho admin.
+<img width="804" alt="Ảnh màn hình 2025-06-14 lúc 10 28 01" src="https://github.com/user-attachments/assets/2f4dbbdc-2f07-46e1-96d6-329c125acbb4" />
 
-## 🛠 Công nghệ sử dụng
+---
 
-* **Frontend:** ReactJS
-* **Backend:** Node.js, Express.js
-* **Database:** SQL Server
-* **AI Recommendation:** Mô hình trí tuệ nhân tạo
-* **Containerization:** Docker
-* **Khác:** Git
+## 🧩 Tính năng nổi bật
 
-## ⚙️ Hướng dẫn cài đặt
+* 🎵 Phát nhạc trực tuyến theo playlist
+* 🧠 Gợi ý bài hát dựa trên hành vi nghe (AI-based Recommendation)
+* 🔍 Tìm kiếm theo tên bài hát, nghệ sĩ
+* 📂 Quản lý bài hát, danh sách phát, người dùng (admin)
+* 📊 Thống kê lượt nghe, lượt tải
+
+---
+
+## 🛠️ Công nghệ sử dụng
+
+| Thành phần | Công nghệ                                    |
+| ---------- | -------------------------------------------- |
+| Frontend   | ReactJS, Tailwind                            |
+| Backend    | Node.js, Express                             |
+| Database   | SQL Server                                   |
+| AI         | Custom Recommender System (SVD + CBF hybrid) |
+| Khác       | JWT Auth, Docker, REST API                   |
+
+---
+
+## 🚀 Cài đặt & chạy thử
 
 ### Bước 1: Cài đặt Docker
 
 Truy cập [Docker Desktop](https://www.docker.com/get-started/) và tải phiên bản phù hợp với hệ điều hành.
 
 ### Bước 2: Lấy mã nguồn dự án
-
-Clone từ GitHub:
 
 ```bash
 git clone https://github.com/ntkhai268/grapfity.git
@@ -61,11 +65,23 @@ docker-compose up -d
 
 Mở trình duyệt và truy cập [http://localhost:5173/login](http://localhost:5173/login)
 
+Tài khoản demo:
+
 | Vai trò       | Tài khoản    | Mật khẩu  |
 | ------------- | ------------ | --------- |
 | Người dùng    | hungphamtuam | 987654321 |
 | Quản trị viên | superadmin   | 1         |
 
+---
+
+## 💻 Học được gì qua dự án?
+
+* Tư duy kiến trúc fullstack (API - frontend - DB)
+* Quản lý phân quyền, xác thực token (JWT)
+* Thiết kế UI/UX có trải nghiệm mượt mà
+* Triển khai AI-based recommendation vào sản phẩm thật
+
+---
 
 ## 📌 Mô hình phát triển phần mềm
 
@@ -74,6 +90,8 @@ Dự án sử dụng mô hình phát triển Waterfall (thác nước), được
 * Yêu cầu rõ ràng từ đầu, ít thay đổi trong quá trình phát triển.
 * Triển khai tuần tự: Thu thập yêu cầu → Phân tích thiết kế → Lập trình → Kiểm thử → Triển khai.
 * Quản lý tiến độ dễ dàng, phù hợp quy mô nhỏ và tính chất giáo dục của môn học.
+
+---
 
 ## 🤝 Thành viên
 
