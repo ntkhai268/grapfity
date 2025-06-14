@@ -97,7 +97,7 @@ const registerController = async (req, res) => {
       userName,
       email,
       password,
-      roleId,
+      roleId ,
       Name,
       Birthday,
       Address,

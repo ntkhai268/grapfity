@@ -7,20 +7,20 @@ ENV SA_PASSWORD=nhomnaymanhNhat1!
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PATH="$PATH:/opt/mssql-tools/bin"
 
-# Cài công cụ để cài mssql-tools
 RUN apt-get update && \
-    apt-get install -y curl apt-transport-https gnupg software-properties-common locales && \
+    apt-get install -y curl apt-transport-https gnupg2 software-properties-common locales tzdata unixodbc libgssapi-krb5-2 && \
     locale-gen en_US.UTF-8 && \
-    curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list -o /etc/apt/sources.list.d/mssql-release.list && \
+    curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg && \
+    install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/microsoft.gpg && \
+    sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/ubuntu/20.04/prod focal main" > /etc/apt/sources.list.d/mssql-release.list' && \
     apt-get update && \
     ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev && \
-    ln -s /opt/mssql-tools/bin/* /usr/local/bin
+    ln -s /opt/mssql-tools/bin/* /usr/local/bin && \
+    rm -f microsoft.gpg
 
-# Copy script khởi tạo DB
+
 COPY ./init/init.sql /usr/src/app/init.sql
 COPY ./init/init.sh /usr/src/app/init.sh
 RUN chmod +x /usr/src/app/init.sh
 
-# Start SQL Server + run script tạo DB
-CMD /bin/bash -c "/opt/mssql/bin/sqlservr & sleep 20 && /usr/src/app/init.sh"
+CMD ["/usr/src/app/init.sh"]
