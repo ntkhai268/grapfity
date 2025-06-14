@@ -96,11 +96,12 @@ BEGIN
 END;
 GO
 
--- === 4. XÓA CỘT status TRONG Track ===
-BEGIN TRY
-    ALTER TABLE Track DROP COLUMN status;
-END TRY
-BEGIN CATCH
-    PRINT 'Không thể xóa cột status trong Track (có thể không tồn tại)';
-END CATCH;
+
+ALTER TABLE dbo.Tracks DROP CONSTRAINT DF__Tracks__status__37A5467C;
 GO
+
+ALTER TABLE dbo.Tracks DROP COLUMN status;
+GO
+
+
+

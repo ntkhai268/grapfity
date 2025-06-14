@@ -69,6 +69,7 @@ const uploadTrackFields = multer({
     storage: multer.diskStorage({
         destination: function (req, file, cb) {
             const dir = file.fieldname === 'audio' ? trackAudioDir : trackImageDir;
+            console.log(trackAudioDir, trackImageDir);
             cb(null, dir);
         },
         filename: function (req, file, cb) {

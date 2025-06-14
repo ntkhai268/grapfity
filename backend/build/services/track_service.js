@@ -4,7 +4,6 @@ import { extractMetadata, checkMetadataSimilarity } from '../services/metadata_s
 const getAllTracks = async () => {
   return await db.Track.findAll({
     where: {
-      status: 'approved',
       privacy: 'public'
     },
     include: [{
@@ -33,7 +32,6 @@ const getTrackById = async trackId => {
     const track = await db.Track.findOne({
       where: {
         id: numericTrackId,
-        status: 'approved'
       },
       // Bạn có thể chọn các attributes cụ thể từ bảng Track nếu muốn
       attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'privacy'],
@@ -65,7 +63,6 @@ const getTrackWithUploaderById = async id => {
   return await db.Track.findOne({
     where: {
       id,
-      status: 'approved'
     },
     include: {
       model: db.User,
@@ -84,7 +81,6 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
   const isOwner = numericUserId === numericCurrentUserId;
   const whereClause = {
     uploaderId: numericUserId,
-    status: 'approved',
     ...(isOwner ? {} : {
       privacy: 'public'
     }) // 👈 Nếu không phải chủ sở hữu thì chỉ thấy bài public
@@ -129,7 +125,6 @@ const createTrack = async ({
     imageUrl,
     uploaderId,
     privacy,
-    status: 'approved'
   });
   metadata.track_id = newTrack.id;
   const {
@@ -240,16 +235,10 @@ const getTracksByUserId = async userId => {
     }]
   });
 };
-const updateTrackStatus = async (id, status) => {
-  const track = await db.Track.findByPk(id);
-  if (!track) throw new Error('Track not found');
-  return await track.update({
-    status
-  });
-};
+
 const getJoinedTracks = async () => {
   return await db.Track.findAll({
-    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt'],
     include: [{
       model: db.Metadata,
       attributes: ['trackname'],
@@ -270,4 +259,4 @@ const getJoinedTracks = async () => {
     }]
   });
 };
-export { getAllTracks, getAllTracksForAdmin, getTrackById, getTrackWithUploaderById, getTracksByUploaderId, createTrack, updateTrack, deleteTrack, getTracksByUserId, getJoinedTracks, updateTrackStatus };
+export { getAllTracks, getAllTracksForAdmin, getTrackById, getTrackWithUploaderById, getTracksByUploaderId, createTrack, updateTrack, deleteTrack, getTracksByUserId, getJoinedTracks };

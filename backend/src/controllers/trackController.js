@@ -16,8 +16,7 @@ import {
     deleteTrack,
     getAllTracksForAdmin,
     getTracksByUserId,
-    getJoinedTracks,
-    updateTrackStatus
+    getJoinedTracks
 } from '../services/track_service.js';
 
 
@@ -186,12 +185,13 @@ const createTrackController = async (req, res) => {
   try {
     const jwtData = verityJWT(req.cookies.jwt);
     const uploaderId = jwtData.userId;
-
     const imageUrl = `assets/track_image/${req.files.image[0].filename}`;
     const trackUrl = `assets/track_audio/${req.files.audio[0].filename}`;
-    const absAudioPath = path.resolve(`src/public/${trackUrl}`);
+    const absAudioPath = path.resolve(`build/public/${trackUrl}`);
     const privacy = req.body.privacy || 'public';
     const trackname = req.body.title || 'Untitled';
+    const lyrics = req.body.lyrics || '';
+
 
     const newTrack = await createTrack({
       trackUrl,
@@ -199,7 +199,8 @@ const createTrackController = async (req, res) => {
       uploaderId,
       privacy,
       absAudioPath,
-      trackname
+      trackname,
+      lyrics
     });
 
     return res.status(200).json({
@@ -363,36 +364,6 @@ const getTracksByUserController = async (req, res) => {
     return res.status(500).send('Internal Server Error');
   }
 };
-  const updateTrackStatusController = async (req, res) => {
-    // 1. Parse và validate id
-    const id = parseInt(req.params.id, 10);
-    if (isNaN(id)) {
-      return res.status(400).json({ message: 'Invalid track id' });
-    }
-  
-    // 2. Validate status
-    const { status } = req.body;
-    if (!status || typeof status !== 'string') {
-      return res.status(400).json({ message: 'Missing or invalid status' });
-    }
-  
-    try {
-      // 3. Cập nhật
-      const updatedTrack = await updateTrackStatus(id, status);
-  
-      // 4. Trả về kết quả
-      return res.status(200).json({
-        message: 'Update track status succeed!',
-        data: updatedTrack
-      });
-    } catch (err) {
-      console.error('Error updating track status:', err);
-      if (err.message === 'Track not found') {
-        return res.status(404).json({ message: 'Track not found' });
-      }
-      return res.status(500).json({ message: 'Internal Server Error' });
-    }
-  };
 
 export {
     getAllTracksController,
@@ -406,6 +377,5 @@ export {
     getPublicTracksOfUserController,
     getJoinedTracksController,
     downloadTrackController,
-    updateTrackStatusController,
     getTracksByUserController
 };

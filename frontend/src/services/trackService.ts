@@ -7,7 +7,6 @@ export interface JoinedTrack {
   trackUrl: string;
   imageUrl: string;
   uploaderId: number;
-  status: "pending" | "approved" | "rejected";
   createdAt: string;
   Metadatum: {
     trackname?: string;
@@ -45,16 +44,6 @@ export const fetchJoinedTracks = async (): Promise<JoinedTrack[]> => {
 };
 
 // Update a track's status (pending / approved / rejected)
-export const updateTrackStatus = async (
-  id: number,
-  status: "pending" | "approved" | "rejected"
-): Promise<JoinedTrack> => {
-  const res = await axios.patch<{ message: string; data: JoinedTrack }>(
-    `http://localhost:8080/api/tracks/${id}/status`,
-    { status }
-  );
-  return res.data.data;
-};
 export const deleteTrack = async (id: number): Promise<{ message: string }> => {
   const res = await axios.delete<{ message: string }>(
     `http://localhost:8080/api/delete-track/${id}`

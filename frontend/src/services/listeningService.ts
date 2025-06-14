@@ -23,7 +23,6 @@ export interface ListeningHistoryRecord {
     trackUrl: string;
     imageUrl: string;
     uploaderId: number;
-    status: string;
     createdAt: string;
     User: {
       id: number;

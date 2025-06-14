@@ -1,6 +1,5 @@
-// components/Header.tsx
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../styles/Header.css";
 import UploadSongMetadata from "../components/Manager_Songs/UploadSong_Metadata";
 import spotifyLogo from "../../public/assets/iconspotify.png";
@@ -10,20 +9,19 @@ import userIcon from "../../public/assets/iconnguoidung.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { fetchJoinedTracks, JoinedTrack } from "../services/trackService";
-
-const API_BASE_URL = 'http://localhost:8080';
-// Ánh xạ toàn bộ ảnh từ /assets/images
-// const imageModules = import.meta.glob(
-//   "../assets/images/*.{png,jpg,jpeg,svg}",
-//   { eager: true, as: "url" }
-// );
-// const imageMap: Record<string, string> = {};
-// Object.entries(imageModules).forEach(([path, url]) => {
-//   const filename = path.split("/").pop();
-//   if (filename) imageMap[filename] = url as string;
-// });
 import { getCurrentUser } from "../services/authService";
-import { getMyProfile, UserType as UserData  } from "../services/userService.ts";
+import { getMyProfile, UserType as UserData } from "../services/userService.ts";
+
+// Map ảnh
+const imageModules = import.meta.glob("../assets/images/*.{png,jpg,jpeg,svg}", {
+  eager: true,
+  as: "url",
+});
+const imageMap: Record<string, string> = {};
+Object.entries(imageModules).forEach(([path, url]) => {
+  const filename = path.split("/").pop();
+  if (filename) imageMap[filename] = url as string;
+});
 
 const Header: React.FC = () => {
   const [showMenu, setShowMenu] = useState(false);
@@ -33,31 +31,24 @@ const Header: React.FC = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const location = useLocation();//lấy thông tin location hiện tại
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-   const [user, setUser] = useState<UserData | null>(null);
+  const [user, setUser] = useState<UserData | null>(null);
 
   const toggleUserMenu = () => setShowMenu((prev) => !prev);
   const toggleUploadModal = () => setShowUploadModal((prev) => !prev);
 
-  // Xử lý tìm kiếm
   const handleLogout = async () => {
     try {
       await fetch("http://localhost:8080/api/logout", {
         method: "POST",
-        credentials: "include", // GỬI cookie để backend xoá nó
+        credentials: "include",
       });
     } catch (err) {
-      console.error("Lỗi khi gọi logout:", err);
+      console.error("Lỗi logout:", err);
     }
-
-    // Xoá dữ liệu phụ nếu bạn lưu gì thêm
     localStorage.removeItem("roleId");
     localStorage.removeItem("userId");
-    // hoặc clear hết nếu không có gì quan trọng:
-    // localStorage.clear();
-
-    window.location.href = "/mainpage"; 
+    window.location.href = "/mainpage";
   };
 
   const handleSearch = () => {
@@ -77,12 +68,12 @@ const Header: React.FC = () => {
       }
       try {
         const allTracks = await fetchJoinedTracks();
-        const approved = allTracks.filter((t) => t.status === "approved");
-        const matched = approved.filter((t) => {
+        const matched = allTracks.filter((t) => {
           const name = t.Metadatum?.trackname?.toLowerCase() || "";
           const artist = t.User?.UploaderName?.toLowerCase() || "";
           return name.includes(q) || artist.includes(q);
         });
+
         setSuggestions(matched.slice(0, 5));
         setShowDropdown(true);
       } catch (err) {
@@ -92,18 +83,18 @@ const Header: React.FC = () => {
     return () => clearTimeout(delay);
   }, [searchValue]);
 
-  // dùng để lấy avatar
   useEffect(() => {
-      const fetchUser = async () => {
-        try {
-          const profile = await getMyProfile();
-          setUser(profile);
-        } catch (err) {
-          console.error("Không thể tải thông tin người dùng:", err);
-        }
-      };
-      fetchUser();
-    }, []);
+    const fetchUser = async () => {
+      try {
+        const profile = await getMyProfile();
+        setUser(profile);
+      } catch (err) {
+        console.error("Lỗi lấy thông tin người dùng:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -113,30 +104,17 @@ const Header: React.FC = () => {
         setShowDropdown(false);
       }
     };
-   
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-   useEffect(() => {
-      const checkLogin = async () => {
-        const user = await getCurrentUser();
-        setIsLoggedIn(!!user); // true nếu có user, false nếu null
-      };
-  
-      checkLogin();
-    }, []);
-
-    const handleUploadClick = () => {
-    if (!isLoggedIn) {
-      alert('Bạn cần đăng nhập để tải lên!');
-       navigate('/login', { state: { from: location } });  // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
-    } else {
-      toggleUploadModal();  // Mở modal upload nếu đã đăng nhập
-    }
-  };
-
-
+  useEffect(() => {
+    const checkLogin = async () => {
+      const user = await getCurrentUser();
+      setIsLoggedIn(!!user);
+    };
+    checkLogin();
+  }, []);
 
   return (
     <header>
@@ -165,24 +143,26 @@ const Header: React.FC = () => {
         )}
         <div className="vertical-divider"></div>
         <button className="search-icon-btn" onClick={handleSearch}>
-          {/* có thể dùng SVG hoặc icon tuỳ ý */}
           🔍
         </button>
 
-        {/* Dropdown Search Results */}
+        {/* Dropdown */}
         {showDropdown && suggestions.length > 0 && (
           <div className="search-dropdown">
             {suggestions.map((track) => {
               const fileName = track.imageUrl.split("/").pop()!;
-              const imgSrc = `${API_BASE_URL}/assets/track_image/${fileName}` || track.imageUrl;
-
+              const imgSrc = imageMap[fileName] || track.imageUrl;
               return (
                 <div
                   key={track.id}
                   className="search-dropdown-item"
                   onClick={() => {
                     setShowDropdown(false);
-                    navigate("/search", { state: { selectedTrack: track } });
+                    localStorage.setItem(
+                      "selectedTrack",
+                      JSON.stringify(track)
+                    );
+                    navigate("/search");
                   }}
                 >
                   <img
@@ -191,7 +171,7 @@ const Header: React.FC = () => {
                   />
                   <div>
                     <div className="dropdown-title">
-                      {track.Metadatum?.trackname || `Track ${track.id}`}
+                      {track.Metadatum?.trackname}
                     </div>
                     <div className="dropdown-artist">
                       {track.User?.UploaderName}
@@ -204,52 +184,42 @@ const Header: React.FC = () => {
         )}
       </div>
 
-     
+      <div className="right-controls">
+        <button className="btn-upload" onClick={toggleUploadModal}>
+          Upload
+        </button>
+        <button className="btn-TB">
+          <img src={bellIcon} alt="Thông báo" />
+        </button>
 
-        <div className="right-controls">
-          {/* Upload Button */}
-          <button className="btn-upload" onClick={handleUploadClick}>
-            Upload
-          </button>
-
-          {/* Notification */}
-          <button className="btn-TB">
-            <img src={bellIcon} alt="Thông báo" />
-          </button>
-
-   
-
-          {/* User Dropdown */}
-          <div className="user-dropdown" ref={dropdownRef}>
-            { isLoggedIn ? (
-              <button className="btn-ND" onClick={toggleUserMenu}>
-                <img src={user?.Avatar || userIcon} alt="Người dùng" />
-              </button>
-              ) :(
-              <button className="Login" onClick={() => navigate('/login', { state: { from: location } })}>
-                  Đăng Nhập
-              </button>
-              )
-            }
-            
-            {showMenu && (
-              <div className="dropdown-menu">
-                <div className="menu-item" onClick={() => navigate("/profile")}>
-                  Profile
-                </div>
-                <div className="menu-item" onClick={() => navigate("/stats")}>
-                  Stats
-                </div>
-                {isLoggedIn && (
-                  <div className="menu-item" onClick={handleLogout}>
-                    Logout
-                  </div>
-                )}
+        <div className="user-dropdown">
+          {isLoggedIn ? (
+            <button className="btn-ND" onClick={toggleUserMenu}>
+              <img src={user?.Avatar || userIcon} alt="Người dùng" />
+            </button>
+          ) : (
+            <button className="Login" onClick={() => navigate("/login")}>
+              Đăng Nhập
+            </button>
+          )}
+          {showMenu && (
+            <div className="dropdown-menu">
+              <div className="menu-item" onClick={() => navigate("/profile")}>
+                Profile
               </div>
-            )}
-          </div>
+              <div className="menu-item" onClick={() => navigate("/stats")}>
+                Stats
+              </div>
+              {isLoggedIn && (
+                <div className="menu-item" onClick={handleLogout}>
+                  Logout
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      {/* Upload Modal */}
+      </div>
+
       {showUploadModal && (
         <div className="popup-backdrop" onClick={toggleUploadModal}>
           <div onClick={(e) => e.stopPropagation()} className="popup-content">

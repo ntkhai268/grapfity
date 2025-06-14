@@ -9,7 +9,6 @@ export interface MinimalTrack {
   trackUrl: string;
   imageUrl: string;
   uploaderId: number;
-  status: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -41,7 +40,6 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       trackUrl: string;
       imageUrl: string;
       uploaderId: number;
-      status: string;
       createdAt: string;
       updatedAt: string;
       User: { UploaderName: string };
@@ -67,7 +65,6 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       trackUrl: toPublicPath(item.trackUrl),
       imageUrl: toPublicPath(item.imageUrl),
       uploaderId: item.uploaderId,
-      status: item.status,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     };

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { verityJWT } from '../middleware/JWTActions.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-import { getAllTracks, getTrackById, getTrackWithUploaderById, getTracksByUploaderId, createTrack, updateTrack, deleteTrack, getAllTracksForAdmin, getTracksByUserId, getJoinedTracks, updateTrackStatus } from '../services/track_service.js';
+import { getAllTracks, getTrackById, getTrackWithUploaderById, getTracksByUploaderId, createTrack, updateTrack, deleteTrack, getAllTracksForAdmin, getTracksByUserId, getJoinedTracks } from '../services/track_service.js';
 const getAllTracksController = async (req, res) => {
   try {
     const tracks = await getAllTracks();
@@ -363,43 +363,4 @@ const getTracksByUserController = async (req, res) => {
     return res.status(500).send('Internal Server Error');
   }
 };
-const updateTrackStatusController = async (req, res) => {
-  // 1. Parse và validate id
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id)) {
-    return res.status(400).json({
-      message: 'Invalid track id'
-    });
-  }
-
-  // 2. Validate status
-  const {
-    status
-  } = req.body;
-  if (!status || typeof status !== 'string') {
-    return res.status(400).json({
-      message: 'Missing or invalid status'
-    });
-  }
-  try {
-    // 3. Cập nhật
-    const updatedTrack = await updateTrackStatus(id, status);
-
-    // 4. Trả về kết quả
-    return res.status(200).json({
-      message: 'Update track status succeed!',
-      data: updatedTrack
-    });
-  } catch (err) {
-    console.error('Error updating track status:', err);
-    if (err.message === 'Track not found') {
-      return res.status(404).json({
-        message: 'Track not found'
-      });
-    }
-    return res.status(500).json({
-      message: 'Internal Server Error'
-    });
-  }
-};
-export { getAllTracksController, getTrackByIdController, getTrackWithUploaderByIdController, uploadTrackCoverController, createTrackController, updateTrackController, deleteTrackController, getMyTracksController, getPublicTracksOfUserController, getJoinedTracksController, downloadTrackController, updateTrackStatusController, getTracksByUserController };
+export { getAllTracksController, getTrackByIdController, getTrackWithUploaderByIdController, uploadTrackCoverController, createTrackController, updateTrackController, deleteTrackController, getMyTracksController, getPublicTracksOfUserController, getJoinedTracksController, downloadTrackController, getTracksByUserController };

@@ -230,3 +230,65 @@
     max-width: 100%;
   }
 }
+
+.topGrid_result {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.topResultCard {
+  flex: 1;
+  min-width: 300px;
+  max-width: 350px;
+  background-color: #181818;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.topResultContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.songListWrapper {
+  flex: 2;
+  min-width: 300px;
+}
+
+.artistList_result,
+.playlistList_result {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 24px;
+}
+
+.artistItem_result,
+.playlistItem_result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.artistAvatar_result {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.artistName_result,
+.playlistTitle_result {
+  margin-top: 8px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.playlistCover_result {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}

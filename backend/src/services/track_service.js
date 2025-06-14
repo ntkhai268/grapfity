@@ -5,7 +5,6 @@ import { extractMetadata, checkMetadataSimilarity} from '../services/metadata_se
 const getAllTracks = async () => {
     return await db.Track.findAll({
         where: {
-            status: 'approved',
             privacy: 'public'
             
         },
@@ -42,7 +41,6 @@ const getTrackById = async (trackId) => {
         const track = await db.Track.findOne( {
             where: {
                 id: numericTrackId,
-                status: 'approved' 
             },
             // Bạn có thể chọn các attributes cụ thể từ bảng Track nếu muốn
             attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt', 'updatedAt', 'privacy'], 
@@ -94,7 +92,6 @@ const getTrackWithUploaderById = async (id) => {
     return await db.Track.findOne({
         where: {
             id,
-            status: 'approved' 
         },
         include: {
             model: db.User,
@@ -117,7 +114,6 @@ const getTracksByUploaderId = async (userId, currentUserId) => {
 
   const whereClause = {
     uploaderId: numericUserId,
-    status: 'approved',
     ...(isOwner ? {} : { privacy: 'public' }) // 👈 Nếu không phải chủ sở hữu thì chỉ thấy bài public
   };
 
@@ -153,13 +149,14 @@ const createTrack = async ({
   uploaderId,
   privacy,
   absAudioPath,
-  trackname
+  trackname,
+  lyrics
 }) => {
   console.log('🧪 absAudioPath:', absAudioPath);
   const metadata = await extractMetadata(absAudioPath);
 
   metadata.trackname = trackname;
-  metadata.lyrics = '';
+  metadata.lyrics = lyrics;
 
   const approved = await checkMetadataSimilarity(metadata);
   if (!approved){
@@ -211,9 +208,6 @@ const updateTrack = async (id, updateData, userId) => {
     if (!track) throw new Error('Track not found');
     if (track.uploaderId !== userId) {
         throw new Error('Unauthorized: You can only edit your own tracks.');
-    }
-    if ('status' in updateData) {
-        delete updateData.status;
     }
     // Chỉ cập nhật các trường cho phép
     const allowedFields = ['title', 'imageUrl', 'lyrics', 'privacy'];
@@ -268,15 +262,9 @@ const getTracksByUserId = async (userId) => {
   });
 };
 
-const updateTrackStatus = async (id, status) => {
-  const track = await db.Track.findByPk(id);
-  if (!track) throw new Error('Track not found');
-  return await track.update({ status });
-};
-
 const getJoinedTracks = async () => {
   return await db.Track.findAll({
-    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+    attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt'],
     include: [
       {
         model: db.Metadata,
@@ -313,6 +301,5 @@ export {
     updateTrack,
     deleteTrack,
     getTracksByUserId,
-    getJoinedTracks,
-    updateTrackStatus
+    getJoinedTracks
 };

@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 console.log('Serving static files from directory:', path.join(__dirname, 'public'));
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['http://localhost:5173', 'http://localhost:5174'],
   credentials: true 
 }));
 
