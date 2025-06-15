@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   fetchUsers,
   createUser,
-  updateUser,
-  deleteUser,
+  adminUpdateUser,
+  adminDeleteUser,
   UserType,
   CreateUserPayload,
   UpdateUserPayload,
   fetchUserId,
 } from "../services/userService.ts";
+
 import "../styles/admin.css";
 
 const Section_admin_users: React.FC = () => {
@@ -198,14 +199,13 @@ const Section_admin_users: React.FC = () => {
       setFilteredUsers(data);
     } catch (err) {
       console.error(err);
-      alert("Thêm user thất bại.");
     }
     setAddOpen(false);
     setNewUser({
       userName: "",
       email: "",
       password: "",
-      roleId: 1,
+      roleId: 2,
       Name: "",
       Birthday: "",
       Address: "",
@@ -237,29 +237,30 @@ const Section_admin_users: React.FC = () => {
       setConfirmPassword(value);
     }
   };
-  const handleEditSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editUser.password !== confirmPassword) {
-      alert("Password và Confirm Password không khớp.");
-      return;
-    }
+const handleEditSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (editUser.password !== confirmPassword) {
+    alert("Password và Confirm Password không khớp.");
+    return;
+  }
 
-    try {
-      const formData = new FormData();
-      formData.append("id", editUser.id.toString());
-      formData.append("password", editUser.password);
+  try {
+    const payload: Partial<UpdateUserPayload> = {
+      password: editUser.password,
+    };
 
-      await updateUser(formData);
-      const data = await fetchUsers();
-      setUsers(data);
-      setFilteredUsers(data);
-    } catch (err) {
-      console.error(err);
-      alert("Cập nhật user thất bại.");
-    }
+    await adminUpdateUser(editUser.id, payload);
+    const data = await fetchUsers();
+    setUsers(data);
+    setFilteredUsers(data);
+  } catch (err) {
+    console.error(err);
+    alert("Cập nhật user thất bại.");
+  }
 
-    setEditOpen(false);
-  };
+  setEditOpen(false);
+};
+
   const handleRoleSelect = (role: number) =>
     setNewUser((prev) => ({ ...prev, roleId: role }));
   // Handle Delete Selected
@@ -271,7 +272,7 @@ const Section_admin_users: React.FC = () => {
     if (!ids.length) return;
   
     // Kiểm tra nếu có ID = 1
-    if (ids.includes(1)) {
+    if (ids.includes(3011)) {
       alert("Không thể xoá user có ID = 1 (quản trị viên mặc định).");
       return;
     }
@@ -279,7 +280,8 @@ const Section_admin_users: React.FC = () => {
     if (!window.confirm(`Xác nhận xóa ${ids.length} user?`)) return;
   
     try {
-      await Promise.all(ids.map((id) => deleteUser(id)));
+      await Promise.all(ids.map((id) => adminDeleteUser(id)));
+
       const data = await fetchUsers();
       setUsers(data);
       setFilteredUsers(data);
@@ -432,7 +434,7 @@ const Section_admin_users: React.FC = () => {
   onClick={async () => {
     if (window.confirm(`Bạn có chắc muốn xoá user "${u.userName}"?`)) {
       try {
-        await deleteUser(u.id);
+        await adminDeleteUser(u.id);
         const data = await fetchUsers();
         setUsers(data);
         setFilteredUsers(data);

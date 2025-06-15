@@ -91,80 +91,60 @@ const handleUserLogin = async (username, password) => {
     }
 };
 
-const updateUser = async (id, {
+const updateUserService = async (
+    id,
     userName,
     email,
     password,
+    roleId,
     Name,
     Birthday,
     Address,
-    PhoneNumber,
-    Avatar
-}) => {
+    PhoneNumber
+  ) => {
+    // Tìm user theo khóa chính
     const user = await db.User.findByPk(id);
-    if (!user) {
-        const error = new Error('User not found');
-        error.statusCode = 404;
-        throw error;
+    if (!user) return null;
+  
+    // Xây dựng đối tượng cập nhật
+    const updateData = {
+      userName,
+      email,
+      roleId,
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    };
+  
+    // Nếu có password mới, hash rồi gán vào updateData
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
     }
+  
+    // Thực hiện cập nhật
+    await user.update(updateData);
+    return user;
+  };
 
-    const updateFields = {};
-
-    if (typeof userName === 'string' && userName.trim() !== '') {
-        updateFields.userName = userName.trim();
-    }
-
-    if (typeof email === 'string' && email.trim() !== '') {
-        updateFields.email = email.trim();
-    }
-
-    if (typeof password === 'string' && password.trim() !== '') {
-        const saltRounds = 10;
-        updateFields.password = await bcrypt.hash(password, saltRounds);
-    }
-
-    if (typeof Name === 'string' && Name.trim() !== '') {
-        updateFields.Name = Name.trim();
-    }
-
-    if (Birthday) {
-        updateFields.Birthday = Birthday; // đảm bảo frontend gửi đúng định dạng yyyy-mm-dd
-    }
-
-    if (typeof Address === 'string' && Address.trim() !== '') {
-        updateFields.Address = Address.trim();
-    }
-
-    if (typeof PhoneNumber === 'string' && PhoneNumber.trim() !== '') {
-        updateFields.PhoneNumber = PhoneNumber.trim();
-    }
-
-    if (typeof Avatar === 'string' && Avatar.trim() !== '') {
-        updateFields.Avatar = Avatar.trim(); // hoặc URL ảnh được xử lý sẵn
-    }
-
-    const updatedUser = await user.update(updateFields);
-    return updatedUser;
-};
-
-const deleteUser = async (userId) => {
-  return await db.sequelize.transaction(async (t) => {
-    const user = await db.User.findByPk(userId, { transaction: t });
+const deleteUser = async (id) => {
+    return await db.sequelize.transaction(async (t) => {
+    const user = await db.User.findByPk(id, { transaction: t });
     if (!user) throw new Error('User not found');
 
     // Ví dụ: xóa playlist, tracks liên quan (nếu cần)
-    await db.Track.destroy({ where: { userId }, transaction: t });
-    await db.Playlist.destroy({ where: { userId }, transaction: t });
+    await db.Track.destroy({ where: { id }, transaction: t });
+    await db.Playlist.destroy({ where: { id }, transaction: t });
 
     await db.User.destroy({
-      where: { id: userId },
+      where: { id: id },
       transaction: t,
       individualHooks: true,
     });
 
     return true;
   });
-};
+  };
 
 
 export {
@@ -172,6 +152,6 @@ export {
     getUserById,
     createUserService,
     handleUserLogin,
-    updateUser,
+    updateUserService,
     deleteUser
 };

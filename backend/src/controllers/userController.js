@@ -5,8 +5,8 @@ import {
     createUserService ,
     getUserById,      
     handleUserLogin,
-    updateUser,
-    deleteUser
+    updateUserService,
+    deleteUser as deleteUserService
   } from '../services/user_service.js';
   
 import { verityJWT } from '../middleware/JWTActions.js';
@@ -134,79 +134,63 @@ const handleUserLoginController = async (req, res) => {
 };
 
 const updateUserController = async (req, res) => {
-    try {
-        const userId = req.userId;
-
-        // Lấy dữ liệu từ req.body (text field)
-        const {
-            userName,
-            email,
-            password,
-            Name,
-            Birthday,
-            Address,
-            PhoneNumber
-        } = req.body;
-
-        // Lấy file ảnh nếu có (gửi từ FormData)
-        const Avatar = req.file ? `/assets/user_image/${req.file.filename}` : undefined;
-
-        const updatedUser = await updateUser(userId, {
-            userName,
-            email,
-            password,
-            Name,
-            Birthday,
-            Address,
-            PhoneNumber,
-            Avatar
-        });
-
-        return res.status(200).json({
-            message: 'Cập nhật thông tin thành công!',
-            data: updatedUser
-        });
-    } catch (err) {
-        console.error('Lỗi khi cập nhật thông tin:', err.message, err.stack);
-        return res.status(500).json({ message: 'Lỗi server.' });
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid user id' });
     }
-}
 
+    // Lấy tất cả các field từ body, bao gồm password
+    const {
+      userName,
+      email,
+      password,
+      roleId,
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    } = req.body;
+
+    const updatedUser = await updateUserService(
+      id,
+      userName,
+      email,
+      password,
+      roleId,
+      Name,
+      Birthday,
+      Address,
+      PhoneNumber
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Trả về user đã được cập nhật (bao gồm password đã hash)
+    return res.status(200).json({
+      message: 'User updated successfully',
+      data: updatedUser
+    });
+  } catch (err) {
+    console.error('updateUserController error:', err);
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+// DELETE /api/users/:id
 const deleteUserController = async (req, res) => {
   try {
-    const paramId = req.params.id;         // từ URL (nếu có)
-    const currentUserId = req.userId;      // từ JWT middleware
-
-    let targetId;
-
-    // 1. Nếu không có id truyền vào, thì xóa chính mình
-    if (!paramId) {
-      if (!currentUserId) {
-        return res.status(401).json({ message: 'Unauthorized: No token' });
-      }
-      targetId = currentUserId;
-    } else {
-      targetId = parseInt(paramId, 10);
-      if (isNaN(targetId)) {
-        return res.status(400).json({ message: 'Invalid user id' });
-      }
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: 'Invalid user id' });
     }
-
-    // 2. Kiểm tra: có phải đang xóa người khác không?
-    const isSelf = targetId === currentUserId;
-
-    // 3. Thực hiện xóa
-    await deleteUser(targetId);
-
-    // 4. Nếu là chính mình thì xóa cookie luôn
-    if (isSelf) {
-      res.clearCookie('jwt');
+    const rows = await deleteUserService(id);
+    if (rows === 0) {
+      return res.status(404).json({ message: 'User not found' });
     }
-
-    return res.status(200).json({
-      message: 'User deleted successfully!',
-    });
-
+    return res.status(200).json({ message: 'User deleted' });
   } catch (err) {
     console.error('deleteUserController error:', err);
     return res.status(500).json({ message: 'Internal Server Error' });

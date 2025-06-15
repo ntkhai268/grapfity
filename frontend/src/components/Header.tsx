@@ -13,10 +13,10 @@ import { getCurrentUser } from "../services/authService";
 import { getMyProfile, UserType as UserData } from "../services/userService.ts";
 
 // Map ảnh
-const imageModules = import.meta.glob(
-  "../assets/images/*.{png,jpg,jpeg,svg}",
-  { eager: true, as: "url" }
-);
+const imageModules = import.meta.glob("../assets/images/*.{png,jpg,jpeg,svg}", {
+  eager: true,
+  as: "url",
+});
 const imageMap: Record<string, string> = {};
 Object.entries(imageModules).forEach(([path, url]) => {
   const filename = path.split("/").pop();
@@ -68,12 +68,12 @@ const Header: React.FC = () => {
       }
       try {
         const allTracks = await fetchJoinedTracks();
-        const approved = allTracks.filter((t) => t.status === "approved");
-        const matched = approved.filter((t) => {
+        const matched = allTracks.filter((t) => {
           const name = t.Metadatum?.trackname?.toLowerCase() || "";
           const artist = t.User?.UploaderName?.toLowerCase() || "";
           return name.includes(q) || artist.includes(q);
         });
+
         setSuggestions(matched.slice(0, 5));
         setShowDropdown(true);
       } catch (err) {
@@ -97,7 +97,10 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -155,14 +158,24 @@ const Header: React.FC = () => {
                   className="search-dropdown-item"
                   onClick={() => {
                     setShowDropdown(false);
-                    localStorage.setItem("selectedTrack", JSON.stringify(track));
+                    localStorage.setItem(
+                      "selectedTrack",
+                      JSON.stringify(track)
+                    );
                     navigate("/search");
                   }}
                 >
-                  <img src={imgSrc} alt={track.Metadatum?.trackname || `Track ${track.id}`} />
+                  <img
+                    src={imgSrc}
+                    alt={track.Metadatum?.trackname || `Track ${track.id}`}
+                  />
                   <div>
-                    <div className="dropdown-title">{track.Metadatum?.trackname}</div>
-                    <div className="dropdown-artist">{track.User?.UploaderName}</div>
+                    <div className="dropdown-title">
+                      {track.Metadatum?.trackname}
+                    </div>
+                    <div className="dropdown-artist">
+                      {track.User?.UploaderName}
+                    </div>
                   </div>
                 </div>
               );
@@ -172,8 +185,12 @@ const Header: React.FC = () => {
       </div>
 
       <div className="right-controls">
-        <button className="btn-upload" onClick={toggleUploadModal}>Upload</button>
-        <button className="btn-TB"><img src={bellIcon} alt="Thông báo" /></button>
+        <button className="btn-upload" onClick={toggleUploadModal}>
+          Upload
+        </button>
+        <button className="btn-TB">
+          <img src={bellIcon} alt="Thông báo" />
+        </button>
 
         <div className="user-dropdown">
           {isLoggedIn ? (
@@ -181,13 +198,23 @@ const Header: React.FC = () => {
               <img src={user?.Avatar || userIcon} alt="Người dùng" />
             </button>
           ) : (
-            <button className="Login" onClick={() => navigate("/login")}>Đăng Nhập</button>
+            <button className="Login" onClick={() => navigate("/login")}>
+              Đăng Nhập
+            </button>
           )}
           {showMenu && (
             <div className="dropdown-menu">
-              <div className="menu-item" onClick={() => navigate("/profile")}>Profile</div>
-              <div className="menu-item" onClick={() => navigate("/stats")}>Stats</div>
-              {isLoggedIn && <div className="menu-item" onClick={handleLogout}>Logout</div>}
+              <div className="menu-item" onClick={() => navigate("/profile")}>
+                Profile
+              </div>
+              <div className="menu-item" onClick={() => navigate("/stats")}>
+                Stats
+              </div>
+              {isLoggedIn && (
+                <div className="menu-item" onClick={handleLogout}>
+                  Logout
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -197,7 +224,9 @@ const Header: React.FC = () => {
         <div className="popup-backdrop" onClick={toggleUploadModal}>
           <div onClick={(e) => e.stopPropagation()} className="popup-content">
             <UploadSongMetadata onCancel={toggleUploadModal} />
-            <button className="popup-close-btn" onClick={toggleUploadModal}>&times;</button>
+            <button className="popup-close-btn" onClick={toggleUploadModal}>
+              &times;
+            </button>
           </div>
         </div>
       )}

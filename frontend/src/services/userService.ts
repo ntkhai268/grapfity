@@ -1,4 +1,3 @@
-// src/services/userService.ts
 import axios from "axios";
 
 // =========================
@@ -79,7 +78,7 @@ export const getUserById = async (id: number | string): Promise<UserType> => {
   return normalizeUser(resp.data.data);
 };
 
-// 📥 Lấy profile người khác (dành cho FE khi xem người khác)
+// 📥 Lấy profile người khác (FE xem user khác)
 export const getUserByIdforUser = async (id: number | string): Promise<UserType> => {
   const resp = await axios.get<{ message: string; data: UserType }>(
     `${USERS_API}/profile/${id}`
@@ -106,23 +105,34 @@ export const createUser = async (payload: CreateUserPayload): Promise<UserType> 
 };
 
 // 🛠 Cập nhật người dùng
-export const updateUser = async (formData: FormData): Promise<{ message: string }> => {
-  const res = await axios.put(`${USERS_API}/me`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-    withCredentials: true,
-  });
-  return res.data;
+export const updateUser = async (formData: FormData): Promise<{
+  message: string;
+  data: UserType;
+}> => {
+  const res = await axios.put<{ message: string; data: UserType }>(
+    `${USERS_API}/me`,
+    formData,
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+      withCredentials: true,
+    }
+  );
+  return {
+    message: res.data.message,
+    data: normalizeUser(res.data.data),
+  };
 };
 
 // ❌ Xóa người dùng (chính mình hoặc bởi admin)
 export const deleteUser = async (id?: number): Promise<{ message: string }> => {
   const url = id ? `${USERS_API}/${id}` : `${API_BASE_URL}/api/delete-user`;
-  const resp = await axios.delete(url, {
+  const resp = await axios.delete<{ message: string }>(url, {
     withCredentials: true,
   });
   return resp.data;
 };
 
+// 📥 Lấy ID của user đang đăng nhập
 export const fetchUserId = async (): Promise<number | null> => {
   try {
     const user = await getMyProfile();
@@ -131,4 +141,43 @@ export const fetchUserId = async (): Promise<number | null> => {
     console.error("Lỗi lấy userId:", err);
     return null;
   }
+};
+// 🛠 Admin cập nhật thông tin người dùng theo ID
+export const adminUpdateUser = async (
+  id: number,
+  payload: Partial<UpdateUserPayload>
+): Promise<{ message: string; data: UserType }> => {
+  const form = new URLSearchParams();
+  if (payload.password) {
+    form.append("password", payload.password);
+  }
+
+  const res = await axios.put<{ message: string; data: UserType }>(
+    `http://localhost:8080/api/update-users/${id}`,
+    form,
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      withCredentials: true,
+    }
+  );
+
+  return {
+    message: res.data.message,
+    data: res.data.data,
+  };
+};
+
+// ❌ Admin xóa người dùng theo ID
+export const adminDeleteUser = async (
+  id: number
+): Promise<{ message: string }> => {
+  const res = await axios.delete<{ message: string }>(
+    `http://localhost:8080/api/delete-users/${id}`, // ✅ endpoint chuẩn
+    {
+      withCredentials: true,
+    }
+  );
+  return res.data;
 };

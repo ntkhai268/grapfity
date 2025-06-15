@@ -22,6 +22,32 @@ services:
       retries: 5
       start_period: 60s
 
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  extract-track-feature:
+    build:
+      context: ./extract-track-feature
+    container_name: extract-track-feature
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./extract-track-feature:/app
+    restart: unless-stopped
+
   backend:
     platform: linux/amd64
     build:
@@ -46,4 +72,6 @@ services:
 
 volumes:
   sql_data:
+    driver: local
+  esdata:
     driver: local

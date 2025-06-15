@@ -58,7 +58,6 @@ const LoginForm: React.FC = () => {
       if (response.ok && data.token && data.roleId != null) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("roleId", data.roleId.toString());
-        alert(data.message);
         const from = location.state?.from?.pathname || '/';  // Lấy thông tin trang trước đó
         navigate(from, { replace: true });  // Điều hướng về trang trước đó
 

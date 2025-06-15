@@ -57,7 +57,7 @@ export const updateTrackStatus = async (
 };
 export const deleteTrack = async (id: number): Promise<{ message: string }> => {
   const res = await axios.delete<{ message: string }>(
-    `http://localhost:8080/api/delete-track/${id}`
+    `http://localhost:8080/api/tracks/${id}`
   );
   return res.data;
 };
