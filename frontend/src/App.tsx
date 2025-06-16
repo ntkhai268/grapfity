@@ -22,6 +22,7 @@ import ListeningLayouts from "./layouts/ListeningLayouts";
 import LoginForm from "./container/Login";
 import LoginLayout from "./layouts/LoginLayouts";
 import SearchPage from "./container/SearchPage";
+import ManagerSongSection from "./components/ManagerSongSection";
 
 // Import GlobalAudioManager và các kiểu dữ liệu/API cần thiết
 import GlobalAudioManager, { PlaylistContext, Song } from './hooks/GlobalAudioManager';
@@ -166,7 +167,10 @@ const App = () => {
       />
       <Route path="/profile" element={<ProfileLayout />} />
       <Route path="/profile/:userId" element={<ProfileLayout />} />
-      <Route path="/ManagerSong" element={<ManagerSongLayout />} />
+      <Route path="/ManagerSong" element={<ManagerSongLayout />}>
+        <Route index element={<div style={{ color: "white", padding: 32 }}>Chọn một bài hát để quản lý.</div>} />
+        <Route path=":trackId" element={<ManagerSongSection />} />
+      </Route>
       <Route path="/ManagerPlaylistLayout/:playlistId" element={<ManagerPlaylistLayout />} />
       <Route path="/stats/*" element={<StatsLayouts />} />
       <Route path="/upload/*" element={<UploadLayouts />} />

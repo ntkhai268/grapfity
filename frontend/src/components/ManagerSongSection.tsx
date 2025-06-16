@@ -1,11 +1,14 @@
 import React, { useState, useEffect, RefObject } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation,useParams } from "react-router-dom";
 import Controls from "./Manager_Songs/Controls";
 import Lyrics from "./Manager_Songs/Lyrics";
 import PopularSongs from "./Manager_Songs/PopularSongs";
 import Recommendations from "./Manager_Songs/Recommendations";
 import SongHeader from "./Manager_Songs/Song-Header";
 import Sidebar from "./Sidebar";
+
+import { decodeBase62WithPrefix  } from "../hooks/base62";
+
 
 // Import hook useSongManager và kiểu dữ liệu của nó
 // Đảm bảo đường dẫn này chính xác đến file hook của bạn
@@ -28,6 +31,9 @@ interface ISongManagerOutput {
 
 
 const ManagerSongSection: React.FC = () => {
+  const { trackId } = useParams();
+  const decodedId = decodeBase62WithPrefix(trackId ?? "0"); 
+  
   const [bgColor, setBgColor] = useState<string>("#7D3218"); // màu mặc định
   const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(false);
   
@@ -98,6 +104,28 @@ const ManagerSongSection: React.FC = () => {
     }
   }
 }, [songFromState]);
+useEffect(() => {
+  if (!viewSong && trackId) {
+    const decodedId = decodeBase62WithPrefix(trackId);
+    console.log("[FALLBACK] Decode từ URL:", decodedId);
+
+    const song = GlobalAudioManager.getPlaylist().find(s => s.id === decodedId);
+    if (song) {
+      console.log("[FALLBACK] Tìm thấy trong GlobalAudioManager:", song);
+      setViewSong(song);
+    } else {
+      fetch(`http://localhost:8001/api/tracks/${decodedId}`) // 👈 thay đúng host của backend bạn
+        .then(res => res.ok ? res.json() : Promise.reject("Không tìm thấy"))
+        .then(data => {
+          console.log("[FALLBACK] Tìm thấy bài hát qua API:", data);
+          setViewSong(data);
+        })
+        .catch(err => {
+          console.error("[FALLBACK] Không load được bài hát:", err);
+        });
+    }
+  }
+}, [trackId, viewSong]);
 
 // useEffect(() => {
 //   if (playlist.length > 0 && viewSong) {
@@ -124,7 +152,13 @@ useEffect(() => {
   console.log("🔁 ManagerSongSection reloaded:", location.state?._forceKey);
 }, [location.state?._forceKey]);
 
-
+if (!viewSong) {
+  return (
+    <div style={{ color: 'white', padding: 32 }}>
+      ⏳ Đang tải bài hát (decodedId: {decodedId})...
+    </div>
+  );
+}
   return (
     <div>
       <div className="container">

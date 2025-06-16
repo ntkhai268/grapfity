@@ -8,6 +8,7 @@ import  { RepeatButton, ShuffleButton } from './modeControl';
 import { useNavigate } from "react-router-dom";
 import VolumeControl from "./VolumeControl";
 import { trackingListeningHistoryAPI } from "../services/listeningService";
+import { encodeBase62WithPrefix } from "../hooks/base62";
 
 
 // Interface cho FooterLeft (có thể giữ nguyên hoặc điều chỉnh)
@@ -208,7 +209,9 @@ const goToManagerSong = () => {
   localStorage.setItem("viewedPlaylist", JSON.stringify(playlist));
   localStorage.setItem("viewedIndex", index.toString());
 
-  navigate("/ManagerSong", {
+  const encodedId = encodeBase62WithPrefix(Number(currentSong.id), 22);
+
+  navigate(`/ManagerSong/${encodedId}`, {
     state: {
       songs: playlist,
       currentIndex: index,

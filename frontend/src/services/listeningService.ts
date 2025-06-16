@@ -96,3 +96,14 @@ export const getTop5TracksOfProfileAPI = async (userId: string | number) =>{
   const res = await axios.get(`${API_BASE_URL}/popular-user/${userId}/top5`);
   return res.data;
 };
+
+export const getHomeRecommendationsAPI = async () => {
+  const res =  await axios.get(`${API_BASE_URL}/recommend/home/`);
+  console.log(res.data)
+  return res.data.data;
+}
+
+export const getTrackRecommendationsAPI = async (trackId: string | number) => {
+  const res = await axios.get(`${API_BASE_URL}/recommend/track/${trackId}`);
+  return res.data;
+}

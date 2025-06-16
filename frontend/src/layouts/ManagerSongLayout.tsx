@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-import ManagerSongSection from "../components/ManagerSongSection";
 import "../styles/ManagerSongLayout.css";
+import { Outlet } from "react-router-dom";
 
 const ManagerSongLayout: React.FC = () => {
   useEffect(() => {
@@ -27,7 +27,7 @@ const ManagerSongLayout: React.FC = () => {
         <div className="main-content">
           <Sidebar />
           <div className="page-content">
-            <ManagerSongSection /> {/* Thay Section bằng ProfileSection */}
+              <Outlet /> 
           </div>
         </div>
         <Footer />

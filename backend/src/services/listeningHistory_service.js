@@ -65,7 +65,7 @@ const getTop10PopularTracks = async () => {
           {
             model: db.Metadata,
 
-             attributes: ['trackname'] 
+            attributes: ['trackname'] 
           },
           {
             model: db.User,

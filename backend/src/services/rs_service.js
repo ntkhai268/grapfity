@@ -38,7 +38,29 @@ export const recommendForHome = async (userId) => {
   }
 
   const listened = new Set(histories.map((h) => h.trackId));
-  const result = [...recommendations].filter((id) => !listened.has(id));
+  const trackIds = [...recommendations].filter((id) => !listened.has(id));
+
+  const tracks = await db.Track.findAll({
+    where: { id: trackIds },
+    include: [
+      {
+        model: db.Metadata,
+        attributes: ['duration_ms'], 
+      },
+      {
+        model: db.User,
+        attributes: ["userName"],
+      },
+    ],
+  });
+
+  const result = tracks.map((track) => ({
+    id: track.id,
+    src: track.trackUrl,
+    title: track.Metadata?.duration_ms || "Không rõ tên",
+    artist: track.User?.userName || "Không rõ nghệ sĩ",
+    cover: track.imageUrl,
+  }));
   return result;
 };
 

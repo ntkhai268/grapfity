@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, RefObject } from "react";
 
 // Import API và kiểu dữ liệu Playlist từ service của bạn
-import { getMyPlaylistsAPI } from "../../services/playlistService";
+import { createPlaylistAPI, getMyPlaylistsAPI } from "../../services/playlistService";
 import { addTrackToPlaylistAPI } from "../../services/trackPlaylistService";
 import {downloadTrackByIdAPI } from"../../services/trackServiceAPI";
 import type { PlaylistData } from "../Manager_Playlists/ManagerDataPlaylist";
@@ -94,10 +94,7 @@ const Controls: React.FC<ControlsProps> = ({
     }
   }, [isLoggedIn]);
 
-  const handleCreateNewPlaylist = useCallback(() => {
-    console.log("Action: Create new playlist");
-    closeDropdown();
-  }, [closeDropdown]);
+
 
   const handleAddToExistingPlaylist = useCallback(async (playlistId: string | number) => {
     if (isAddingTrack || !currentTrackId) {
@@ -192,6 +189,38 @@ const Controls: React.FC<ControlsProps> = ({
     fetchPlaylists();
   }, [fetchPlaylists]);
 
+  const handleCreatePlaylist = async () => {
+          console.log("Bắt đầu tạo playlist mới...");
+          // Có thể thêm trạng thái loading ở đây nếu muốn (ví dụ: disable nút)
+          // setIsLoading(true);
+          try {
+              // Gọi API tạo playlist mới (KHÔNG cần truyền userId, chỉ truyền trackId nếu có)
+              // Vì đây là tạo playlist trống, không cần truyền gì cả (hoặc truyền null/undefined)
+              const newPlaylist = await createPlaylistAPI(); // <-- Gọi không cần tham số
+      
+              if (newPlaylist && newPlaylist.id) {
+                  console.log("Playlist mới đã được tạo:", newPlaylist);
+                  await fetchPlaylists(); 
+                  // Điều hướng đến trang của playlist mới tạo thành công
+         
+              } else {
+                  console.error("Không thể tạo playlist: API không trả về dữ liệu hợp lệ.");
+                  alert("Đã xảy ra lỗi khi tạo playlist (phản hồi không hợp lệ).");
+              }
+          } catch (error: any) { // Bắt lỗi cụ thể hơn
+              console.error("Lỗi khi tạo playlist:", error);
+              // Kiểm tra lỗi Unauthorized
+              if (error.message === 'Unauthorized') {
+                   alert("Vui lòng đăng nhập để tạo playlist.");
+                   // navigate('/login'); // Chuyển hướng nếu cần
+              } else {
+                   alert(`Đã xảy ra lỗi khi tạo playlist: ${error.message || 'Vui lòng thử lại.'}`);
+              }
+          } finally {
+              // Tắt trạng thái loading nếu có
+              // setIsLoading(false);
+          }
+      };
   //Tải trạng thái like & số like khi trackId thay đổi
   useEffect(() => {
     const fetchLikeState = async () => {
@@ -275,7 +304,7 @@ const Controls: React.FC<ControlsProps> = ({
                     <i className="fas fa-search"></i>
                     <input type="text" placeholder="Tìm một danh sách phát" disabled={isLoadingPlaylists || !!playlistError}/>
                   </div>
-                  <div className="submenu-item" onClick={handleCreateNewPlaylist}>
+                  <div className="submenu-item" onClick={handleCreatePlaylist}>
                     <i className="fas fa-plus"></i>
                     <span>Danh sách phát mới</span>
                   </div>

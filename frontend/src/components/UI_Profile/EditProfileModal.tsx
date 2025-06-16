@@ -3,6 +3,7 @@ import { UserType } from '../../services/userService';
 import '../../styles/EditProfileModal.css';
 import { verifyPassword } from '../../services/authService';
 import { deleteUser } from '../../services/userService';
+import { useNavigate } from "react-router-dom";
 
 interface EditProfileModalProps {
   user: UserType; 
@@ -20,6 +21,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
 
 
   useEffect(() => {
@@ -117,11 +119,13 @@ const handleDeleteAccount = async (e: FormEvent) => {
     alert("❌ Mật khẩu không đúng.");
     return;
   }
-
+  
   const confirmed = window.confirm("⚠️ Bạn có chắc chắn muốn xóa tài khoản này không?");
   if (confirmed) {
     await deleteUser();
     alert("✅ Tài khoản đã được xoá.");
+    localStorage.clear();
+    navigate('/login');
     onClose(); // hoặc redirect logout
   }
 };
