@@ -22,8 +22,10 @@ const getListeningHistoryOfUser = async (userId) => {
       {
         model: db.User,
         attributes: ['id', ['name', 'Name']]
-      }
-    ]
+      },
+    ],
+    order: [['updatedAt', 'DESC']]
+
   });
 
   return histories;
@@ -64,7 +66,6 @@ const getTop10PopularTracks = async () => {
       include: [
           {
             model: db.Metadata,
-
             attributes: ['trackname'] 
           },
           {

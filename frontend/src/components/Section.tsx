@@ -12,7 +12,7 @@ import { PlaylistData } from "../components/Manager_Playlists/ManagerDataPlaylis
 import { getAllPublicPlaylistsAPI } from "../services/playlistService"; 
 import { getTop10PopularTracksAPI, getHomeRecommendationsAPI  } from "../services/listeningService";
 import { encodeBase62WithPrefix  } from "../hooks/base62";
-
+import { fetchListeningHistory, ListeningHistoryRecord } from "../services/listeningService"; // Import hàm fetchListeningHistory nếu cần
 
 
 import "../styles/Section.css"; // Đảm bảo đường dẫn CSS đúng
@@ -53,7 +53,23 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
             setError(null);
             try {
                 // fetchedTracks có kiểu TrackData[]
-                const fetchedTracks: TrackData[] = await getAllTracksAPI(); 
+                const fetchedRecords: ListeningHistoryRecord[] = await fetchListeningHistory();
+
+                const fetchedTracks: TrackData[] = fetchedRecords.map(record => {
+                const track = record.track;
+                const metadata = record.metadata;
+
+                return {
+                    id: track.id,
+                    title: metadata?.trackname || 'Unknown',
+                    artist: track.User?.UploaderName || 'Unknown',
+                    src: track.trackUrl,
+                    cover: track.imageUrl,
+                    // Nếu TrackData có thêm các trường khác như privacy, createdAt, ... thì thêm vào
+                    // privacy: track.privacy,
+                    // createdAt: track.createdAt,
+                };
+                });
                 
                 // Ánh xạ từ TrackData[] sang Song[]
                 const songs: Song[] = fetchedTracks.map(mapTrackDataToSong);
@@ -314,8 +330,8 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                         <div className="song-list">
                         {isLoadingTop ? (
                             <div>Đang tải top 10 bài hát phổ biến...</div>
-                        ) : recommendedTracks.length > 0 ? (
-                            recommendedTracks.map((song, index) => {
+                        ) : top10Tracks.length > 0 ? (
+                            top10Tracks.map((song, index) => {
                             // console.log(`Song #${index + 1}:`);
                             // console.log("  Title:", song.title);
                             // console.log("  Artist:", song.artist);
@@ -326,7 +342,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                 <button
                                 key={`top-${song.id}-${index}`}
                                 className="song-item-section"
-                                onClick={() => handleClicktest(song, top10Tracks, index, 'queue', 'recommended')}
+                                onClick={() => handleClicktest(song, top10Tracks, index, 'queue', 'top10')}
                                 >
                                 <div className="song-image-wrapper">
                                     <img src={song.cover || 'assets/anhmau.png'} alt={song.title} />

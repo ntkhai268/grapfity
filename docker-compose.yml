@@ -29,6 +29,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+      - ES_JAVA_TOOL_OPTIONS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
     volumes:

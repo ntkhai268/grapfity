@@ -44,20 +44,25 @@ export const recommendForHome = async (userId) => {
     where: { id: trackIds },
     include: [
       {
-        model: db.Metadata,
-        attributes: ['duration_ms'], 
-      },
-      {
         model: db.User,
         attributes: ["userName"],
       },
     ],
   });
 
+  //dùng include metadata không được nên hard code
+  for (const track of tracks) {
+    const metadata = await db.Metadata.findOne({ 
+      where: { track_id: track.id }, 
+      attributes: ["trackname"] 
+    });
+    track.trackname = metadata?.trackname || null;
+  }
+
   const result = tracks.map((track) => ({
     id: track.id,
     src: track.trackUrl,
-    title: track.Metadata?.duration_ms || "Không rõ tên",
+    title: track.trackname || "Không rõ tên",
     artist: track.User?.userName || "Không rõ nghệ sĩ",
     cover: track.imageUrl,
   }));

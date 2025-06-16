@@ -97,7 +97,7 @@ END;
 GO
 
 
-ALTER TABLE dbo.Tracks DROP CONSTRAINT DF__Tracks__status__37A5467C;
+ALTER TABLE dbo.Tracks DROP CONSTRAINT chk_track_status;
 GO
 
 ALTER TABLE dbo.Tracks DROP COLUMN status;
@@ -135,7 +135,7 @@ BEGIN
     SET IDENTITY_INSERT [dbo].[Users] OFF 
 END
 
-IF NOT EXISTS (SELECT 1 FROM [dbo].[Tracks] WHERE id = 5000)
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Tracks] WHERE id = 5001)
 BEGIN 
     SET IDENTITY_INSERT [dbo].[Tracks] ON
     INSERT INTO [dbo].[Tracks] (
