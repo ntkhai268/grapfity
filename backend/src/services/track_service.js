@@ -1,6 +1,7 @@
 import { Sequelize, Transaction } from 'sequelize';
 import db from '../models/index.js';
 import { extractMetadata, checkMetadataSimilarity} from '../services/metadata_service.js';
+import { indexTrack, deleteEntity } from './search_service.js';
 
 const getAllTracks = async () => {
     return await db.Track.findAll({
@@ -183,6 +184,8 @@ const createTrack = async ({
   release_date,
   lyrics
 });
+  const uploader = await db.User.findByPk(uploaderId);
+  await indexTrack(newTrack, metadata, uploader);
 
   return newTrack;
 };
@@ -213,6 +216,7 @@ const deleteTrack = async (trackId) => {
       individualHooks: true,
       transaction: t,
     });
+    await deleteEntity('track', trackId);
     return true;
   });
 };

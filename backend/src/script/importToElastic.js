@@ -28,7 +28,8 @@ async function importToElastic() {
                 type: 'user',
                 name: user.Name,
                 username: user.userName,
-                userId: user.id
+                userId: user.id,
+                avatar: user.Avatar
             });
         });
 

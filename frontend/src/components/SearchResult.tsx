@@ -356,4 +356,4 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
   );
 };
 
-export default SearchResult;
+export default SearchResult;                                                                                                                                        

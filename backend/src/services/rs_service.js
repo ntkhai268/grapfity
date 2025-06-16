@@ -72,5 +72,35 @@ export const recommendForHome = async (userId) => {
 export const recommendForTrack = async (trackId) => {
   const metadata = await db.Metadata.findOne({ where: { track_id: trackId } });
   if (!metadata) return [];
-  return await getMostSimilarTracks(metadata, 10);
+
+  const similarTrackIds = await getMostSimilarTracks(metadata, 10);
+
+  const tracks = await db.Track.findAll({
+    where: { id: similarTrackIds },
+    include: [
+      {
+        model: db.User,
+        attributes: ["userName"],
+      },
+    ],
+  });
+
+  for (const track of tracks) {
+    const meta = await db.Metadata.findOne({ 
+      where: { track_id: track.id }, 
+      attributes: ["trackname"] 
+    });
+    track.trackname = meta?.trackname || null;
+  }
+
+  const result = tracks.map((track) => ({
+    id: track.id,
+    src: track.trackUrl,
+    title: track.trackname || "Không rõ tên",
+    artist: track.User?.userName || "Không rõ nghệ sĩ",
+    cover: track.imageUrl,
+  }));
+
+  return result;
 };
+

@@ -1,4 +1,5 @@
 import db from '../models/index.js';
+import { indexPlaylist, deleteEntity } from './search_service.js';
 const getAllPlaylistsByUserId = async (userId, currentUserId) => {
   try {
     const isOwner = Number(userId) === Number(currentUserId); // 👈 So sánh người dùng
@@ -62,8 +63,6 @@ const getAllPublicPlaylists = async () => {
   });
 };
 
-
-
 const createPlaylist = async (userId, trackId) => {
     let title, createDate, imageUrl, privacy;
     const playlistCount = await db.Playlist.count({
@@ -100,6 +99,7 @@ const createPlaylist = async (userId, trackId) => {
             trackId: trackId
         });
     }
+    await indexPlaylist(newPlaylist);
 
     return newPlaylist;
 };
@@ -230,7 +230,7 @@ const deletePlaylist = async (playlistId, userId) => {
 
   // Gọi destroy trên đối tượng đã load – sẽ tự chạy hook afterDestroy
   await playlist.destroy();
-
+  await deleteEntity('playlist', numericPlaylistId);
   return true;
 };
 

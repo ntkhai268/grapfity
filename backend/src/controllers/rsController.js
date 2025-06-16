@@ -20,15 +20,11 @@ export const getHomeRecommendationsController = async (req, res) => {
 export const getTrackRecommendationsController = async (req, res) => {
   try {
     const { trackId } = req.params;
-    const trackIds = await rsService.recommendForTrack(trackId);
-
-    const tracks = await db.Track.findAll({
-      where: { id: trackIds },
-    });
+    const result = await rsService.recommendForTrack(trackId);
 
     res.status(200).json({
       message: "Gợi ý thành công từ bài hát",
-      data: tracks,
+      data: result,
     });
   } catch (error) {
     console.error("❌ Lỗi gợi ý từ bài hát:", error);

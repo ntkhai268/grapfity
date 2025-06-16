@@ -7,4 +7,4 @@ until curl -s http://elasticsearch:9200 >/dev/null; do
 done
 
 # Gọi script khởi tạo index
-node init-indexes.js
+# node init-indexes.js

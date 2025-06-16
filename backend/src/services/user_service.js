@@ -1,6 +1,7 @@
 import db from '../models/index.js';
 import bcrypt from 'bcrypt';
 import { createJWT, verityJWT } from '../middleware/JWTActions.js';
+import { indexUser, deleteEntity } from './search_service.js';
 
 const getAllUsers = async () => {
     return db.User.findAll(); // Lấy tất cả dữ liệu trong bảng User
@@ -56,6 +57,8 @@ const createUserService = async (payload) => {
       Address: payload.Address || null,
       PhoneNumber: payload.PhoneNumber || null
     });
+
+    await indexUser(newUser);
 
     return {
       message: 'Register successful',
@@ -157,7 +160,7 @@ const deleteUser = async (userId) => {
       transaction: t,
       individualHooks: true,
     });
-    console.log('Rows deleted:', deleted); // Nếu = 0 thì afterDestroy sẽ không chạy
+    await deleteEntity('user', userId);
     return true;
   });
 };
