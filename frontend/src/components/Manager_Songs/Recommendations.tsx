@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 
-import { getTop10PopularTracksAPI } from "../../services/listeningService";
+import {getTrackRecommendationsAPI} from "../../services/listeningService";
 import { mapTrackDataToSong } from "../Section"; // hoặc copy lại hàm nếu khác file
 import { TrackData } from "../../services/trackServiceAPI";
+import { encodeBase62WithPrefix  } from "../../hooks/base62";
+
+interface RecomendProps {
+  trackId: string | number; // Lyrics sẽ nhận trackId từ component cha
+}
 
 interface ISong {
   id: number | string;
@@ -16,7 +21,7 @@ interface ISong {
   stats?: string;
   duration?: string;
 }
-const Recommendations: React.FC = () => {
+const Recommendations: React.FC<RecomendProps> = ({trackId}) => {
   const navigate = useNavigate();
   const [songs, setSongs] = useState<ISong[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -26,7 +31,7 @@ const Recommendations: React.FC = () => {
     const fetchSongs = async () => {
       setLoading(true);
       try {
-        const data: TrackData[] = await getTop10PopularTracksAPI();
+        const data: TrackData[] = await getTrackRecommendationsAPI(trackId);
         // Map sang ISong, bổ sung số thứ tự (number)
         const mappedSongs: ISong[] = data.map((track, idx) => ({
           ...mapTrackDataToSong(track),
@@ -52,7 +57,8 @@ const Recommendations: React.FC = () => {
     };
     GlobalAudioManager.setPlaylist(songs, index, context);
     GlobalAudioManager.playSongAt(index);
-    navigate("/ManagerSong", {
+    const encodedId = encodeBase62WithPrefix(Number(song.id), 22); 
+    navigate(`/ManagerSong/${encodedId}`, {
       state: {
         songs,
         currentIndex: index,

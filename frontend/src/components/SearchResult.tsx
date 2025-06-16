@@ -2,6 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import styles from "../styles/search-result.module.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { PlaylistContext, Song } from "../hooks/GlobalAudioManager";
+import { encodeBase62WithPrefix  } from "../hooks/base62";
+
+const BACKEND_URL = 'http://localhost:8080';
+// Hàm map tạm thời từ TrackData sang Song (bạn có thể đặt ở nơi khác)
+function normalizeUrl(url: string | undefined | null): string | undefined {
+  if (!url) return undefined;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url; // đã chuẩn URL
+  return `${BACKEND_URL}/${url.replace(/^\/+/, '')}`;
+}
 
 const imageModules = import.meta.glob("../assets/images/*.{png,jpg,jpeg,svg}", {
   eager: true,
@@ -70,6 +81,15 @@ type PlaylistItem = {
   imageUrl: string;
 };
 
+const convertTrackItemToSong = (track: TrackItem): Song => ({
+  id: track.trackId,        // chuyển trackId → id
+  title: track.title,
+  artist: track.artist,
+ cover: normalizeUrl(track.imageUrl),
+  src: normalizeUrl(track.trackUrl) || "",      // chuyển trackUrl → src
+});
+
+
 type SearchItem = TrackItem | UserItem | PlaylistItem;
 
 interface SearchResultProps {
@@ -81,6 +101,7 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
   const [results, setResults] = useState<SearchItem[]>([]);
   const [query, setQuery] = useState("");
   const [topResult, setTopResult] = useState<SearchItem | null>(null);
+   const navigate = useNavigate();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -143,6 +164,37 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
       .catch((err) => console.error("Lỗi khi tìm kiếm:", err));
   }, [location.search]);
 
+  const handleClicktest = (
+        song: Song,
+        list: Song[],
+        index: number,
+        type: PlaylistContext['type'],
+        contextId: string | number = type
+        ) => {
+            // 👉 1. Lưu vào localStorage để chống mất khi reload
+            localStorage.setItem("viewedSong", JSON.stringify(song));
+            localStorage.setItem("viewedPlaylist", JSON.stringify(list));
+            localStorage.setItem("viewedIndex", index.toString());
+            localStorage.setItem("currentContext", JSON.stringify({
+                type,
+                id: contextId,
+                songs: list,
+            }));
+        
+            // Mã hóa ID 
+            const encodedId = encodeBase62WithPrefix(Number(song.id), 22); // hoặc 16-22 tùy độ dài bạn muốn
+        
+            //  Điều hướng sang trang ManagerSong, truyền kèm state
+            navigate(`/ManagerSong/${encodedId}`, {
+                state: {
+                    songs: list,
+                    currentIndex: index,
+                    currentSong: song,
+                    context: { id: contextId, type },
+                },
+            });
+      };
+
   const tracks = results.filter((r): r is TrackItem => r.type === "track");
   const users = results.filter((r): r is UserItem => r.type === "user");
   const playlists = results.filter((r): r is PlaylistItem => r.type === "playlist");
@@ -183,7 +235,30 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         {topResult && (
           <div className={styles.topResultSection_result}>
             <h3 className={styles.sectionTitle_result}>Kết quả hàng đầu</h3>
-            <div className={styles.artistCard_result}>
+            <div className={styles.artistCard_result}
+             onClick={() => {
+                console.log("Đã click vào topResult:", topResult);
+
+                if (topResult.type === "user") {
+                  console.log("✅ Đây là user, chuyển hướng đến:", `/profile/${topResult.userId}`);
+                  navigate(`/profile/${topResult.userId}`);
+                }
+
+                if (topResult.type === "track") {
+                  console.log("🎵 Đây là track, mở trang ManagerSong");
+                  const song = convertTrackItemToSong(topResult);
+                  handleClicktest(song, [song], 0, "search", "search");
+                }
+
+                if (topResult.type === "playlist") {
+                  console.log("📂 Đây là playlist, chuyển hướng đến:", `/ManagerPlaylistLayout/${topResult.playlistId}`);
+                  navigate(`/ManagerPlaylistLayout/${topResult.playlistId}`);
+                }
+              }}
+              style={{
+                cursor: topResult.type === "user" ? "pointer" : "default",
+              }}
+            >
               <div className={styles.artistImageContainer_result}>
                 {renderImageOrLetter(
                   (topResult as any).imageUrl,
@@ -210,8 +285,15 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
           <div className={styles.songsSection_result}>
             <h3 className={styles.sectionTitle_result}>Bài hát</h3>
             <ul className={styles.songsList_result}>
-              {tracks.slice(0, 4).map((t) => (
-                <li key={`track-${t.trackId}`} className={styles.songItem_result}>
+               {tracks.map((t, index) =>(
+                <li key={`track-${t.trackId}`} className={styles.songItem_result}
+                  onClick={() => {
+                    const song = convertTrackItemToSong(t);
+                    const songList = tracks.map(convertTrackItemToSong);
+                    handleClicktest(song, songList, index, "search", "search");
+                  }}
+                  style={{ cursor: "pointer" }}
+                >
                   <div className={styles.songInfo_result}>
                     {renderImageOrLetter(t.imageUrl, t.title, styles.songCover_result, "square")}
                     <div className={styles.songDetails_result}>
@@ -232,7 +314,13 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
           <h3 className={styles.sectionTitle_result}>Nghệ sĩ</h3>
           <ul className={styles.artistList_result}>
             {[...relatedArtists, ...syntheticArtist].map((u) => (
-              <li key={`user-${u.userId}`} className={styles.artistItem_result}>
+              <li key={`user-${u.userId}`} className={styles.artistItem_result}
+                onClick={() => {
+                  console.log("👤 Click vào artist:", u.name, "→ /profile/" + u.userId);
+                  navigate(`/profile/${u.userId}`);
+                }}
+                style={{ cursor: "pointer" }}
+              >
                 {renderImageOrLetter("", u.name, styles.artistAvatar_result)}
                 <p className={styles.artistName_result}>{u.name}</p>
               </li>
@@ -246,7 +334,13 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
           <h3 className={styles.sectionTitle_result}>Playlist</h3>
           <ul className={styles.playlistList_result}>
             {playlists.map((p) => (
-              <li key={`playlist-${p.playlistId}`} className={styles.playlistItem_result}>
+              <li key={`playlist-${p.playlistId}`} className={styles.playlistItem_result}
+                 onClick={() => {
+                    console.log("📂 Click playlist:", p.title, "→ /ManagerPlaylistLayout/" + p.playlistId);
+                    navigate(`/ManagerPlaylistLayout/${p.playlistId}`);
+                  }}
+                  style={{ cursor: "pointer" }}
+              >
                 {renderImageOrLetter(p.imageUrl, p.title, styles.playlistCover_result, "square")}
                 <p className={styles.playlistTitle_result}>{p.title}</p>
               </li>

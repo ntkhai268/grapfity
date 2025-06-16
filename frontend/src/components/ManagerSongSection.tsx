@@ -188,8 +188,8 @@ if (!viewSong) {
               
             />
             <Lyrics trackId={viewSong?.id ?? null} />
-            <Recommendations/>
-            <PopularSongs/>
+            <Recommendations trackId={viewSong?.id ?? null}/>
+            <PopularSongs trackId={viewSong?.id ?? null}/>
           </div>
         </div>
       </div>

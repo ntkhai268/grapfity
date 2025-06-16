@@ -125,6 +125,13 @@ const App = () => {
       if (!rawSongs) return null;
       return JSON.parse(rawSongs) as Song[];
     }
+    if (context.type === 'search') {
+        const raw = localStorage.getItem("currentContext");
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            console.log("🔎 Đang phục hồi playlist từ search:", parsed);
+            return parsed.songs || null;
+        }}
       return null; // Không hỗ trợ context này
     } catch {
       return null;

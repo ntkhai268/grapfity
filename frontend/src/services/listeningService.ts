@@ -104,6 +104,8 @@ export const getHomeRecommendationsAPI = async () => {
 }
 
 export const getTrackRecommendationsAPI = async (trackId: string | number) => {
+  console.log("Fetching recommendations for track:", trackId);
   const res = await axios.get(`${API_BASE_URL}/recommend/track/${trackId}`);
-  return res.data;
+  console.log("Recommendations response:", res.data);
+  return res.data.data;
 }

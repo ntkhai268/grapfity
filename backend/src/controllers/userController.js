@@ -134,6 +134,7 @@ const handleUserLoginController = async (req, res) => {
 };
 
 const updateUserController = async (req, res) => {
+  console.log("✅ [updateUserController] req.body:", req.body);
     try {
         const userId = req.userId;
 

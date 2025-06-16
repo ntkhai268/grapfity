@@ -5,6 +5,11 @@ import GlobalAudioManager from "../../hooks/GlobalAudioManager";
 import { getTop10PopularTracksAPI } from "../../services/listeningService";
 import { mapTrackDataToSong } from "../Section"; // hoặc copy lại hàm nếu khác file
 import { TrackData } from "../../services/trackServiceAPI";
+import { encodeBase62WithPrefix  } from "../../hooks/base62";
+
+interface PopularProps {
+  trackId: string | number | null; // Lyrics sẽ nhận trackId từ component cha
+}
 
 interface ISong {
   id: number | string;
@@ -16,9 +21,10 @@ interface ISong {
   stats?: string;
   duration?: string;
 }
-const PopularSongs: React.FC = () => {
+const PopularSongs: React.FC<PopularProps> = ({trackId}) => {
   const navigate = useNavigate();
   const [songs, setSongs] = useState<ISong[]>([]);
+  const [recommendations, setRecommendations] = useState<ISong[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [expanded, setExpanded] = useState(false);
 
@@ -52,7 +58,8 @@ const PopularSongs: React.FC = () => {
     };
     GlobalAudioManager.setPlaylist(songs, index, context);
     GlobalAudioManager.playSongAt(index);
-    navigate("/ManagerSong", {
+    const encodedId = encodeBase62WithPrefix(Number(song.id), 22); 
+    navigate(`/ManagerSong/${encodedId}`, {
       state: {
         songs,
         currentIndex: index,

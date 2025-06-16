@@ -96,6 +96,165 @@ BEGIN
 END;
 GO
 
+DECLARE @constraintName NVARCHAR(200);
+DECLARE constraint_cursor0 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'Tracks';
+
+OPEN constraint_cursor0;
+FETCH NEXT FROM constraint_cursor0 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql NVARCHAR(MAX);
+    SET @sql = 'ALTER TABLE Tracks DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor0 INTO @constraintName;
+END
+CLOSE constraint_cursor0;
+DEALLOCATE constraint_cursor0;
+
+DECLARE @constraintName1 NVARCHAR(200);
+DECLARE constraint_cursor1 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'Playlists';
+
+OPEN constraint_cursor1;
+FETCH NEXT FROM constraint_cursor1 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql1 NVARCHAR(MAX);
+    SET @sql1 = 'ALTER TABLE Playlists DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor1 INTO @constraintName;
+END
+CLOSE constraint_cursor1;
+DEALLOCATE constraint_cursor1;
+
+DECLARE @constraintName2 NVARCHAR(200);
+DECLARE constraint_cursor2 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'PlaylistTracks';
+
+OPEN constraint_cursor2;
+FETCH NEXT FROM constraint_cursor2 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql2 NVARCHAR(MAX);
+    SET @sql2 = 'ALTER TABLE PlaylistTracks DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor2 INTO @constraintName;
+END
+
+CLOSE constraint_cursor2;
+DEALLOCATE constraint_cursor2;
+
+DECLARE @constraintName3 NVARCHAR(200);
+DECLARE constraint_cursor3 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'Metadata';
+
+OPEN constraint_cursor3;
+FETCH NEXT FROM constraint_cursor3 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql3 NVARCHAR(MAX);
+    SET @sql = 'ALTER TABLE Metadata DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor3 INTO @constraintName;
+END
+
+CLOSE constraint_cursor3;
+DEALLOCATE constraint_cursor3;
+
+DECLARE @constraintName4 NVARCHAR(200);
+DECLARE constraint_cursor4 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'Likes';
+
+OPEN constraint_cursor4;
+FETCH NEXT FROM constraint_cursor4 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql4 NVARCHAR(MAX);
+    SET @sql = 'ALTER TABLE Likes DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor4 INTO @constraintName;
+END
+
+CLOSE constraint_cursor4;
+DEALLOCATE constraint_cursor4;
+
+DECLARE @constraintName5 NVARCHAR(200);
+DECLARE constraint_cursor5 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'listeningHistories';
+
+OPEN constraint_cursor5;
+FETCH NEXT FROM constraint_cursor5 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql5 NVARCHAR(MAX);
+    SET @sql = 'ALTER TABLE listeningHistories DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor5 INTO @constraintName;
+END
+
+CLOSE constraint_cursor5;
+DEALLOCATE constraint_cursor5;
+
+DECLARE @constraintName6 NVARCHAR(200);
+DECLARE constraint_cursor6 CURSOR FOR
+SELECT f.name
+FROM sys.foreign_keys AS f
+WHERE OBJECT_NAME(f.parent_object_id) = 'searchHistories';
+
+OPEN constraint_cursor6;
+FETCH NEXT FROM constraint_cursor6 INTO @constraintName;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    DECLARE @sql6 NVARCHAR(MAX);
+    SET @sql = 'ALTER TABLE searchHistories DROP CONSTRAINT [' + @constraintName + '];';
+    EXEC sp_executesql @sql;
+
+    PRINT 'Đã xóa constraint: ' + @constraintName;
+
+    FETCH NEXT FROM constraint_cursor6 INTO @constraintName;
+END
+
+CLOSE constraint_cursor6;
+DEALLOCATE constraint_cursor6;
+
 
 ALTER TABLE dbo.Tracks DROP CONSTRAINT chk_track_status;
 GO
