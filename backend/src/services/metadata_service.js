@@ -11,7 +11,7 @@ const extractMetadata = async (filePath) => {
     form.append('file', fs.createReadStream(absolutePath));
 
     const response = await axios.post(
-      'http://extract-track-feature:5000/extract', // hoặc http://localhost:5000 nếu test local
+      'http://extract-track-feature:5000/extract',
       form,
       {
         headers: form.getHeaders()
@@ -101,7 +101,66 @@ const checkMetadataSimilarity = async (metadata) => {
   return true;
 };
 
+const getMostSimilarTracks = async (metadata, count = 10) => {
+  const numericFields = ['duration_ms', 'loudness', 'tempo', 'key', 'mode', 'energy'];
+
+  // Cập nhật lại min/max nếu có metadata mới
+  for (const field of numericFields) {
+    updateStatsWithNewValue(field, metadata[field], metadataStats);
+  }
+
+  const normalize = (val, field, stats) => {
+    const min = stats[field].min;
+    const max = stats[field].max;
+    if (min === max) return 0.5;
+    return (val - min) / (max - min);
+  };
+
+  const numericVec = numericFields.map(f => normalize(metadata[f], f, metadataStats));
+  const embeddingVec = metadata.embedding || [];
+  const inputVec = [...numericVec, ...embeddingVec];
+
+  const distance = (a, b) => {
+    return Math.sqrt(a.reduce((sum, ai, i) => {
+      const bi = b[i];
+      return sum + (ai - bi) ** 2;
+    }, 0));
+  };
+
+  // Lấy metadata hiện có từ DB
+  const existingMetadatas = await db.Metadata.findAll({
+    attributes: ['track_id', ...numericFields, 'embedding'],
+  });
+
+  const distances = [];
+
+  for (const row of existingMetadatas) {
+    const emb = row.embedding;
+    if (!Array.isArray(emb)) continue;
+
+    const rowNumericVec = numericFields.map(f =>
+      normalize(parseFloat(row[f]), f, metadataStats)
+    );
+
+    const rowVec = [...rowNumericVec, ...emb];
+    const d = distance(inputVec, rowVec);
+
+    distances.push({
+      trackId: row.track_id,
+      distance: d,
+    });
+  }
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  const result = distances.slice(0, count).map(item => item.trackId);
+
+  return result;
+};
+
+
 export {
   extractMetadata,
-  checkMetadataSimilarity
+  checkMetadataSimilarity,
+  getMostSimilarTracks
 };

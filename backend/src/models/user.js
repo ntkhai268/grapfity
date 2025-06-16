@@ -6,14 +6,10 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       User.hasMany(models.Track, {
         foreignKey: 'uploaderId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
 
       User.hasMany(models.Playlist, {
         foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
       User.hasMany(models.Like, {
         foreignKey: 'userId',
@@ -27,8 +23,8 @@ export default (sequelize, DataTypes) => {
 
       User.belongsTo(models.Role, {
         foreignKey: 'roleId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
+        onDelete: 'RESTRICT',
+        onUpdate: 'RESTRICT'
       })
     }
   }
@@ -50,12 +46,27 @@ export default (sequelize, DataTypes) => {
   });
 
   User.addHook('afterDestroy', async (user, options) => {
-    const { listeningHistory, Like} = sequelize.models;
-    await Promise.all([
-      listeningHistory.destroy({ where: { userId: user.id }, transaction: options.transaction }),
-      Like.destroy({ where: { userId: user.id }, transaction: options.transaction }),
-    ]);
-  })
+    const { Track, Like, Playlist, listeningHistory, Metadata, PlaylistTrack, searchHistory} = sequelize.models;
+
+    const userTracks = await Track.findAll({
+      where: { uploaderId: user.id },
+      transaction: options.transaction
+    });
+    console.log('userTracks: ', userTracks);
+
+    for (const track of userTracks) {
+      await Metadata.destroy({ where: { track_id: track.id }, transaction: options.transaction });
+      await Like.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+      await listeningHistory.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+      await PlaylistTrack.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+    }
+
+    await Track.destroy({ where: { uploaderId: user.id }, transaction: options.transaction });
+    await Playlist.destroy({ where: { userId: user.id }, transaction: options.transaction });
+    await Like.destroy({ where: { userId: user.id }, transaction: options.transaction });
+    await listeningHistory.destroy({ where: { userId: user.id }, transaction: options.transaction });
+    await searchHistory.destroy({ where: { userId: user.id }, transaction: options.transaction });
+  });
 
   return User;
 };

@@ -42,11 +42,11 @@ const getTrackById = async trackId => {
       }, {
         model: db.Metadata,
         attributes: [
-        // Liệt kê các trường bạn muốn lấy từ Metadatum
-        'trackname', 'duration_ms', 'explicit', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'time_signature', 'year', 'release_date', 'lyrics' // <<<--- ĐẢM BẢO LẤY TRƯỜNG 'lyrics'
+          // Liệt kê các trường bạn muốn lấy từ Metadatum
+          'trackname', 'duration_ms', 'explicit', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo', 'time_signature', 'year', 'release_date', 'lyrics' // <<<--- ĐẢM BẢO LẤY TRƯỜNG 'lyrics'
         ]
       }
-      // Bạn có thể include thêm các model khác liên quan đến Track nếu cần
+        // Bạn có thể include thêm các model khác liên quan đến Track nếu cần
       ]
     });
     if (!track) {
@@ -217,22 +217,22 @@ const getTracksByUserId = async userId => {
       uploaderId: userId
     },
     include: [
-    // 1) Lấy trackname từ Metadata, dùng alias 'Metadatum'
-    // 2) Lấy lịch sử nghe, dùng alias 'listeningHistories'
-    {
-      model: db.User,
-      attributes: [['name', 'UploaderName']],
-      required: false
-    }, {
-      model: db.listeningHistory,
-      attributes: ['listenCount', 'createdAt'],
-      include: [
-      // 3) Lấy thông tin listener, dùng alias 'listener'
       {
         model: db.User,
-        attributes: ['id', 'Name']
+        attributes: [['name', 'UploaderName']],
+        required: false
+      }, {
+        model: db.listeningHistory,
+        attributes: ['listenCount', 'createdAt'],
+        include: [
+          {
+            model: db.User,
+            attributes: ['id', 'Name']
+          }]
+      },{
+        model: db.Metadata,
+        attributes: ['trackname']
       }]
-    }]
   });
 };
 

@@ -10,7 +10,7 @@ const getAllPlaylistsByUserId = async (userId, currentUserId) => {
       },
       include: [
          {
-            model: db.User, // ✅ Lấy người tạo playlist
+            model: db.User,
             attributes: ['id', 'Name'] 
           },
         {
@@ -205,97 +205,33 @@ const updatePlaylist = async (playlistId, userId, title, imageUrl, privacy) => {
     }
 };
 
-
-
 const deletePlaylist = async (playlistId, userId) => {
-    // Validate input (đảm bảo ID là số hợp lệ)
-    const numericPlaylistId = Number(playlistId);
-    if (isNaN(numericPlaylistId) || !userId) {
-        const error = new Error("Dữ liệu không hợp lệ (playlistId hoặc userId).");
-        error.statusCode = 400;
-        throw error;
+  const numericPlaylistId = Number(playlistId);
+  if (isNaN(numericPlaylistId) || !userId) {
+    const error = new Error("Dữ liệu không hợp lệ (playlistId hoặc userId).");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  // Kiểm tra quyền sở hữu playlist
+  const playlist = await db.Playlist.findOne({
+    where: {
+      id: numericPlaylistId,
+      userId: userId
     }
+  });
 
-    // Sử dụng transaction để đảm bảo cả hai thao tác xóa đều thành công hoặc thất bại cùng nhau
-    const t = await db.sequelize.transaction(); // <-- Bắt đầu transaction
+  if (!playlist) {
+    const exists = await db.Playlist.findByPk(numericPlaylistId);
+    const error = new Error(exists ? "Permission denied" : "Playlist not found");
+    error.statusCode = exists ? 403 : 404;
+    throw error;
+  }
 
-    try {
-        // --- BƯỚC 1: Kiểm tra sự tồn tại và quyền sở hữu của Playlist ---
-        console.log(`[Service] Checking ownership for playlist ${numericPlaylistId}, user ${userId}`);
-        const playlistToDelete = await db.Playlist.findOne({
-            where: {
-                id: numericPlaylistId, // Giả sử cột ID trong Playlist là 'id'
-                // --- SỬA TÊN CỘT Ở ĐÂY ---
-                // Sử dụng tên cột 'userId' (viết hoa I) như trong schema DB
-                userId: userId
-                // -------------------------
-            },
-            transaction: t // Thực hiện trong transaction
-        });
+  // Gọi destroy trên đối tượng đã load – sẽ tự chạy hook afterDestroy
+  await playlist.destroy();
 
-        // Nếu không tìm thấy playlist hoặc không đúng chủ sở hữu
-        if (!playlistToDelete) {
-            // Kiểm tra xem playlist có tồn tại nhưng không thuộc user này không
-            const exists = await db.Playlist.findByPk(numericPlaylistId, { transaction: t });
-            if (exists) {
-                console.warn(`[Service] Permission denied for user ${userId} on playlist ${numericPlaylistId}`);
-                const error = new Error('Permission denied'); // Không có quyền
-                error.statusCode = 403;
-                throw error; // Lỗi sẽ được bắt và rollback ở catch
-            } else {
-                console.warn(`[Service] Playlist ${numericPlaylistId} not found`);
-                const error = new Error('Playlist not found'); // Không tìm thấy
-                error.statusCode = 404;
-                throw error; // Lỗi sẽ được bắt và rollback ở catch
-            }
-        }
-
-        // --- BƯỚC 2: Xóa các liên kết trong PlaylistTrack TRƯỚC ---
-        console.log(`[Service] Deleting PlaylistTrack entries for playlist ${numericPlaylistId}`);
-        await db.PlaylistTrack.destroy({
-            where: {
-                // --- SỬA TÊN CỘT Ở ĐÂY ---
-                // Sử dụng tên cột 'playlistId' (viết hoa I) như trong schema DB
-                playlistId: numericPlaylistId
-                // -------------------------
-            },
-            transaction: t // Thực hiện trong transaction
-        });
-
-        // --- BƯỚC 3: Xóa bản ghi Playlist ---
-        console.log(`[Service] Deleting Playlist ${numericPlaylistId}`);
-        // Không cần `where` nữa vì đã tìm thấy và kiểm tra quyền ở Bước 1
-        // Chỉ cần destroy đối tượng đã tìm thấy
-        await playlistToDelete.destroy({ transaction: t });
-
-        // --- BƯỚC 4: Commit Transaction ---
-        await t.commit(); // Hoàn tất transaction nếu mọi thứ thành công
-        console.log(`[Service] Playlist ${numericPlaylistId} deleted successfully.`);
-
-    } catch (error) {
-        // Nếu có lỗi, rollback transaction
-        console.error(`[Service] Error deleting playlist ${numericPlaylistId}:`, error);
-        // Đảm bảo rollback chỉ được gọi một lần và khi transaction còn hoạt động
-        if (t && !t.finished) { // Kiểm tra xem transaction đã kết thúc chưa
-             await t.rollback();
-             console.log(`[Service] Transaction rolled back for playlist ${numericPlaylistId}.`);
-        }
-
-
-        // Ném lại lỗi để controller xử lý (giữ nguyên statusCode nếu có)
-        if (!error.statusCode) {
-            // Kiểm tra xem có phải lỗi từ DB không
-             if (error.name === 'SequelizeDatabaseError') {
-                 // Có thể đây là lỗi "Invalid column name" hoặc lỗi DB khác
-                 console.error("[Service] Database Error:", error.original?.message || error.message);
-                 // Không ghi đè statusCode nếu đã có
-                 if(!error.statusCode) error.statusCode = 500;
-             } else {
-                 error.statusCode = 500; // Lỗi server mặc định cho các lỗi khác
-             }
-        }
-        throw error;
-    }
+  return true;
 };
 
 

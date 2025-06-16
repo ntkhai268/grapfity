@@ -14,7 +14,7 @@ export interface MinimalTrack {
 }
 
 export interface Artist {
-  id?: number; // optional vì trong dữ liệu hiện tại không có id
+  id?: number;
   UploaderName: string;
 }
 
@@ -24,7 +24,7 @@ export interface TrackWithCount extends MinimalTrack {
   artist?: Artist;
 }
 
-// Chuyển '../public/assets/...' hoặc '../assets/...' → '/assets/...'
+// Chuyển đường dẫn ../public/assets/... hoặc ../assets/... thành /assets/...
 function toPublicPath(p: string): string {
   return p
     .replace(/^\.\.\/public/, '')
@@ -40,14 +40,18 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       trackUrl: string;
       imageUrl: string;
       uploaderId: number;
+      privacy: string;
       createdAt: string;
       updatedAt: string;
-      User: { UploaderName: string };
+      User: {
+        UploaderName: string;
+      };
       listeningHistories: Array<{
-        metadata: { trackname: string } | null;
         listenCount: number;
-        listener: { id: number; Name: string };
       }>;
+      Metadatum: {
+        trackname: string;
+      };
     }>;
   }>('/api/tracks/user');
 
@@ -57,8 +61,7 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
       0
     );
 
-    const metaEntry = item.listeningHistories.find(h => h.metadata?.trackname);
-    const trackName = metaEntry?.metadata?.trackname ?? null;
+    const trackName = item.Metadatum?.trackname ?? null;
 
     const base: MinimalTrack = {
       id: item.id,
@@ -77,6 +80,8 @@ export async function getUserTracks(): Promise<TrackWithCount[]> {
     };
   });
 
+  // Sắp xếp theo lượt nghe giảm dần
   tracks.sort((a, b) => b.listenCount - a.listenCount);
+
   return tracks;
 }

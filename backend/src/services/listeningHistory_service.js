@@ -7,7 +7,7 @@ const getListeningHistoryOfUser = async (userId) => {
     include: [
       {
         model: db.Track,
-        attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'status', 'createdAt'],
+        attributes: ['id', 'trackUrl', 'imageUrl', 'uploaderId', 'createdAt'],
         include: [
           {
             model: db.Metadata,

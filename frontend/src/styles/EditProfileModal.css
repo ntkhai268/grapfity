@@ -90,3 +90,17 @@
   border: none;
   cursor: pointer;
 }
+.delete_button {
+  background-color: #e53935; /* đỏ */
+  color: white;
+}
+
+.delete_button:hover {
+  background-color: #c62828; /* đỏ đậm hơn khi hover */
+}
+
+.delete_button:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}

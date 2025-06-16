@@ -6,8 +6,6 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       Metadata.belongsTo(models.Track, {
         foreignKey: 'track_id',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
     }
   }

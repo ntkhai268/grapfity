@@ -54,21 +54,6 @@ const getTrackById = async (trackId) => {
                     attributes: [ // Liệt kê các trường bạn muốn lấy từ Metadatum
                         'trackname',
                         'duration_ms',
-                        'explicit',
-                        'danceability',
-                        'energy',
-                        'key',
-                        'loudness',
-                        'mode',
-                        'speechiness',
-                        'acousticness',
-                        'instrumentalness',
-                        'liveness',
-                        'valence',
-                        'tempo',
-                        'time_signature',
-                        'year',
-                        'release_date',
                         'lyrics' // <<<--- ĐẢM BẢO LẤY TRƯỜNG 'lyrics'
                     ]
                 }
@@ -223,42 +208,39 @@ const updateTrack = async (id, updateData, userId) => {
 
 const deleteTrack = async (trackId) => {
   await db.sequelize.transaction(async (t) => {
-    await db.PlaylistTrack.destroy({ where: { trackId }, transaction: t });
-
     await db.Track.destroy({
       where: { id: trackId },
       individualHooks: true,
       transaction: t,
     });
+    return true;
   });
 };
 
 
 //dangkhoi them
-const getTracksByUserId = async (userId) => {
+const getTracksByUserId = async userId => {
   return await db.Track.findAll({
-    where: { uploaderId: userId },
-    
+    where: {
+      uploaderId: userId
+    },
     include: [
-      // 1) Lấy trackname từ Metadata, dùng alias 'Metadatum'
-      // 2) Lấy lịch sử nghe, dùng alias 'listeningHistories'
       {
         model: db.User,
         attributes: [['name', 'UploaderName']],
         required: false
-      },
-      {
+      }, {
         model: db.listeningHistory,
         attributes: ['listenCount', 'createdAt'],
         include: [
-          // 3) Lấy thông tin listener, dùng alias 'listener'
           {
             model: db.User,
             attributes: ['id', 'Name']
-          }
-        ]
-      }
-    ]
+          }]
+      },{
+        model: db.Metadata,
+        attributes: ['trackname']
+      }]
   });
 };
 

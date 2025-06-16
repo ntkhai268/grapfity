@@ -14,7 +14,8 @@ router.get('/users/me', authenticateUser, getUserProfileController); // để us
 router.get('/users/profile/:id', getUserProfileController); // hàm để user coi profile của nhau
 router.get('/users/:id', getUserProfileController); 
 router.put('/users/me', authenticateUser,uploadUserImage, updateUserController);
-router.delete('/delete-user/', deleteUserController) //sử dụng hàm getAllUsers để xử lý request cho route /users
+router.delete('/delete-user/',authenticateUser, deleteUserController)
+router.delete('/delete-user/:id',authenticateUser, deleteUserController)
 router.post('/verify-password', authenticateUser, verifyPasswordController);
 router.put('/users/:id',authenticateUser, updateUserController);
 

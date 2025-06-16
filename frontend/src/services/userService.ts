@@ -116,7 +116,8 @@ export const updateUser = async (formData: FormData): Promise<{ message: string 
 
 // ❌ Xóa người dùng (chính mình hoặc bởi admin)
 export const deleteUser = async (id?: number): Promise<{ message: string }> => {
-  const url = id ? `${USERS_API}/${id}` : `${API_BASE_URL}/api/delete-user`;
+  const url = id ? `${API_BASE_URL}/api/delete-users/${id}` : `${API_BASE_URL}/api/delete-user`;
+  console.log("Deleting user at URL:", url);
   const resp = await axios.delete(url, {
     withCredentials: true,
   });

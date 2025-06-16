@@ -152,16 +152,12 @@ const deleteUser = async (userId) => {
     const user = await db.User.findByPk(userId, { transaction: t });
     if (!user) throw new Error('User not found');
 
-    // Ví dụ: xóa playlist, tracks liên quan (nếu cần)
-    await db.Track.destroy({ where: { userId }, transaction: t });
-    await db.Playlist.destroy({ where: { userId }, transaction: t });
-
-    await db.User.destroy({
+    const deleted = await db.User.destroy({
       where: { id: userId },
       transaction: t,
       individualHooks: true,
     });
-
+    console.log('Rows deleted:', deleted); // Nếu = 0 thì afterDestroy sẽ không chạy
     return true;
   });
 };

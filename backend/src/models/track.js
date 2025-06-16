@@ -7,8 +7,6 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       Track.belongsTo(models.User, {
         foreignKey: 'uploaderId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
       });
 
       Track.belongsToMany(models.Playlist, {
@@ -27,8 +25,6 @@ export default (sequelize, DataTypes) => {
 
       Track.hasOne(models.Metadata, {
         foreignKey: 'track_id',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
       });
     }
   }
@@ -51,9 +47,14 @@ export default (sequelize, DataTypes) => {
   });
 
   Track.addHook('afterDestroy', async (track, options) => {
-    const { listeningHistory } = sequelize.models;
+    const { Like, listeningHistory, Metadata, PlaylistTrack } = sequelize.models;
+
+    await PlaylistTrack.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+    await Like.destroy({ where: { trackId: track.id }, transaction: options.transaction });
     await listeningHistory.destroy({ where: { trackId: track.id }, transaction: options.transaction });
+    await Metadata.destroy({ where: { track_id: track.id }, transaction: options.transaction });
   });
+
 
   return Track;
 };

@@ -156,6 +156,7 @@ export const getAllPublicPlaylistsAPI = async (): Promise<PlaylistData[]> => {
 export const createPlaylistAPI = async (trackId?: string | number | null): Promise<PlaylistData | null> => {
     console.log(`Attempting to create playlist`, trackId ? `from track: ${trackId}` : '(empty)');
     try {
+        console.log("Sending POST request to create playlist...");
         const response = await axios.post<any>(`${API_BASE_URL}/`,
             { trackId: trackId },
             { withCredentials: true }

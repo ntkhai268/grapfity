@@ -340,10 +340,9 @@ const getTracksByUserController = async (req, res) => {
 
     // 1. Lấy toàn bộ tracks kèm listeningHistories
     const tracks = await getTracksByUserId(userId);
-
+    console.log(tracks);
     // 2. Chuyển về plain object và chỉ giữ listenCount + listener
     const filtered = tracks.map(track => {
-      // toJSON() để có object thuần
       const t = track.toJSON();
       return {
         ...t,

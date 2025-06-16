@@ -6,8 +6,6 @@ export default (sequelize, DataTypes) => {
     static associate(models) {
       searchHistory.belongsTo(models.User, {
         foreignKey: 'userId',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE'
       });
     }
   }

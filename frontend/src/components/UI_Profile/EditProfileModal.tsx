@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'reac
 import { UserType } from '../../services/userService';
 import '../../styles/EditProfileModal.css';
 import { verifyPassword } from '../../services/authService';
+import { deleteUser } from '../../services/userService';
 
 interface EditProfileModalProps {
   user: UserType; 
@@ -18,6 +19,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
   const [isEditing, setIsEditing] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
 
   useEffect(() => {
     setFormData({ ...user, password: '' });
@@ -102,65 +105,120 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({ user, onClose, onSa
   };
 
 
+const handleDeleteAccount = async (e: FormEvent) => {
+  e.preventDefault();
+  if (!oldPassword) {
+    alert("Vui lòng nhập mật khẩu để xác nhận xoá tài khoản.");
+    return;
+  }
 
+  const isValid = await verifyPassword(oldPassword);
+  if (!isValid) {
+    alert("❌ Mật khẩu không đúng.");
+    return;
+  }
+
+  const confirmed = window.confirm("⚠️ Bạn có chắc chắn muốn xóa tài khoản này không?");
+  if (confirmed) {
+    await deleteUser();
+    alert("✅ Tài khoản đã được xoá.");
+    onClose(); // hoặc redirect logout
+  }
+};
   return (
-    <div className="modal_overlay">
-      <form className="modal_content" onSubmit={handleSave}>
-        <div className="modal_header">
-          <h2>Thông tin người dùng</h2>
-          <button type="button" onClick={onClose} className="modal_close">&times;</button>
+  <div className="modal_overlay">
+    <form className="modal_content" onSubmit={isDeleting ? handleDeleteAccount : handleSave}>
+      <div className="modal_header">
+        <h2>Thông tin người dùng</h2>
+        <button type="button" onClick={onClose} className="modal_close">&times;</button>
+      </div>
+
+      <div className="modal_body">
+        <div className="avatar_section" onClick={handleImageClick}>
+          <img
+            src={formData.Avatar || 'assets/User_alt@3x.png'}
+            alt="avatar"
+            className="avatar_preview"
+            style={{ cursor: isEditing ? 'pointer' : 'default' }}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+            style={{ display: 'none' }}
+          />
         </div>
 
-        <div className="modal_body">
-          <div className="avatar_section" onClick={handleImageClick}>
-            <img
-              src={formData.Avatar || 'assets/User_alt@3x.png'}
-              alt="avatar"
-              className="avatar_preview"
-              style={{ cursor: isEditing ? 'pointer' : 'default' }}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handleAvatarChange}
-              style={{ display: 'none' }}
-            />
-          </div>
-
-          <div className="input_section">
-            <input name="userName" value={formData.userName} onChange={handleChange} placeholder="Tên đăng nhập" readOnly={!isEditing} />
-            <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" readOnly={!isEditing} />
-
-            {isEditing && (
-              <>
-                <input type="password" name="password" value={oldPassword}  onChange={(e) => setOldPassword(e.target.value)} placeholder="Nhập mật khẩu hiện tại" />
-                <input type="password" name="password"  value={newPassword}onChange={(e) => setNewPassword(e.target.value)} placeholder="Nhập mật khẩu mới" />
-                <input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange} placeholder="Xác nhận mật khẩu mới" />
-                {passwordError && <div className="error_text">{passwordError}</div>}
-              </>
-            )}
-
-            <input name="Name" value={formData.Name} onChange={handleChange} placeholder="Họ và tên" readOnly={!isEditing} />
-            <input type="date" name="Birthday" value={formData.Birthday?.toString().split('T')[0] || ''} onChange={handleChange} readOnly={!isEditing} />
-            <input name="Address" value={formData.Address ?? ''} onChange={handleChange} placeholder="Địa chỉ" readOnly={!isEditing} />
-            <input name="PhoneNumber" value={formData.PhoneNumber ?? ''} onChange={handleChange} placeholder="Số điện thoại" readOnly={!isEditing} />
-          </div>
-        </div>
-
-        <div className="modal_footer">
-          {!isEditing ? (
-            <button type="button" className="edit_button_profile" onClick={() => setIsEditing(true)}>Edit</button>
-          ) : (
+        <div className="input_section">
+          {!isDeleting && (
             <>
-              <button type="button" className="cancel_button" onClick={() => setIsEditing(false)}>Cancel</button>
-              <button type="submit" className="save_button" disabled={!!passwordError}>Save</button>
+              <input name="userName" value={formData.userName} onChange={handleChange} placeholder="Tên đăng nhập" readOnly={!isEditing} />
+              <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" readOnly={!isEditing} />
+            </>
+          )}
+
+          {(isEditing || isDeleting) && (
+            <>
+              <input
+                type="password"
+                name="password"
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                placeholder="Nhập mật khẩu hiện tại"
+              />
+              {!isDeleting && (
+                <>
+                  <input
+                    type="password"
+                    name="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Nhập mật khẩu mới"
+                  />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    placeholder="Xác nhận mật khẩu mới"
+                  />
+                  {passwordError && <div className="error_text">{passwordError}</div>}
+                </>
+              )}
+            </>
+          )}
+
+          {!isDeleting && (
+            <>
+              <input name="Name" value={formData.Name} onChange={handleChange} placeholder="Họ và tên" readOnly={!isEditing} />
+              <input type="date" name="Birthday" value={formData.Birthday?.toString().split('T')[0] || ''} onChange={handleChange} readOnly={!isEditing} />
+              <input name="Address" value={formData.Address ?? ''} onChange={handleChange} placeholder="Địa chỉ" readOnly={!isEditing} />
+              <input name="PhoneNumber" value={formData.PhoneNumber ?? ''} onChange={handleChange} placeholder="Số điện thoại" readOnly={!isEditing} />
             </>
           )}
         </div>
-      </form>
-    </div>
-  );
+      </div>
+
+      <div className="modal_footer">
+        {!isEditing ? (
+          <button type="button" className="edit_button_profile" onClick={() => setIsEditing(true)}>Edit</button>
+        ) : isDeleting ? (
+          <>
+            <button type="button" className="cancel_button" onClick={() => setIsDeleting(false)}>Cancel</button>
+            <button type="submit" className="delete_button">Confirm Delete</button>
+          </>
+        ) : (
+          <>
+            <button type="button" className="delete_button" onClick={() => setIsDeleting(true)} disabled={!!passwordError}>Delete Account</button>
+            <button type="button" className="cancel_button" onClick={() => setIsEditing(false)}>Cancel</button>
+            <button type="submit" className="save_button" disabled={!!passwordError}>Save</button>
+          </>
+        )}
+      </div>
+    </form>
+  </div>
+);
+
 };
 
 export default EditProfileModal;
