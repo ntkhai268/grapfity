@@ -9,7 +9,9 @@ import playlisttrackRouter from './playlist_track_router.js';
 import likeRouter from './like_router.js';
 import listeningHistoryRouter from './listeningHistory_router.js';
 import statsRouter from './stats_router.js';
+import searchRouter from './search_router.js';
 // import metadataRouter from './metadata_router.js';
+import rsRouter from './rs_router.js';
 
 router.use('', userRouter)
 router.use('', authRouter)
@@ -36,6 +38,7 @@ router.use('', playlisttrackRouter)
 router.use('', likeRouter)
 router.use('', listeningHistoryRouter)
 router.use('', statsRouter)
-// router.use('', metadataRouter)
+router.use('/search', searchRouter);
+router.use('/', rsRouter);
 
 export default router; //export router để sử dụng ở file khác

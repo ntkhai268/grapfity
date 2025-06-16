@@ -26,6 +26,7 @@ const Header_admin: React.FC = () => {
     confirmPassword: "",
     avatar: "",
   });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [editingField, setEditingField] = useState<keyof ProfileData | "">("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -70,7 +71,7 @@ const Header_admin: React.FC = () => {
             username: data.userName || "",
             password: "",
             confirmPassword: "",
-            avatar: data.Avatar || "",
+            avatar: data.Avatar ? `http://localhost:8080${data.Avatar}` : "",
           });
         } else {
           console.error("Lỗi: Không có dữ liệu người dùng trong phản hồi", json);
@@ -82,48 +83,15 @@ const Header_admin: React.FC = () => {
     fetchProfile();
   }, []);
 
-  const handleSave = async () => {
-    if (profile.password || profile.confirmPassword) {
-      if (profile.password !== profile.confirmPassword) {
-        setPasswordError("Mật khẩu xác nhận không khớp");
-        return;
-      }
-    }
-
-    if (userId === null) return;
-    try {
-      setPasswordError("");
-      const [day, month, year] = profile.birthYear.split("-");
-      const isoBirthday = profile.birthYear
-        ? new Date(+year, +month - 1, +day).toISOString()
-        : undefined;
-
-      const payload: any = {
-        userName: profile.username,
-        email: profile.email,
-        Name: profile.name,
-        Birthday: isoBirthday,
-        Address: profile.address,
-        PhoneNumber: profile.phone,
-      };
-      if (profile.password) {
-        payload.password = profile.password;
-      }
-
-      const res = await fetch(`http://localhost:8080/api/users/${userId}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        setModalOpen(false);
-      } else {
-        console.error("Update failed:", json);
-      }
-    } catch (err) {
-      console.error(err);
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setProfile((prev) => ({
+        ...prev,
+        avatar: previewUrl,
+      }));
+      setSelectedFile(file);
     }
   };
 
@@ -189,11 +157,7 @@ const Header_admin: React.FC = () => {
         <div className="header_actions_admin">
           <div className="user_profile_admin">
             <img
-              src={
-                profile.avatar
-                  ? `http://localhost:8080${profile.avatar}`
-                  : "/placeholder.svg"
-              }
+              src={profile.avatar || "/placeholder.svg"}
               alt="avatar"
               className="user_avatar_admin"
             />
@@ -230,15 +194,20 @@ const Header_admin: React.FC = () => {
             <div className="modal_body_admin">
               <div className="profile_left_admin">
                 <img
-                  src={
-                    profile.avatar
-                      ? `http://localhost:8080${profile.avatar}`
-                      : "/placeholder.svg"
-                  }
+                  src={profile.avatar || "/placeholder.svg"}
                   alt="Profile"
                   className="profile_image_admin"
                 />
-                <button className="btn_change_avatar_admin">CHANGE</button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="upload_avatar_input"
+                  style={{ display: "none" }}
+                  onChange={handleAvatarChange}
+                />
+                <label htmlFor="upload_avatar_input" className="btn_change_avatar_admin">
+                  CHANGE
+                </label>
               </div>
               <div className="profile_right_admin">
                 {renderRow("Name", "name")}
@@ -253,7 +222,7 @@ const Header_admin: React.FC = () => {
               </div>
             </div>
             <div className="modal_footer_admin">
-              <button className="btn_save_admin" onClick={handleSave} disabled={!!passwordError}>
+              <button className="btn_save_admin" disabled={!!passwordError}>
                 SAVE
               </button>
             </div>

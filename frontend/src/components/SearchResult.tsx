@@ -14,8 +14,36 @@ Object.entries(imageModules).forEach(([path, url]) => {
 });
 function resolveImg(src: string) {
   const fileName = src.split("/").pop()!;
-  return imageMap[fileName] || src;
+  return imageMap[fileName] || "";
 }
+
+const getInitialLetter = (name: string) => {
+  return name?.charAt(0)?.toUpperCase() || "?";
+};
+
+const renderImageOrLetter = (
+  imageUrl: string | undefined,
+  fallbackName: string,
+  className: string,
+  shape: "circle" | "square" = "circle"
+) => {
+  const resolved = imageUrl ? resolveImg(imageUrl) : "";
+  const isValid = resolved && !resolved.includes("undefined");
+
+  if (isValid) {
+    return <img src={resolved} alt={fallbackName} className={className} />;
+  } else {
+    return (
+      <div
+        className={`${styles.letterAvatar_result} ${className} ${
+          shape === "square" ? styles.square : ""
+        }`}
+      >
+        {getInitialLetter(fallbackName)}
+      </div>
+    );
+  }
+};
 
 type TrackItem = {
   type: "track";
@@ -56,14 +84,16 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const q = searchParams.get("query")?.trim();
-    setQuery(q || "");
+    const q = searchParams.get("query")?.trim() || "";
+    setQuery(q);
+
     if (!q) return;
 
     axios
       .get(`http://localhost:8080/api/search?q=${encodeURIComponent(q)}`)
       .then((res) => {
-        const mapped: SearchItem[] = res.data.map((item: any): SearchItem => {
+        const mapped: SearchItem[] = (res.data as any[]).map((item): SearchItem => {
+
           if (item.type === "track") {
             return {
               type: "track",
@@ -93,8 +123,22 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
             throw new Error("Unknown item type");
           }
         });
+
         setResults(mapped);
-        setTopResult(mapped[0] || null);
+
+        const keyword = q.toLowerCase();
+        const exactTrack = mapped.find(
+          (item) => item.type === "track" && item.title.toLowerCase().includes(keyword)
+        );
+        const exactPlaylist = mapped.find(
+          (item) => item.type === "playlist" && item.title.toLowerCase().includes(keyword)
+        );
+        const exactUser = mapped.find(
+          (item) => item.type === "user" && item.name.toLowerCase().includes(keyword)
+        );
+
+        const top = exactTrack || exactPlaylist || exactUser || mapped[0] || null;
+        setTopResult(top);
       })
       .catch((err) => console.error("Lỗi khi tìm kiếm:", err));
   }, [location.search]);
@@ -102,6 +146,26 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
   const tracks = results.filter((r): r is TrackItem => r.type === "track");
   const users = results.filter((r): r is UserItem => r.type === "user");
   const playlists = results.filter((r): r is PlaylistItem => r.type === "playlist");
+
+  const primaryArtistName = tracks[0]?.artist ?? null;
+
+  const relatedArtists = primaryArtistName
+    ? users.filter((u) => u.name.toLowerCase() === primaryArtistName.toLowerCase())
+    : [];
+
+  const hasArtistInUsers = relatedArtists.length > 0;
+
+  const syntheticArtist: UserItem[] =
+    !hasArtistInUsers && primaryArtistName
+      ? [
+          {
+            type: "user",
+            userId: -1,
+            name: primaryArtistName,
+            username: primaryArtistName.toLowerCase().replace(/\s+/g, "_"),
+          },
+        ]
+      : [];
 
   if (!query) {
     return (
@@ -115,24 +179,26 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
     <div className={`${styles.search_result_section} ${sidebarExpanded ? styles.shrink : ""}`}>
       <h2 className={styles.sectionTitle_result}>Kết quả cho: <em>{query}</em></h2>
 
-      {/* --- Top result + Songs --- */}
-      <div className={styles.topGrid_result}>
+      <div className={styles.top_row}>
         {topResult && (
-          <div className={styles.topResultCard}>
-            <h3 className={styles.sectionTitle_result}>Top result</h3>
-            <div className={styles.topResultContent}>
-              <img
-                src={resolveImg((topResult as any).imageUrl || "/assets/iconnguoidung.png")}
-                alt={(topResult as any).title || (topResult as any).name}
-                className={styles.songCoverTop_result}
-              />
-              <div className={styles.songDetails_result}>
-                <h1 className={styles.songTitleTop_result}>
+          <div className={styles.topResultSection_result}>
+            <h3 className={styles.sectionTitle_result}>Kết quả hàng đầu</h3>
+            <div className={styles.artistCard_result}>
+              <div className={styles.artistImageContainer_result}>
+                {renderImageOrLetter(
+                  (topResult as any).imageUrl,
+                  (topResult as any).title || (topResult as any).name,
+                  styles.artistImage_result,
+                  "square"
+                )}
+              </div>
+              <div className={styles.songInfoTop_result}>
+                <p className={styles.songTitleTop_result}>
                   {(topResult as any).title || (topResult as any).name}
-                </h1>
+                </p>
                 <p className={styles.songArtistTop_result}>
-                  {topResult.type === "track" && (topResult as TrackItem).artist}
-                  {topResult.type === "playlist" && `Playlist #${(topResult as PlaylistItem).playlistId}`}
+                  {topResult.type === "track" && `Bài hát • ${topResult.artist}`}
+                  {topResult.type === "playlist" && `Playlist`}
                   {topResult.type === "user" && `@${(topResult as UserItem).username}`}
                 </p>
               </div>
@@ -141,22 +207,19 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         )}
 
         {tracks.length > 0 && (
-          <div className={styles.songListWrapper}>
-            <h3 className={styles.sectionTitle_result}>Songs</h3>
+          <div className={styles.songsSection_result}>
+            <h3 className={styles.sectionTitle_result}>Bài hát</h3>
             <ul className={styles.songsList_result}>
-              {tracks.map((t) => (
+              {tracks.slice(0, 4).map((t) => (
                 <li key={`track-${t.trackId}`} className={styles.songItem_result}>
                   <div className={styles.songInfo_result}>
-                    <img
-                      src={resolveImg(t.imageUrl)}
-                      alt={t.title}
-                      className={styles.songCover_result}
-                    />
+                    {renderImageOrLetter(t.imageUrl, t.title, styles.songCover_result, "square")}
                     <div className={styles.songDetails_result}>
                       <p className={styles.songTitle_result}>{t.title}</p>
                       <p className={styles.songArtist_result}>{t.artist}</p>
                     </div>
                   </div>
+                  <span className={styles.songDuration_result}>3:52</span>
                 </li>
               ))}
             </ul>
@@ -164,18 +227,13 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         )}
       </div>
 
-      {/* --- Artists --- */}
-      {users.length > 0 && (
+      {(relatedArtists.length > 0 || syntheticArtist.length > 0) && (
         <div className={styles.resultGroup}>
-          <h3 className={styles.sectionTitle_result}>Artists</h3>
+          <h3 className={styles.sectionTitle_result}>Nghệ sĩ</h3>
           <ul className={styles.artistList_result}>
-            {users.map((u) => (
+            {[...relatedArtists, ...syntheticArtist].map((u) => (
               <li key={`user-${u.userId}`} className={styles.artistItem_result}>
-                <img
-                  src={resolveImg("/assets/iconnguoidung.png")}
-                  alt={u.name}
-                  className={styles.artistAvatar_result}
-                />
+                {renderImageOrLetter("", u.name, styles.artistAvatar_result)}
                 <p className={styles.artistName_result}>{u.name}</p>
               </li>
             ))}
@@ -183,18 +241,13 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         </div>
       )}
 
-      {/* --- Playlists --- */}
       {playlists.length > 0 && (
         <div className={styles.resultGroup}>
-          <h3 className={styles.sectionTitle_result}>Playlists</h3>
+          <h3 className={styles.sectionTitle_result}>Playlist</h3>
           <ul className={styles.playlistList_result}>
             {playlists.map((p) => (
               <li key={`playlist-${p.playlistId}`} className={styles.playlistItem_result}>
-                <img
-                  src={resolveImg(p.imageUrl)}
-                  alt={p.title}
-                  className={styles.playlistCover_result}
-                />
+                {renderImageOrLetter(p.imageUrl, p.title, styles.playlistCover_result, "square")}
                 <p className={styles.playlistTitle_result}>{p.title}</p>
               </li>
             ))}
@@ -202,7 +255,6 @@ const SearchResult: React.FC<SearchResultProps> = ({ sidebarExpanded }) => {
         </div>
       )}
 
-      {/* --- No results --- */}
       {tracks.length === 0 && users.length === 0 && playlists.length === 0 && (
         <p>Không tìm thấy kết quả nào phù hợp.</p>
       )}

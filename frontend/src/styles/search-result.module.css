@@ -1,11 +1,9 @@
-/* styles/search-result.module.css */
-
+/* Layout chính */
 .search_result_section {
   position: absolute;
   top: 80px;
   left: 80px;
   right: 10px;
-
   height: 77vh;
   background-color: #000;
   border-radius: 8px;
@@ -16,13 +14,12 @@
   flex-direction: column;
   gap: 32px;
   transition: left 0.3s ease, padding 0.3s ease;
-  
 }
-
 .search_result_section.shrink {
   left: 290px;
 }
 
+/* Scrollbar */
 .search_result_section::-webkit-scrollbar {
   width: 6px;
 }
@@ -35,6 +32,7 @@
   scrollbar-color: #888 transparent;
 }
 
+/* Section title */
 .sectionTitle_result {
   font-size: 24px;
   font-weight: 700;
@@ -42,22 +40,22 @@
   color: #fff;
 }
 
+/* Row chứa TopResult và Songs */
 .top_row {
   display: flex;
   gap: 32px;
 }
 
+/* Chia tỉ lệ 40-60 */
 .topResultSection_result {
-  flex: 1;
-  max-width: 400px;
+  flex: 0 0 40%;
 }
-
 .songsSection_result {
-  flex: 2;
+  flex: 0 0 60%;
 }
 
-.artistCard_result,
-.songCard_result {
+/* Card hiển thị trong top result */
+.artistCard_result {
   background-color: #181818;
   border-radius: 8px;
   padding: 24px;
@@ -65,16 +63,16 @@
   flex-direction: column;
   gap: 16px;
   height: 300px;
+  width: 100%;
 }
-.artistCard_result:hover,
-.songCard_result:hover {
+.artistCard_result:hover {
   background-color: #282828;
 }
 
+/* Ảnh top result */
 .artistImageContainer_result {
   width: 150px;
   height: 150px;
-  border-radius: 50%;
   overflow: hidden;
   margin-bottom: 16px;
 }
@@ -82,23 +80,17 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
 }
 
-/* Khi Top result là bài hát */
+/* Info dưới ảnh top result */
 .songInfoTop_result {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  gap: 16px; /* matching artistCard_result gap */
-  margin-bottom: 16px;
-}
-.songCoverTop_result {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 8px;
-  /* tạo khoảng cách dưới ảnh giống artist */
+  gap: 16px;
   margin-bottom: 16px;
 }
 .songTitleTop_result {
@@ -112,11 +104,7 @@
   margin-top: 10px;
 }
 
-.songCardList_result {
-  width: 100%;
-  background-color: transparent;
-  padding: 0;
-}
+/* Danh sách bài hát */
 .songsList_result {
   list-style: none;
   margin: 0;
@@ -133,7 +121,6 @@
 .songItem_result:hover {
   background-color: #282828;
 }
-
 .songInfo_result {
   display: flex;
   align-items: center;
@@ -144,6 +131,7 @@
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
+  aspect-ratio: 1 / 1;
 }
 .songDetails_result {
   display: flex;
@@ -163,60 +151,87 @@
 .songDuration_result {
   font-size: 14px;
   color: #b3b3b3;
+  margin-left: auto;
+  min-width: 40px;
+  text-align: right;
 }
 
-.featuringSection_result,
-.albumSection_result {
-  width: 100%;
+/* Avatar fallback */
+.letterAvatar_result {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #333;
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  object-fit: cover;
 }
-.grid_list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+
+/* Bo góc vuông cho fallback ảnh playlist, track */
+.square {
+  border-radius: 8px !important;
+  aspect-ratio: 1 / 1;
+}
+
+/* Nghệ sĩ */
+.resultGroup {
+  margin-top: 32px;
+}
+.artistList_result {
+  display: flex;
+  flex-wrap: wrap;
   gap: 24px;
 }
-.grid_item {
+.artistItem_result {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  width: 140px;
+  text-align: center;
+  transition: transform 0.2s ease;
 }
-.grid_item_img {
-  width: 100%;
+.artistItem_result:hover {
+  transform: scale(1.05);
+}
+.artistAvatar_result {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 8px;
+}
+.artistName_result {
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Playlist thumbnail */
+.playlistCover_result {
+  width: 80px;
+  height: 80px;
   object-fit: cover;
   border-radius: 8px;
 }
-.grid_item_title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #fff;
-  margin: 0;
-}
-.grid_item_sub {
-  font-size: 14px;
-  color: #b3b3b3;
-}
-
-.artistsSection_result {
-  width: 100%;
-  margin-top: 32px;
-}
-.artist_grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px,1fr));
-  gap: 24px;
-}
-.artist_card {
+.playlistItem_result {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
 }
-.artist_avatar {
-  width: 140px;
-  height: 140px;
-  object-fit: cover;
-  border-radius: 50%;
+.playlistTitle_result {
+  font-size: 14px;
+  color: #fff;
+  text-align: center;
+}
+.playlistList_result {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .search_result_section {
     left: 10px;
@@ -226,7 +241,8 @@
   .top_row {
     flex-direction: column;
   }
-  .topResultSection_result {
-    max-width: 100%;
+  .topResultSection_result,
+  .songsSection_result {
+    width: 100%;
   }
 }

@@ -1,9 +1,7 @@
 numpy==1.24.4
-essentia
 openl3
 librosa
 uvicorn
 fastapi
 soundfile
 python-multipart
-librosa

@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   mssql:
+    platform: linux/amd64 
     build:
       context: ./mssql
       dockerfile: Dockerfile
@@ -43,19 +44,27 @@ services:
       context: ./extract-track-feature
     container_name: extract-track-feature
     ports:
-      - "5000:5000"
+      - "5001:5000"
     volumes:
       - ./extract-track-feature:/app
     restart: unless-stopped
 
   backend:
-    platform: linux/amd64
+    platform: linux/amd64 
     build:
       context: ./backend
       dockerfile: Dockerfile
     restart: always
     environment:
-      - DB_HOST=host.docker.internal
+      DB_HOST: mssql
+      DB_PORT: 1433
+      DB_USERNAME: sa
+      DB_PASSWORD: nhomnaymanhNhat1!
+      DB_NAME: DB_Graptify
+      DIALECT: mssql
+      DB_ENCRYPT: false
+      NODE_ENV: development
+      PORT: 8080
     depends_on:
       mssql:
         condition: service_healthy

@@ -1,50 +1,36 @@
-import { exec } from 'child_process';
+import axios from 'axios';
+import fs from 'fs';
+import FormData from 'form-data';
 import path from 'path';
-import util from 'util';
 import db from '../models/index.js';
 
-const execAsync = util.promisify(exec);
-
 const extractMetadata = async (filePath) => {
+  try {
     const absolutePath = path.resolve(filePath);
-    const inputDir = path.dirname(absolutePath);
-    const filename = path.basename(absolutePath);
+    const form = new FormData();
+    form.append('file', fs.createReadStream(absolutePath));
 
-    const dockerCmd = [
-        'sudo docker run --rm',
-        `-v "${inputDir}:/input"`,
-        'ntkhai2608/music-extractor',
-        'python', 'scripts/extract_audio_features.py',
-        `/input/${filename}`
-    ].join(' ');
+    const response = await axios.post(
+      'http://extract-track-feature:5000/extract',
+      form,
+      {
+        headers: form.getHeaders()
+      }
+    );
 
-    try {
-        const { stdout } = await execAsync(dockerCmd);
-        const jsonStart = stdout.indexOf('{');
-        const jsonEnd = stdout.lastIndexOf('}') + 1;
+    const result = response.data;
+    console.log(result);
 
-        if (jsonStart === -1 || jsonEnd === -1) {
-            throw new Error('Không tìm thấy JSON trong output.');
-        }
-
-        const jsonStr = stdout.slice(jsonStart, jsonEnd);
-        const result = JSON.parse(jsonStr);
-
-        const { prediction = {}, ...rest } = result;
-
-        return {
-        ...rest,
-        ...prediction
-        };
-    } catch (err) {
-        console.error(`❌ Lỗi khi extract metadata cho file ${filePath}:`, err.message);
-        throw new Error('Docker metadata extraction failed');
-    }
+    return result;
+  } catch (err) {
+    console.error(`❌ Lỗi khi extract metadata cho file ${filePath}:`, err.message);
+    throw new Error('HTTP metadata extraction failed');
+  }
 };
 
 const metadataStats = {
 
-// khởi tạo các giá trị ban đầu
+  // khởi tạo các giá trị ban đầu
   duration_ms: { min: 175000, max: 345312 },
   loudness: { min: -9.0, max: 6799.71875 },
   tempo: { min: 0.0, max: 135.0 },
@@ -72,20 +58,17 @@ const normalize = (value, field, stats) => {
 };
 
 const checkMetadataSimilarity = async (metadata) => {
-  const fields = ['duration_ms', 'loudness', 'tempo',
-    'key', 'mode', 'explicit',
-    'danceability', 'speechiness', 'acousticness',
-    'instrumentalness', 'liveness', 'valence', 'energy'
-  ];
+  const numericFields = ['duration_ms', 'loudness', 'tempo', 'key', 'mode', 'energy'];
 
-  for (const field of fields) {
+  for (const field of numericFields) {
     updateStatsWithNewValue(field, metadata[field], metadataStats);
   }
 
-  const newVec = fields.map(f => normalize(metadata[f], f, metadataStats));
-  console.log('newVec:', )
+  const numericVec = numericFields.map(f => normalize(metadata[f], f, metadataStats));
 
-  const existingMetadatas = await db.Metadata.findAll({ attributes: fields });
+  const embeddingVec = metadata.embedding;
+
+  const newFullVec = [...numericVec, ...embeddingVec];
 
   const distance = (a, b) => {
     return Math.sqrt(a.reduce((sum, ai, i) => {
@@ -94,19 +77,90 @@ const checkMetadataSimilarity = async (metadata) => {
     }, 0));
   };
 
-  for (const row of existingMetadatas) {
-    const existingVec = fields.map(f => normalize(parseFloat(row[f]), f, metadataStats));
-    const d = distance(newVec, existingVec);
-    console.log("🔍 existingVec:", existingVec, "→ d:", d.toFixed(4));
+  // Lấy metadata cũ từ DB, gồm các trường số và embedding
+  const existingMetadatas = await db.Metadata.findAll({
+    attributes: [...numericFields, 'embedding']
+  });
 
-    if (d < 0.4) return false;
+  for (const row of existingMetadatas) {
+    const emb = row.embedding;
+    if (!Array.isArray(emb)) continue;
+
+    const existingNumericVec = numericFields.map(f =>
+      normalize(parseFloat(row[f]), f, metadataStats)
+    );
+
+    const existingFullVec = [...existingNumericVec, ...emb];
+
+    const d = distance(newFullVec, existingFullVec);
+    console.log("📏 distance:", d.toFixed(4));
+
+    if (d < 0.4) return false; // hoặc threshold bạn định nghĩa
   }
 
   return true;
 };
 
+const getMostSimilarTracks = async (metadata, count = 10) => {
+  const numericFields = ['duration_ms', 'loudness', 'tempo', 'key', 'mode', 'energy'];
+
+  // Cập nhật lại min/max nếu có metadata mới
+  for (const field of numericFields) {
+    updateStatsWithNewValue(field, metadata[field], metadataStats);
+  }
+
+  const normalize = (val, field, stats) => {
+    const min = stats[field].min;
+    const max = stats[field].max;
+    if (min === max) return 0.5;
+    return (val - min) / (max - min);
+  };
+
+  const numericVec = numericFields.map(f => normalize(metadata[f], f, metadataStats));
+  const embeddingVec = metadata.embedding || [];
+  const inputVec = [...numericVec, ...embeddingVec];
+
+  const distance = (a, b) => {
+    return Math.sqrt(a.reduce((sum, ai, i) => {
+      const bi = b[i];
+      return sum + (ai - bi) ** 2;
+    }, 0));
+  };
+
+  // Lấy metadata hiện có từ DB
+  const existingMetadatas = await db.Metadata.findAll({
+    attributes: ['track_id', ...numericFields, 'embedding'],
+  });
+
+  const distances = [];
+
+  for (const row of existingMetadatas) {
+    const emb = row.embedding;
+    if (!Array.isArray(emb)) continue;
+
+    const rowNumericVec = numericFields.map(f =>
+      normalize(parseFloat(row[f]), f, metadataStats)
+    );
+
+    const rowVec = [...rowNumericVec, ...emb];
+    const d = distance(inputVec, rowVec);
+
+    distances.push({
+      trackId: row.track_id,
+      distance: d,
+    });
+  }
+
+  distances.sort((a, b) => a.distance - b.distance);
+
+  const result = distances.slice(0, count).map(item => item.trackId);
+
+  return result;
+};
+
 
 export {
-    extractMetadata,
-    checkMetadataSimilarity
+  extractMetadata,
+  checkMetadataSimilarity,
+  getMostSimilarTracks
 };

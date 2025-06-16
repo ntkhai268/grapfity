@@ -147,7 +147,7 @@ const Header: React.FC = () => {
         </button>
 
         {/* Dropdown */}
-        {showDropdown && suggestions.length > 0 && (
+        {/* {showDropdown && suggestions.length > 0 && (
           <div className="search-dropdown">
             {suggestions.map((track) => {
               const fileName = track.imageUrl.split("/").pop()!;
@@ -181,7 +181,7 @@ const Header: React.FC = () => {
               );
             })}
           </div>
-        )}
+        )} */}
       </div>
 
       <div className="right-controls">

@@ -5,7 +5,9 @@ WORKDIR /grabtify/backend
 
 # Copy package files & install dependencies
 COPY package*.json ./
-RUN npm install && npm install -g @babel/core @babel/cli
+RUN npm install \
+    && npm install axios \
+    && npm install -g @babel/core @babel/cli
 
 # Copy full backend source code
 COPY . .
@@ -23,7 +25,6 @@ RUN apt-get update && \
     ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev && \
     ln -s /opt/mssql-tools/bin/* /usr/local/bin && \
     rm -f microsoft.gpg
-
 
 # Chờ SQL Server sẵn sàng
 COPY wait-for-db.sh /wait-for-db.sh
