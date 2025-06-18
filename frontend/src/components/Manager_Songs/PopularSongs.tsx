@@ -21,10 +21,9 @@ interface ISong {
   stats?: string;
   duration?: string;
 }
-const PopularSongs: React.FC<PopularProps> = ({trackId}) => {
+const PopularSongs: React.FC<PopularProps> = () => {
   const navigate = useNavigate();
   const [songs, setSongs] = useState<ISong[]>([]);
-  const [recommendations, setRecommendations] = useState<ISong[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [expanded, setExpanded] = useState(false);
 

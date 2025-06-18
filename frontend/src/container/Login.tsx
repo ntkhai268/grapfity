@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/LoginForm.css";
-import { GoogleLogin } from "@react-oauth/google";
+// import { GoogleLogin } from "@react-oauth/google";
 
 const LoginForm: React.FC = () => {
   const navigate = useNavigate();  // Hook để điều hướng
@@ -59,7 +59,6 @@ const LoginForm: React.FC = () => {
       if (response.ok && data.token && data.roleId != null) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("roleId", data.roleId.toString());
-        alert(data.message);
         const from = location.state?.from?.pathname || '/';  // Lấy thông tin trang trước đó
         navigate(from, { replace: true });  // Điều hướng về trang trước đó
 
@@ -79,26 +78,26 @@ const LoginForm: React.FC = () => {
     }
   };
 
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      const res = await fetch("http://localhost:3001/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: credentialResponse.credential }),
-      });
+  // const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+  //   try {
+  //     const res = await fetch("http://localhost:3001/api/auth/google", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ credential: credentialResponse.credential }),
+  //     });
 
-      const data = await res.json();
-      if (res.ok) {
-        alert("Đăng nhập Google thành công!");
-        window.location.href = "http://localhost:5173/mainpage";
-      } else {
-        alert(data.error || "Đăng nhập Google thất bại!");
-      }
-    } catch (err) {
-      console.error("Lỗi khi gửi credential:", err);
-      alert("Không thể kết nối máy chủ khi đăng nhập bằng Google.");
-    }
-  };
+  //     const data = await res.json();
+  //     if (res.ok) {
+  //       alert("Đăng nhập Google thành công!");
+  //       window.location.href = "http://localhost:5173/mainpage";
+  //     } else {
+  //       alert(data.error || "Đăng nhập Google thất bại!");
+  //     }
+  //   } catch (err) {
+  //     console.error("Lỗi khi gửi credential:", err);
+  //     alert("Không thể kết nối máy chủ khi đăng nhập bằng Google.");
+  //   }
+  // };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -122,7 +121,6 @@ const LoginForm: React.FC = () => {
         }),
       });
       const data: { message: string } = await response.json();
-
       if (response.ok) {
         alert("Đăng ký thành công!");
         window.location.href = "http://localhost:5173/mainpage";
@@ -166,13 +164,8 @@ const LoginForm: React.FC = () => {
           <button type="submit" className="btn">
             Login
           </button>
-          <p>or login with social platforms</p>
-          <div className="social-icons">
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={() => alert("Đăng nhập Google thất bại!")}
-            />
-          </div>
+          
+         
         </form>
       </div>
 
@@ -220,13 +213,7 @@ const LoginForm: React.FC = () => {
           <button type="submit" className="btn">
             Register
           </button>
-          <p>or register with social platforms</p>
-          <div className="social-icons">
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={() => alert("Đăng ký Google thất bại!")}
-            />
-          </div>
+          
         </form>
       </div>
 

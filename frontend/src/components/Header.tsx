@@ -48,7 +48,7 @@ const Header: React.FC = () => {
     }
     localStorage.removeItem("roleId");
     localStorage.removeItem("userId");
-    window.location.href = "/mainpage";
+    window.location.href = "/login";
   };
 
   const handleSearch = () => {

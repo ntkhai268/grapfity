@@ -46,7 +46,7 @@ export const fetchJoinedTracks = async (): Promise<JoinedTrack[]> => {
 // Update a track's status (pending / approved / rejected)
 export const deleteTrack = async (id: number): Promise<{ message: string }> => {
   const res = await axios.delete<{ message: string }>(
-    `http://localhost:8080/api/delete-track/${id}`
+    `http://localhost:8080/api/tracks/${id}`
   );
   return res.data;
 };

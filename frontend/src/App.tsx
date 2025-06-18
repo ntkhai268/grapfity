@@ -38,21 +38,21 @@ import { getMyPlaylistsAPI } from './services/playlistService';
 
 
 
-export function useProfileUserId() {
+export function useProfileUserId(): string | number | null {
   const { userId: profileUserId } = useParams<{ userId: string }>();
   const [currentUserId, setCurrentUserId] = useState<string | number | null>(null);
 
   useEffect(() => {
-    if (!profileUserId) {
-      // Chỉ fetch nếu đang ở profile của mình
+    if (!profileUserId && !currentUserId) {
       getCurrentUser().then(user => {
-        if (user?.id) setCurrentUserId(user.id);
+        if (user?.id) {
+          setCurrentUserId(user.id);
+        }
       });
     }
   }, [profileUserId]);
 
-  if (profileUserId) return profileUserId;
-  return currentUserId;
+  return profileUserId || currentUserId;
 }
 // Hàm tiện ích map từ TrackData (hoặc cấu trúc track trong PlaylistData) sang Song
 const mapTrackDataToSong = (track: any): Song => ({ 
@@ -70,76 +70,135 @@ import Section_admin_tracks from "./components/section_admin_tracks"
 import Section_admin_users from "./components/section_admin_users"
 import Section_admin_profile from "./components/section_admin_statistical"
 
+
 const App = () => {
+ const viewedUserId = useProfileUserId(); // lấy user trước
 
+  // useEffect(() => {
+  //   if (!viewedUserId) return; // chưa có user → không gọi
 
- useEffect(() => {
+  //   const fetchPlaylist = async (context: PlaylistContext): Promise<Song[] | null> => {
+  //     try {
+  //       if (!context?.type || !context?.id) return null;
+
+  //       if (context.type === 'playlist') {
+  //         if (typeof context.id === 'string' && context.id.startsWith('playlist_profile_')) {
+  //           const rawId = context.id.replace('playlist_profile_', '');
+  //           const allPlaylists = await getMyPlaylistsAPI();
+  //           const matched = allPlaylists.find(p => String(p.id) === rawId);
+  //           if (!matched) return null;
+  //           return matched.tracks.map(mapTrackDataToSong);
+  //         }
+
+  //         const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(Number(context.id));
+  //         return playlistData?.tracks?.map(mapTrackDataToSong) || null;
+  //       }
+
+  //       if (context.type === 'profile' && context.id === 'liked') {
+  //         const likedTrackData = await getLikedTracksByProfileAPI(viewedUserId);
+  //         return likedTrackData.map(mapTrackDataToSong);
+  //       }
+
+  //       if (context.type === 'queue') {
+  //         const allTrackData = await getAllTracksAPI();
+  //         return allTrackData.map(mapTrackDataToSong);
+  //       }
+
+  //       if (context.type === 'waveform') {
+  //         const rawSongs = localStorage.getItem(waveformPlaylist_${context.id});
+  //         if (!rawSongs) return null;
+  //         return JSON.parse(rawSongs) as Song[];
+  //       }
+
+  //       return null;
+  //     } catch {
+  //       return null;
+  //     }
+  //   };
+    
+  //   GlobalAudioManager.loadInitialState(fetchPlaylist);
+  // }, [viewedUserId]); // chỉ gọi khi đã có user
+
+  useEffect(() => {
+    console.log("🧪 viewedUserId in App.tsx:", viewedUserId); // ← Thêm dòng này
+  if (!viewedUserId) return;
+
   const fetchPlaylist = async (context: PlaylistContext): Promise<Song[] | null> => {
     try {
-      if (!context?.type || !context?.id) return null;
+      console.log("🔍 fetchPlaylist CALLED with context:", context);
 
-      // if (( context.type === 'album')) {
-      //   const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(context.id);
-      //   return playlistData?.tracks?.map(mapTrackDataToSong) || null;
-      // }
+      if (!context?.type || !context?.id) {
+        console.warn("❌ Invalid context:", context);
+        return null;
+      }
+
       if (context.type === 'playlist') {
-        // ⏹ Trường hợp: playlist từ profile cá nhân
         if (typeof context.id === 'string' && context.id.startsWith('playlist_profile_')) {
           const rawId = context.id.replace('playlist_profile_', '');
           const allPlaylists = await getMyPlaylistsAPI();
           const matched = allPlaylists.find(p => String(p.id) === rawId);
+          console.log("🎯 Matched profile playlist:", matched);
           if (!matched) return null;
-          return matched.tracks.map(track => ({
-            id: track.id,
-            src: track.src,
-            title: track.title,
-            artist: track.artist,
-            cover: track.cover || "/assets/anhmau.png"
-          }));
+          return matched.tracks.map(mapTrackDataToSong);
         }
 
-        // ⏹ Trường hợp: phát từ playlist detail hoặc public
         const playlistData: PlaylistData | null = await getTracksInPlaylistAPI(Number(context.id));
-        return playlistData?.tracks?.map(track => ({
-          id: track.id,
-          src: track.src,
-          title: track.title,
-          artist: track.artist,
-          cover: track.cover || "/assets/anhmau.png"
-        })) || null;
+        console.log("🎯 Playlist from API:", playlistData);
+        return playlistData?.tracks?.map(mapTrackDataToSong) || null;
       }
 
-      const viewedUserId = useProfileUserId();
       if (context.type === 'profile' && context.id === 'liked') {
-        if (!viewedUserId) return null;
         const likedTrackData = await getLikedTracksByProfileAPI(viewedUserId);
+        console.log("💖 Liked tracks:", likedTrackData);
         return likedTrackData.map(mapTrackDataToSong);
       }
+
       if (context.type === 'queue') {
         const allTrackData = await getAllTracksAPI();
+        console.log("📦 All tracks (queue):", allTrackData);
         return allTrackData.map(mapTrackDataToSong);
       }
 
-    if (context.type === 'waveform') {
-      const rawSongs = localStorage.getItem(`waveformPlaylist_${context.id}`);
-      if (!rawSongs) return null;
-      return JSON.parse(rawSongs) as Song[];
-    }
-    if (context.type === 'search') {
+      if (context.type === 'waveform') {
+        const rawSongs = localStorage.getItem(`waveformPlaylist_${context.id}`);
+        console.log("📊 Waveform rawSongs:", rawSongs);
+        if (!rawSongs) return null;
+        return JSON.parse(rawSongs) as Song[];
+      }
+      if (context.type === 'search') {
         const raw = localStorage.getItem("currentContext");
         if (raw) {
             const parsed = JSON.parse(raw);
             console.log("🔎 Đang phục hồi playlist từ search:", parsed);
             return parsed.songs || null;
-        }}
-      return null; // Không hỗ trợ context này
-    } catch {
+        }
+}
+
+      return null;
+    } catch (e) {
+      console.error("❌ Error in fetchPlaylist:", e);
       return null;
     }
   };
 
-  GlobalAudioManager.loadInitialState(fetchPlaylist);
-}, []);
+  const init = async () => {
+    console.log("🟡 INIT audio manager...");
+
+    await GlobalAudioManager.loadInitialState(fetchPlaylist);
+
+    const current = GlobalAudioManager.getCurrentSong?.(); // nếu có getter
+    console.log("🎧 Current song after init:", current);
+
+    if (!current) {
+      console.log("⚠️ No current song — trying to restore from localStorage");
+      // gọi nếu bạn đã định nghĩa
+    } else {
+      console.log("✅ Already has a song — no need to restore");
+    }
+  };
+
+  init();
+}, [viewedUserId]);
 
 
   return (
@@ -153,17 +212,6 @@ const App = () => {
           </LoginLayout>
         }
       />
-
-      {/* Trang đăng nhập với Login Layout */}
-      <Route
-        path="/login"
-        element={
-          <LoginLayout>
-            <LoginForm /> {/* Trang đăng nhập */}
-          </LoginLayout>
-        }
-      />
-      <Route path="/" element={<Navigate to="/login" replace />} />
       <Route
         path="/mainpage"
         element={

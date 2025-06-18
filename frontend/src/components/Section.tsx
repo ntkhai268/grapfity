@@ -7,7 +7,7 @@ import GlobalAudioManager, { Song, PlaylistContext } from "../hooks/GlobalAudioM
 
 // Import service API và kiểu dữ liệu TrackData
 // Đảm bảo đường dẫn này chính xác
-import { getAllTracksAPI, TrackData } from "../services/trackServiceAPI";
+import {TrackData } from "../services/trackServiceAPI";
 import { PlaylistData } from "../components/Manager_Playlists/ManagerDataPlaylist";
 import { getAllPublicPlaylistsAPI } from "../services/playlistService"; 
 import { getTop10PopularTracksAPI, getHomeRecommendationsAPI  } from "../services/listeningService";
@@ -44,7 +44,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
     const [error, setError] = useState<string | null>(null);    
     const [currentPlayingId, setCurrentPlayingId] = useState<string | number | null>(null);
     const [isPlaying, setIsPlaying] = useState<boolean>(false);
-    const [publicPlaylists, setPublicPlaylists] = useState<PlaylistData[]>([]);
+    const [, setPublicPlaylists] = useState<PlaylistData[]>([]);
 
     // Fetch dữ liệu khi component mount
     useEffect(() => {
@@ -350,7 +350,7 @@ const Section: React.FC = () => { // Thêm kiểu React.FC
                                     className="play-button-section"
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        handlePlayButtonClick(top10Tracks, index, 'queue', 'recommended');
+                                        handlePlayButtonClick(top10Tracks, index, 'queue', 'top10');
                                     }}
                                     >
                                     <i
