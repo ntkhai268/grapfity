@@ -69,7 +69,7 @@ Tài khoản demo:
 
 | Vai trò       | Tài khoản    | Mật khẩu  |
 | ------------- | ------------ | --------- |
-| Người dùng    | hungphamtuam | 987654321 |
+| Người dùng    | hungphamtuan | 987654321 |
 | Quản trị viên | superadmin   | 1         |
 
 ---
